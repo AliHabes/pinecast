@@ -50,43 +50,53 @@
 
   {% if episodes %}
     <div class="card-block card">
-      <div class="chart-placeholder"
-        data-type="podcast-listen-history"
-        data-podcast="{{ podcast.slug }}"
-        data-title="{{ _('Listen history') }}"
-        data-chart-type="line"></div>
-    </div>
-    <div class="row">
-      <div class="card stat-card total-listens">
-        <strong>{{ _('Total Listens') }}</strong>
-        <span>
-          {% if analytics.total_listens > -1 %}
-            {{ analytics.total_listens }}
-          {% else %}
-            <abbr title="{{ _('Our analytics are having trouble at the moment. Come back later.') }}">???</abbr>
-          {% endif %}
-        </span>
+      <div class="podcast-stats-panel">
+        <div class="segment">
+          <span>{{ _('Total Listens') }}</span>
+          <em>
+            {% if analytics.total_listens > -1 %}
+              {{ analytics.total_listens }}
+            {% else %}
+              <abbr title="{{ _('Our analytics are having trouble at the moment. Come back later.') }}">???</abbr>
+            {% endif %}
+          </em>
+        </div>
+        <div class="segment">
+          <span>{{ _('Listens This Week') }}</span>
+          <em>
+            {% if analytics.total_listens_this_week > -1 %}
+              {{ analytics.total_listens_this_week }}
+            {% else %}
+              <abbr title="{{ _('Our analytics are having trouble at the moment. Come back later.') }}">???</abbr>
+            {% endif %}
+          </em>
+        </div>
+        <div class="segment">
+          <span>{{ ngettext('Subscriber', 'Subscribers', analytics.subscribers) }}</span>
+          <em>
+            {% if analytics.subscribers > -1 %}
+              {{ analytics.subscribers }}
+            {% else %}
+              <abbr title="{{ _('Our analytics are having trouble at the moment. Come back later.') }}">???</abbr>
+            {% endif %}
+          </em>
+        </div>
+        <div class="segment">
+          <span>{{ _('Comments Left') }}</span>
+          <em>
+            {{ feedback.count() }}
+          </em>
+        </div>
       </div>
-      <div class="card stat-card this-week">
-        <strong>{{ _('Listens This Week') }}</strong>
-        <span>
-          {% if analytics.total_listens_this_week > -1 %}
-            {{ analytics.total_listens_this_week }}
-          {% else %}
-            <abbr title="{{ _('Our analytics are having trouble at the moment. Come back later.') }}">???</abbr>
-          {% endif %}
-        </span>
-      </div>
-      <div class="card stat-card total-subscribers">
-        <strong>{{ ngettext('Subscriber', 'Subscribers', analytics.subscribers) }}</strong>
-        <span>
-          {% if analytics.subscribers > -1 %}
-            {{ analytics.subscribers }}
-          {% else %}
-            <abbr title="{{ _('Our analytics are having trouble at the moment. Come back later.') }}">???</abbr>
-          {% endif %}
-        </span>
-      </div>
+
+      {% if analytics.total_listens > -1 %}
+        <div class="chart-placeholder"
+          data-type="podcast-listen-history"
+          data-podcast="{{ podcast.slug }}"
+          data-title="{{ _('Listen history') }}"
+          data-chart-type="line"></div>
+      {% endif %}
+
     </div>
   {% endif %}
 

@@ -50,7 +50,7 @@
 }
 
 .subnav {
-    background: linear-gradient(100deg, #7DA7EF, #8B75EF);
+    background: linear-gradient(100deg, #64B0F8, #71C7EF);
     padding: 0 15px;
 }
 nav.tabs {
@@ -92,7 +92,7 @@ nav.tabs > ul li a {
 }
 nav.tabs > ul li.selected {
     font-weight: bold;
-    border-bottom: 4px solid #8B75EF;
+    border-bottom: 4px solid #52D1C7;
 }
 
 @media (max-width: 760px) {

@@ -19,7 +19,7 @@ html {
 }
 
 body {
-    font-family: Open Sans, Helvetica, Arial, sans-serif;
+    font-family: system, -apple-system, BlinkMacSystemFont, "Open Sans", sans-serif;
     font-size: 14px;
     height: 100%;
     min-height: 100%;
@@ -30,7 +30,7 @@ body {
 }
 
 a {
-    color: #00796B;
+    color: #5395D3;
     text-decoration: none;
 }
 a:hover {
@@ -67,12 +67,13 @@ input[type="number"],
 input[type="password"],
 input[type="datetime-local"],
 textarea {
-    border: 1px solid #c5c5c5;
-    border-radius: 2px;
+    background: #FBFBFB;
+    border: 1px solid #DCDADA;
+    border-radius: 3px;
     box-shadow: 0 0 0 transparent;
     font-size: 14px;
     margin: 2px 0 5px;
-    padding: 8px;
+    padding: 10px 15px;
     transition: box-shadow 0.2s, border-color 0.2s;
     width: 100%;
 }
@@ -136,33 +137,29 @@ button, .btn {
     -moz-appearance: none;
     -ms-appearance: none;
     -webkit-appearance: none;
-    background: #8B75EF;
+    background: #5395D3;
     border: 0;
-    border-radius: 2px;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    border-radius: 3px;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
     color: #fff;
-    cursor: pointer;
-    display: inline-block;
-    font-family: Open Sans, Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    height: 2.5em;
-    line-height: 2.5em;
-    padding: 0 20px;
+    display: block;
+    font-size: 13px;
+    margin: 20px 0;
+    padding: 9px 30px;
     position: relative;
+    text-transform: uppercase;
+    transition: box-shadow 0.3s, top 0.1s;
     top: 0;
-    transition: box-shadow 0.2s, top 0.2s;
 }
 
 button:hover, .btn:hover,
 button:focus, .btn:focus {
-    box-shadow: 0 4px 5px rgba(0, 0, 0, 0.25);
-    outline: none;
-    text-decoration: none;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
 }
 
 button:active, .btn:active {
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-    top: 4px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    top: 3px;
 }
 
 button:disabled, .btn:disabled {
@@ -191,6 +188,7 @@ button:disabled, .btn:disabled {
 .card-comment > .comment-from {
     display: block;
     font-size: 16px;
+    font-weight: 600;
     line-height: 20px;
     height: 20px;
     margin-bottom: 20px;
@@ -415,6 +413,30 @@ ul .empty-state i {
 }
 
 
+.podcast-stats-panel {
+    display: flex;
+    padding: 0px 20px 30px;
+}
+.podcast-stats-panel .segment {
+    border-right: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    margin-right: 40px;
+    padding-right: 40px;
+}
+.podcast-stats-panel .segment:last-of-type {
+    border: 0;
+}
+.podcast-stats-panel .segment span {
+    font-size: 12px;
+    color: #888;
+}
+.podcast-stats-panel .segment em {
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 400;
+}
+
 .row {
     display: flex;
 }
@@ -507,7 +529,7 @@ menu.tabs a.selected {
     height: 5px;
 }
 .progress i {
-    background: #8B75EF;
+    background: #52D1C7;
     border-radius: 3px;
     display: block;
     height: 5px;
@@ -515,7 +537,7 @@ menu.tabs a.selected {
     transition: width 0.2s;
 }
 .progress i[data-tooltip]:before {
-    background: #E040FB;
+    background: #52D1C7;
     border-radius: 40px;
     bottom: -30px;
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
@@ -1007,6 +1029,10 @@ li.user-card span.name {
     text-align: center;
 }
 
+.podcast-stats-panel + .chart-placeholder .chart-title {
+    padding-left: 20px;
+}
+
 .chart-placeholder .line-legend {
     line-height: 30px;
     list-style: none;
@@ -1123,7 +1149,7 @@ li.user-card span.name {
 }
 .flair-options li {
     background: #fff;
-    border: 1px solid #009688;
+    border: 1px solid #5395D3;
     border-radius: 3px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
     list-style: none;
@@ -1142,7 +1168,7 @@ li.user-card span.name {
 .chart-option {
     cursor: pointer;
     display: inline-block;
-    border: 1px solid #009688;
+    border: 1px solid #5395D3;
     padding: 3px 7px;
     position: relative;
     z-index: 5;
@@ -1164,13 +1190,15 @@ li.user-card span.name {
     border-radius: 3px;
 }
 .chart-option.is-selected {
-    background: #009688;
+    background: #5395D3;
     color: #fff;
 }
 
 .chart-option-selector {
     display: inline-block;
+    font-size: 12px;
     margin-right: 10px;
+    text-transform: uppercase;
 }
 
 
