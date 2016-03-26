@@ -1,20 +1,14 @@
 {% extends 'login_base.html' %}
 
 {% block body %}
-<hgroup>
-  <h1>{{ _('Sign Up') }}</h1>
-  <h2>
-    {% trans %}
-      Start your podcast for free, no credit card required.
-    {% endtrans %}
-  </h2>
-</hgroup>
 
 <form method="post" action="?" class="card">
   {% if error %}
     <div class="error">
       <strong>{{ _('Error') }}</strong> {{ error }}
     </div>
+  {% else %}
+    <p>{{ _('Sign up for an account, on us.') }}</p>
   {% endif %}
 
   <label>
@@ -32,9 +26,9 @@
 
   <button type="submit">{{ _('Create Account') }}</button>
 
-  <div class="signup-footer">
+  <footer>
     {{ _('Already a member?')}} <a href="{{ url('login') }}">{{ _('Sign In') }}</a>
-  </div>
+  </footer>
 
   <input type="hidden" name="timezone">
   <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">

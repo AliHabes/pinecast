@@ -64,6 +64,8 @@ The Pinecast Team
 
 def validate_confirmation(req, max_age=settings.EMAIL_CONFIRMATION_MAX_AGE):
     full_path = req.get_full_path()
+    if CONFIRMATION_PARAM not in full_path:
+        return False
     param_loc = full_path.index(CONFIRMATION_PARAM)
     trimmed_path = full_path[:param_loc - 1]
     signed = req.GET.get(CONFIRMATION_PARAM)

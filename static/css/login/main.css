@@ -5,7 +5,7 @@
 }
 
 html, body {
-    background: linear-gradient(0deg, #252C36, #353E4C);
+    background: #fff;
     color: #212121;
     margin: 0;
     padding: 0;
@@ -16,68 +16,11 @@ html {
 }
 
 body {
-    font-family: Open Sans, sans-serif;
+    font-family: system, -apple-system, BlinkMacSystemFont, "Open Sans", sans-serif;
     font-size: 13px;
     height: 100%;
     min-height: 100%;
 }
-
-header {
-    background: #fff;
-    height: 60px;
-    left: 0;
-    line-height: 60px;
-    padding: 0 15px;
-    position: fixed;
-    right: 0;
-    text-align: right;
-    top: 0;
-    z-index: 50;
-}
-header > div {
-    margin: auto;
-    max-width: 1024px;
-}
-
-header h1 {
-    float: left;
-    font-size: 13px;
-    line-height: 59px;
-    margin: 0;
-    padding: 0;
-}
-header h1 a {
-    color: #48556A;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: color 0.2s;
-}
-header h1 a:hover {
-    color: #8B75EF;
-}
-header h1 a:before {
-    background: url(/static/img/logo.svg);
-    background-size: 18px 18px;
-    content: '';
-    display: inline-block;
-    height: 18px;
-    margin-right: 8px;
-    vertical-align: middle;
-    width: 18px;
-}
-header h1 a span {
-    vertical-align: middle;
-}
-header .support-link {
-    color: #273650;
-    font-size: 12px;
-    text-decoration: none;
-    text-transform: uppercase;
-}
-header .support-link:hover {
-    text-decoration: underline;
-}
-
 
 
 .main-container {
@@ -88,6 +31,13 @@ main {
     padding-top: 100px;
     text-align: center;
 }
+
+@media (max-width: 500px) {
+    main {
+        padding: 0;
+    }
+}
+
 main hgroup {
     color: #fff;
     padding-bottom: 24px;
@@ -106,21 +56,27 @@ main hgroup h2 {
 
 main .card {
     background: #fff;
-    box-shadow: 0 5px 13px rgba(0, 0, 0, 0.15);
     color: #48556A;
     font-size: 14px;
     margin: auto;
-    max-width: 385px;
-    padding: 35px 40px;
+    max-width: 380px;
+    padding: 0 20px;
     text-align: left;
 }
 main form.card {
     padding-bottom: 0;
 }
 
+form > p,
+main .card > p {
+    color: #888;
+    font-size: 14px;
+    text-align: center;
+}
+
 form label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 form label > span {
     color: #888;
@@ -134,14 +90,18 @@ form label > input[type="number"],
 form label > input[type="password"],
 form label > input[type="datetime-local"],
 form label > textarea {
-    border: 1px solid #c5c5c5;
-    border-radius: 2px;
+    background: #FBFBFB;
+    border: 1px solid #DCDADA;
+    border-radius: 3px;
     box-shadow: 0 0 0 transparent;
     font-size: 14px;
     margin: 2px 0 5px;
-    padding: 8px;
+    padding: 10px 15px;
     transition: box-shadow 0.2s, border-color 0.2s;
     width: 100%;
+}
+form label > input[type="password"] {
+    letter-spacing: 4px;
 }
 form label > small {
     color: #aaa;
@@ -152,31 +112,41 @@ form label > small {
 
 form .g-recaptcha {
     margin-top: 20px;
+    text-align: center;
+}
+form .g-recaptcha > * {
+    display: inline-block;
 }
 
 form button[type=submit] {
-    background: #8B75EF;
+    background: #5395D3;
     border: 0;
     border-radius: 3px;
     color: #fff;
     display: block;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 13px;
     margin: 20px 0;
-    padding: 11px 0;
+    padding: 9px 0;
+    text-transform: uppercase;
     width: 100%;
 }
 
-form .signup-footer {
+form footer {
     border-top: 1px solid #D8D8D8;
-    padding: 20px 0;
+    margin-top: 40px;
+    padding: 30px 0;
+    text-align: center;
 }
 form .post-submit-links {
     margin: 20px 0;
 }
 
 form a {
-    color: #8B75EF;
+    color: #5395D3;
+    text-decoration: none;
+}
+form a:hover {
+    text-decoration: underline;
 }
 
 form p {
@@ -187,20 +157,20 @@ form p {
     background: #e74c3c;
     border-radius: 4px;
     color: #fff;
-    margin: 0 0 10px;
-    padding: 20px;
+    margin: 10px 0 20px;
+    padding: 15px;
 }
 .warning {
     background: #e67e22;
     border-radius: 4px;
     color: #fff;
-    margin: 0 0 10px;
-    padding: 20px;
+    margin: 10px 0 20px;
+    padding: 15px;
 }
 .success {
     background: #4FCAB2;
     border-radius: 4px;
     color: #fff;
-    margin: 0 0 10px;
-    padding: 20px;
+    margin: 10px 0 20px;
+    padding: 15px;
 }

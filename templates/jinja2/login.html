@@ -1,26 +1,23 @@
 {% extends "login_base.html" %}
 
 {% block body %}
-<hgroup>
-  <h1>{{ _('Welcome Back') }}</h1>
-  <h2>{{ _('Please sign in to continue.') }}</h2>
-</hgroup>
-
 <form method="post" action="?" class="card">
   {% if success %}
     <div class="success">
       <strong>{{ _('Success') }}</strong> {{ success }}
     </div>
-  {% endif %}
-  {% if error %}
+  {% elif error %}
     <div class="error">
       <strong>{{ _('Login Error') }}</strong> {{ error }}
     </div>
+  {% else %}
+    <p>{{ _('Please sign in to continue.') }}</p>
   {% endif %}
+
 
   <label>
     <span>{{ _('Email') }}</span>
-    <input type="email" placeholder="{{ _('Email') }}" name="email">
+    <input type="email" placeholder="me@pinecast.com" name="email">
   </label>
   <label>
     <span>{{ _('Password') }}</span>
@@ -29,12 +26,14 @@
   <button type="submit">{{ _('Sign In') }}</button>
 
   <div class="post-submit-links">
-    <a href="{{ url('forgot_password') }}">{{ _('Forgot Password?') }}</a>
+    {% trans su_url=url('signup') %}
+      Or <a href="{{ su_url }}">sign up for an account</a>.
+    {% endtrans %}
   </div>
 
-  <div class="signup-footer">
-    {{ _('Don\'t have an account? ')}} <a href="{{ url('signup') }}">{{ _('Sign Up') }}</a>
-  </div>
+  <footer>
+    <a href="{{ url('forgot_password') }}">{{ _('Forgot your password?') }}</a>
+  </footer>
 
 
   <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
