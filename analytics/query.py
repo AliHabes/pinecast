@@ -35,6 +35,7 @@ def query_async_resolve(async_queries):
         for x in grequests.map(v for k, v in items):
             try:
                 results.append(x.json())
+                x.close()
             except ValueError:
                 pass
 
@@ -65,6 +66,7 @@ class AsyncContext(object):
                 continue
             try:
                 self.resolved.append(x.json())
+                x.close()
             except ValueError:
                 pass
 
