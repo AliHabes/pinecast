@@ -46,8 +46,8 @@ def _get_country(ip, req=None):
     if ip == '127.0.0.1':
         return 'US'
     try:
-        res = requests.get('https://freegeoip.net/json/%s' % ip)
-        return res.json()['country_code']
+        res = requests.get('http://geoip.nekudo.com/api/%s' % ip)
+        return res.json()['country']['code']
     except Exception as e:
         rollbar.report_message('Error resolving country IP: %s' % str(e), 'error')
         return None
