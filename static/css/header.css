@@ -35,15 +35,19 @@
 }
 .main-header h1 a:before {
     background: url(/static/img/logo.svg);
-    background-size: 18px 18px;
+    background-size: 118px 19px;
     content: '';
     display: inline-block;
-    height: 18px;
-    margin-right: 8px;
+    height: 19px;
+    position: relative;
+    top: -2px;
     vertical-align: middle;
-    width: 18px;
+    width: 118px;
 }
 .main-header h1 a span {
+    display: inline-block;
+    overflow: hidden;
+    width: 0;
     vertical-align: middle;
 }
 .main-header .support-link {
