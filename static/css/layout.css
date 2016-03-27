@@ -29,6 +29,10 @@
     background: #fff;
     padding: 60px 15px 0;
 }
+.subheader .back-link {
+    display: block;
+    margin-bottom: 10px;
+}
 .subheader hgroup {
     flex: 1 1 auto;
 }

@@ -178,18 +178,16 @@ button:disabled, .btn:disabled {
 
 .card {
     background: #fff;
-    border: 1px solid #DEE6F3;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
     list-style: none;
     padding: 25px 30px;
     position: relative;
 }
 .card > strong:first-child,
-.card .chart-title,
-.card-comment > .comment-from {
+.card .chart-title {
     display: block;
     font-size: 16px;
     font-weight: 600;
-    line-height: 20px;
     height: 20px;
     margin-bottom: 20px;
     overflow: hidden;
@@ -210,11 +208,16 @@ button:disabled, .btn:disabled {
     padding-right: 0;
 }
 
-.card.card-comment {
-    border: 1px solid #bbb;
-    margin: 15px;
+.card-comment {
+    display: flex;
+}
+.card-comment + .card-comment {
+    border-top: 1px solid #ddd;
+    margin-top: 20px;
+    padding-top: 30px;
 }
 .card-comment .comment-from {
+    margin-right: 0.5em;
     padding-left: 5px;
 }
 .card-comment .comment-from img {
@@ -223,7 +226,25 @@ button:disabled, .btn:disabled {
     vertical-align: middle;
     width: 1.5em;
 }
+.card-comment .feedback-date {
+    display: inline-block;
+    font-size: 0.8em;
+    opacity: 0.5;
+    transition: opacity 0.25s;
+}
+.card-comment:hover .feedback-date {
+    opacity: 0.8;
+}
+.card-comment p {
+    flex: 1 1;
+    line-height: 1.5em;
+    margin-top: 0;
+}
+.card-comment:last-child p {
+    margin-bottom: 0;
+}
 .card-comment menu {
+    margin: 0 0 0 30px;
     opacity: 0.2;
     transition: opacity 0.25s;
 }
@@ -413,25 +434,28 @@ ul .empty-state i {
 }
 
 
-.podcast-stats-panel {
+.stats-panel {
     display: flex;
     padding: 0px 20px 30px;
 }
-.podcast-stats-panel .segment {
+.stats-panel:last-child {
+    padding-bottom: 0;
+}
+.stats-panel .segment {
     border-right: 1px solid #eee;
     display: flex;
     flex-direction: column;
     margin-right: 40px;
     padding-right: 40px;
 }
-.podcast-stats-panel .segment:last-of-type {
+.stats-panel .segment:last-of-type {
     border: 0;
 }
-.podcast-stats-panel .segment span {
+.stats-panel .segment span {
     font-size: 12px;
     color: #888;
 }
-.podcast-stats-panel .segment em {
+.stats-panel .segment em {
     font-size: 40px;
     font-style: normal;
     font-weight: 400;
@@ -442,7 +466,8 @@ ul .empty-state i {
 }
 .row > * {
     flex: 1 1;
-    margin: 0 10px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 .row > :first-child {
     margin-left: 0;
@@ -804,7 +829,7 @@ menu.tabs a.selected {
 .markdown-editor-preview h3 {
     font-size: 1.5em;
 }
-.markdown-editor .markdown-editor-preview p {
+.markdown-editor-preview p {
     margin-top: 0;
 }
 
@@ -830,7 +855,7 @@ menu.tabs a.selected {
 
 table {
     background: #fff;
-    border: 1px solid #DEE6F3;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
     border-radius: 2px;
     line-height: 3em;
     margin: 10px 0;
@@ -848,8 +873,9 @@ table tbody tr:not(:last-child) td {
     border-bottom: 1px solid #f5f5f5;
 }
 
-table .primary {
-    font-weight: bold;
+table .primary,
+table th {
+    font-weight: 500;
 }
 
 
@@ -1030,7 +1056,7 @@ li.user-card span.name {
     text-align: center;
 }
 
-.podcast-stats-panel + .chart-placeholder .chart-title {
+.stats-panel + .chart-placeholder .chart-title {
     padding-left: 20px;
 }
 

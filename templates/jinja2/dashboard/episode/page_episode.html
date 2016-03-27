@@ -1,53 +1,88 @@
 {% extends 'dashboard/base.html' %}
+
+{% block subheader %}
+<section class="subheader">
+  <div>
+    <hgroup>
+      <a class="back-link" href="{{ url('podcast_dashboard', podcast_slug=podcast.slug) }}">
+        {% trans podcast_title=podcast.name %}
+          Back to {{ podcast_title }}
+        {% endtrans %}
+      </a>
+      <h1>{{ episode.title }}</h1>
+      <h2>
+        {{ episode.subtitle }}
+        {% if episode.subtitle %}&bull;{% endif %}
+        <span title="{{ (episode.publish + tz_delta).strftime('%c') }}">
+          {% if episode.is_published() %}
+            {% trans published=episode.publish|pretty_date %}
+              Published {{ published }}
+            {% endtrans %}
+          {% else %}
+            {% trans published=episode.publish|pretty_date %}
+              Scheduled to publish {{ published }}
+            {% endtrans %}
+          {% endif %}
+        </span>
+      </h2>
+    </hgroup>
+
+    <a href="{{ url('edit_podcast_episode', kwargs={'podcast_slug': podcast.slug, 'episode_id': str(episode.id)}) }}" class="btn">
+      {{ _('Edit Episode') }}
+    </a>
+  </div>
+</section>
+<nav class="subnav">
+  <ul class="bottom-tabs tabs dynamic">
+    <li class="selected"><a data-tab=".tab-overview" href="">{{ _('Overview') }}</a></li>
+    <li><a data-tab=".tab-analytics" href="">{{ _('Analytics') }}</a></li>
+    <li><a data-tab=".tab-feedback" href="">{{ _('Feedback') }}</a></li>
+    <li><a data-tab=".tab-audio" href="">{{ _('Audio') }}</a></li>
+  </ul>
+</nav>
+{% endblock %}
+
 {% block dashboard_body %}
-<header>
-  {{ breadcrumb(podcast.name, url('podcast_dashboard', podcast_slug=podcast.slug)) }}
-
-  <menu class="toolbar toolbar-right">
-    <li><a class="btn" href="{{ url('edit_podcast_episode', kwargs={'podcast_slug': podcast.slug, 'episode_id': str(episode.id)}) }}">{{ _('Edit Episode') }}</a></li>
-  </menu>
-
-  <hgroup>
-    <h1>{{ episode.title }}</h1>
-    <h2>{{ episode.subtitle }}</h2>
-  </hgroup>
-
-</header>
-
-<div class="row">
-  <div class="card stat-card">
-    <strong>{{ _('Total Listens') }}</strong>
-    <span>{{ analytics.total_listens }}</span>
-  </div>
-  <div class="card stat-card">
-    <strong>{{_('Published') if episode.is_published() else _('Pending')}}</strong>
-    <span><time datetime="{{ episode.publish }}" title="{{ episode.publish }}">{{ episode.publish|pretty_date }}</time></span>
-  </div>
-</div>
-
-<menu class="tabs dynamic">
-  <li class="selected"><a data-tab=".tab-overview" href="">{{ _('Overview') }}</a></li>
-  <li><a data-tab=".tab-feedback" href="">{{ _('Feedback') }}</a></li>
-  <li><a data-tab=".tab-analytics" href="">{{ _('Analytics') }}</a></li>
-  <li><a data-tab=".tab-audio" href="">{{ _('Audio') }}</a></li>
-</menu>
 
 <div class="tab-overview">
   <div class="card-block card">
-    <strong>{{ _('Description') }}</strong>
-    <div class="markdown-editor-preview">
-      {{ episode.get_html_description()|safe }}
+    <div class="stats-panel">
+      <div class="segment">
+        <span>{{ _('Listens') }}</span>
+        <em>{{ analytics.total_listens }}</em>
+      </div>
+      <div class="segment">
+        <span>{{ _('Size') }}</span>
+        <em>{{ episode.audio_size|filesizeformat }}</em>
+      </div>
+      <div class="segment">
+        <span>{{ _('Duration') }}</span>
+        <em>
+          {% if (episode.duration / 3600)|int %}
+            {{ '%02d'|format((episode.duration / 3600)|round(1, 'floor')|int) -}} :
+          {%- endif -%}
+          {{- '%02d'|format((episode.duration % 3600 / 60)|round(1, 'floor')|int) -}} :
+          {{- '%02d'|format((episode.duration % 60)|round(1, 'floor')|int) }}
+        </em>
+      </div>
     </div>
   </div>
 
-  {% if podcast.site %}
-    <div class="card-block card">
-      <strong>{{ _('Site Page URL') }}</strong>
-      <input type="url"
-        readonly
-        value="http://{{ podcast.slug }}.pinecast.co/episode/{{ str(episode.id) }}">
+  <section class="row">
+    <div class="card-block card markdown-editor-preview">
+      {{ episode.get_html_description()|safe }}
     </div>
-  {% endif %}
+    <div class="sidebar">
+      {% if podcast.site %}
+        <div class="card-block card">
+          <strong>{{ _('Site Page URL') }}</strong>
+          <input type="url"
+            readonly
+            value="http://{{ podcast.slug }}.pinecast.co/episode/{{ str(episode.id) }}">
+        </div>
+      {% endif %}
+    </div>
+  </section>
 
   <div class="card-block card">
     <strong>{{ _('Episode information') }}</strong>
@@ -60,6 +95,7 @@
 
       <dt>{{ _('Duration') }}</dt> {#- -#}
       <dd>
+        {{ episode.formatted_duration() }}
         {{ '%02d'|format((episode.duration / 3600)|round(1, 'floor')|int) }} :
         {{ '%02d'|format((episode.duration % 3600 / 60)|round(1, 'floor')|int) }} :
         {{ '%02d'|format((episode.duration % 60)|round(1, 'floor')|int) }}
@@ -101,22 +137,29 @@
       readonly
       value="https://pinecast.com{{ url('ep_comment_box', kwargs={'podcast_slug': podcast.slug, 'episode_id': str(episode.id)}) }}">
   </div>
-  {% for f in feedback %}
-    <div class="card-block card card-comment">
-      <a class="comment-from" href="mailto:{{ f.sender }}">
-        <img src="{{ gravatar(f.sender) }}" class="comment-from-gravatar">
-        <span>{{ f.sender }}</span>
-      </a>
-      <p>{{ f.message }}</p>
-      <menu class="toolbar">
-        <a href="{{ url('delete_comment', kwargs={'podcast_slug': podcast.slug, 'comment_id': str(f.id)}) }}">{{ _('Delete Comment') }}</a>
-      </menu>
-    </div>
-  {% else %}
-    <div class="episode-empty-state empty-state">
-      {{ _('Nobody has submitted feedback about the episode yet.') }}
-    </div>
-  {% endfor %}
+  <div class="card-block card">
+    {% for f in feedback %}
+      <div class="card-comment">
+        <a class="comment-from" href="mailto:{{ f.sender }}">
+          <img src="{{ gravatar(f.sender) }}" class="comment-from-gravatar" title="{{ f.sender }}" alt="">
+        </a>
+        <p>
+          {{ f.message }}
+          <br>
+          <abbr class="feedback-date" title="{{ (f.created + tz_delta).strftime('%x') }}">
+            {{ f.created|pretty_date }}
+          </abbr>
+        </p>
+        <menu class="toolbar">
+          <a href="{{ url('delete_comment', kwargs={'podcast_slug': podcast.slug, 'comment_id': str(f.id)}) }}">{{ _('Delete') }}</a>
+        </menu>
+      </div>
+    {% else %}
+      <div class="episode-empty-state empty-state">
+        {{ _('Nobody has submitted feedback about the episode yet.') }}
+      </div>
+    {% endfor %}
+  </div>
 </div>
 
 <div class="tab-analytics" style="overflow: hidden; height: 0">

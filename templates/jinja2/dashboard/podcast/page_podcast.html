@@ -50,7 +50,7 @@
 
   {% if episodes %}
     <div class="card-block card">
-      <div class="podcast-stats-panel">
+      <div class="stats-panel">
         <div class="segment">
           <span>{{ _('Total Listens') }}</span>
           <em>
@@ -82,9 +82,13 @@
           </em>
         </div>
         <div class="segment">
-          <span>{{ _('Comments Left') }}</span>
+          <span>{{ _('Feedback') }}</span>
           <em>
-            {{ feedback.count() }}
+            {% if feedback %}
+              {{ feedback.count() }}
+            {% else %}
+              0
+            {% endif %}
           </em>
         </div>
       </div>

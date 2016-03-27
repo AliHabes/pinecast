@@ -8,13 +8,13 @@
     <li><a class="btn" href="{{ url('top_episodes', podcast_slug=podcast.slug) }}">{{ _('Top Episodes') }}</a></li>
   </menu>
   <div class="row">
-    <div class="card chart-placeholder"
+    <div class="card card-block chart-placeholder"
       data-type="podcast-listen-breakdown"
       data-podcast="{{ podcast.slug }}"
       data-title="{{ _('Listens by Source') }}"
       data-chart-type="pie"></div>
 
-    <div class="card chunkier chart-placeholder"
+    <div class="card card-block chunkier chart-placeholder"
       data-type="podcast-subscriber-history"
       data-podcast="{{ podcast.slug }}"
       data-title="{{ _('Subscriber History') }}"
@@ -25,14 +25,14 @@
 
   {% if minimum_plan(podcast.owner, PLANS.PLAN_STARTER) %}
     <div class="row">
-      <div class="card chart-placeholder"
+      <div class="card card-block chart-placeholder"
         data-type="podcast-listen-platform-breakdown"
         data-podcast="{{ podcast.slug }}"
         data-extra="breakdown_type=browser"
         data-title="{{ _('Listens by Browser') }}"
         data-chart-type="pie"></div>
 
-      <div class="card chart-placeholder"
+      <div class="card card-block chart-placeholder"
         data-type="podcast-listen-platform-breakdown"
         data-podcast="{{ podcast.slug }}"
         data-extra="breakdown_type=os"
