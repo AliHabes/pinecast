@@ -2,6 +2,8 @@
 
 A premium podcast hosting service
 
+[![Build Status](https://travis-ci.org/Pinecast/pinecast.svg?branch=master)](https://travis-ci.org/Pinecast/pinecast)
+
 
 ## Installation
 
