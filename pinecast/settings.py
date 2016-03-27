@@ -53,9 +53,9 @@ INSTALLED_APPS = (
     'feedback',
     'podcasts',
     'sites',
-
-    'django_nose',
 )
+if DEBUG:
+    INSTALLED_APPS = INSTALLED_APPS + ('django_nose', )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -127,7 +127,8 @@ LOGGING = {
     },
 }
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+if DEBUG:
+    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 
 # Database
