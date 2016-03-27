@@ -51,9 +51,6 @@ BANNED_SLUGS = set([
     'www',
 ])
 
-THEME_ABN = 'abn'
-SECRET_THEMES = set([THEME_ABN])
-
 GA_VALIDATOR = RegexValidator(r'^[0-9a-zA-Z\-]*$', ugettext_lazy('Only GA IDs are accepted'))
 
 class Site(models.Model):
@@ -63,11 +60,8 @@ class Site(models.Model):
         # Inspired by http://demo.themestation.net/podcaster/
         ('podcasty', ugettext_lazy('Podcasty')),
         ('zen', ugettext_lazy('Zen')),
-        ('wharf', ugettext_lazy('Wharf')),
-        (THEME_ABN, ugettext_lazy('ABN')),
     )
     SITE_THEMES_MAP = {k: v for k, v in SITE_THEMES}
-    SITE_THEMES_MAP_PUBLIC = {k: v for k, v in SITE_THEMES if k not in SECRET_THEMES}
 
     podcast = models.OneToOneField(Podcast)
     theme = models.CharField(choices=SITE_THEMES, max_length=16)
