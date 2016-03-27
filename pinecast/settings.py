@@ -53,6 +53,8 @@ INSTALLED_APPS = (
     'feedback',
     'podcasts',
     'sites',
+
+    'django_nose',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -124,6 +126,8 @@ LOGGING = {
         },
     },
 }
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 
 # Database

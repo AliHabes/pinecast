@@ -69,7 +69,7 @@ def gravatar(s, size=40):
     return 'https://www.gravatar.com/avatar/%s?s=%d' % (dig, size)
 
 
-def pretty_date(time=False):
+def pretty_date(time=None):
     """
     Get a datetime object or a int() Epoch timestamp and return a
     pretty string like 'an hour ago', 'Yesterday', '3 months ago',
@@ -87,7 +87,9 @@ def pretty_date(time=False):
 
     if day_diff < 0:
         day_diff *= -1
+        day_diff -= 1
         second_diff *= -1
+        second_diff += 86400
         if day_diff < 1:
             if second_diff < 10:
                 return ugettext('imminently')
@@ -101,6 +103,7 @@ def pretty_date(time=False):
                 return ugettext('in an hour')
             if second_diff < 86400:
                 return ungettext('{n} hour from now', '{n} hours from now', second_diff / 3600).format(n=second_diff / 3600)
+        day_diff += 1
         if day_diff == 1:
             return ugettext('tomorrow')
         if day_diff < 7:
