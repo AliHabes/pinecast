@@ -517,7 +517,8 @@ menu.tabs a.selected {
 
 
 .duration-control input {
-    width: 50px;
+    padding: 10px;
+    width: 60px;
 }
 
 
