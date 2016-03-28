@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:200,300,400,600);
 
 @import url(header.css);
 @import url(layout.css);
@@ -959,6 +959,7 @@ main > header {
 }
 main > header h1,
 main > header h2 {
+    font-weight: 500;
     text-align: center;
 }
 
@@ -1229,60 +1230,120 @@ li.user-card span.name {
 }
 
 
+.card-upgrade {
+    margin: 0 auto;
+    max-width: 500px;
+}
+.card-upgrade h3 {
+    font-size: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+.card-upgrade .subtext {
+    text-align: center;
+}
+.card-upgrade .cc-form {
+    margin: 0;
+    max-width: none;
+}
+.card-upgrade footer {
+    border-top: 1px solid #eee;
+    color: #bbb;
+    font-size: 0.8em;
+    margin-top: 20px;
+    padding-top: 20px;
+    text-align: center;
+}
+.card-upgrade .cc-form > div:last-child {
+    width: 100%;
+}
+.card-upgrade .cc-form > div:last-child button[type=submit] {
+    margin: 15px auto;
+}
+
+.upgrade-progress {
+    background: #eee;
+    height: 2px;
+    margin: 20px auto 40px;
+    position: relative;
+    width: 100px;
+}
+.upgrade-progress:before,
+.upgrade-progress:after {
+    background: #eee;
+    border-radius: 10px;
+    content: "";
+    display: block;
+    height: 10px;
+    position: absolute;
+    top: -4px;
+    width: 10px;
+}
+.upgrade-progress:before {
+    background: #5395D3;
+    left: -10px;
+}
+.upgrade-progress:after {
+    right: -10px;
+}
+.upgrade-progress[data-progress="2"],
+.upgrade-progress[data-progress="2"]:after {
+    background: #5395D3;
+}
+
 .plans {
-    margin: 0 auto 40px;
+    margin: 40px auto 60px;
     max-width: 500px;
 }
 
-.plan-card {
+.plan {
     font-size: 1.1em;
-    padding-bottom: 55px;
+    padding: 0 15px;
     position: relative;
+    text-align: center;
     transform: scale(1);
     transition: box-shadow 0.2s, transform 0.2s;
     z-index: 9;
 }
-.plan-card > strong:first-child {
-    border-bottom: 0;
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0;
-    text-align: center;
+.plan h4 {
+    font-size: 30px;
+    font-weight: 200;
+    margin: 0 0 20px;
 }
-.plan-card p {
+.plan p {
     color: #999;
     font-size: 0.85em;
-    text-align: center;
 }
-.plan-card ul {
+.plan ul {
+    font-size: 13px;
+    list-style: none;
     padding: 0 0 0 10px;
 }
-.plan-card li {
+.plan li {
     padding: 5px 0;
 }
-.plan-price {
-    bottom: 0;
+.plan .btn {
+    display: inline-block;
+    margin: 25px auto 0;
+}
+.plan .current-plan {
+    color: #52D1C7;
+    display: block;
+    font-weight: 400;
+    padding: 30px 0;
+}
+.plan .plan-price {
     display: block;
     font-size: 24px;
-    left: 0;
     line-height: 55px;
-    position: absolute;
-    right: 0;
-    text-align: center;
 }
-.plan-price sub {
+.plan .plan-price sub {
     color: #444;
     font-size: 0.7em;
     vertical-align: baseline;
 }
 
 .plan-free {
-    padding: 0 20%;
-}
-
-.plan-footer {
-    color: #999;
-    font-style: italic;
-    margin-bottom: 20px;
-    text-align: center;
+    opacity: 0.6;
+    padding: 0 40px 20px;
 }

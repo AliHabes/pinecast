@@ -51,6 +51,12 @@ PLANS_RAW = {
     'FEATURE_MIN_BLOG': FEATURE_MIN_BLOG,
 }
 
+STRIPE_PLANS = {
+    PLAN_STARTER: 'starter',
+    PLAN_PRO: 'pro',
+    PLAN_ULTIMATE: 'ultimate',
+}
+
 
 _MB = 1024 * 1024;
 MAX_FILE_SIZE = {

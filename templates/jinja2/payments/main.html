@@ -3,33 +3,33 @@
 {% block dashboard_body %}
 
 <header>
-  {{ breadcrumb(_('Dashboard'), url('dashboard')) }}
   <h1>{{ _('Upgrade') }}</h1>
 </header>
 
 {% if not stripe_customer %}
-  <p>Step 1 of 2</p>
-
-  <div class="card">
-    <strong>{{ _('Add a payment method') }}</strong>
-    <p>
+  <div class="card card-upgrade">
+    <div class="upgrade-progress" data-progress="1"></div>
+    <h3>{{ _('Step 1: Add a credit card') }}</h3>
+    <p class="subtext">
       {% trans %}
-        To get started, add a payment method. Card processing is handled by <a href="https://stripe.com/">Stripe</a>.
+        Card info is stored securely by <a href="https://stripe.com/">Stripe</a>.
       {% endtrans %}
     </p>
     {% include 'payments/paymentmethod/new.html' %}
+
+    <footer>
+      {% trans %}
+        Adding a payment method will not charge your credit card.
+      {% endtrans %}
+    </footer>
   </div>
 
-  <p>
-    {% trans %}
-      Adding payment information will not charge your credit card.
-    {% endtrans %}
-  </p>
-
 {% else %}
-  <p>Step 2 of 2</p>
-
-  {% include 'payments/upgrades/plans.html' %}
+  <div class="card card-upgrade">
+    <div class="upgrade-progress" data-progress="2"></div>
+    <h3>{{ _('Step 2: Choose a plan') }}</h3>
+    {% include 'payments/upgrades/plans.html' %}
+  </div>
 
 {% endif %}
 
@@ -38,6 +38,5 @@
 {% block after_content %}
 <script src="https://js.stripe.com/v2/"></script>
 <script src="/static/js/react-0.13.3.min.js"></script>
-<script src="/static/js/disable-forms.js"></script>
 <script src="/static/js/ui-cc.js"></script>
 {% endblock %}

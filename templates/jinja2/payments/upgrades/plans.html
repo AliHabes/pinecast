@@ -1,67 +1,99 @@
 <div class="plans row">
-  <div class="card plan-card">
-    <strong>{{ _('Starter') }}</strong>
+  <div class="plan">
+    <h4>{{ _('Starter') }}</h4>
+    <span class="plan-price">$5<sub>/mo</sub></span>
     <ul>
       <li>{{ _('Actionable analytics') }}</li>
       <li>{{ _('64MB limit per episode') }}</li>
       <li>{{ _('Podcast homepage') }}</li>
     </ul>
-    <span class="plan-price">$5<sub>/mo</sub></span>
 
     {% if user_settings.plan == PLANS['PLAN_STARTER'] %}
-      <strong>{{ _('Current Plan') }}</strong>
+      <strong class="current-plan">{{ _('Current Plan') }}</strong>
     {% else %}
-      <button class="btn btn-plain">
-        {{ _('Choose Starter') }}
-      </button>
+      {% if user_settings.plan == PLANS['PLAN_PRO'] or
+            user_settings.plan == PLANS['PLAN_ULTIMATE'] %}
+        <a class="btn btn-plain" href="#" data-plan="starter">
+          {{ _('Downgrade') }}
+        </a>
+      {% else %}
+        <a class="btn btn-plain" href="#" data-plan="starter">
+          {{ _('Upgrade') }}
+        </a>
+      {% endif %}
     {% endif %}
   </div>
-  <div class="card plan-card">
-    <strong>{{ _('Pro') }}</strong>
+  <div class="plan">
+    <h4>{{ _('Pro') }}</h4>
+    <span class="plan-price">$50<sub>/mo</sub></span>
     <ul>
       <li>{{ _('Advanced analytics') }}</li>
       <li>{{ _('128MB limit per episode') }}</li>
       <li>{{ _('Create networks') }}</li>
       <li>{{ _('Feedback tool') }}</li>
     </ul>
-    <span class="plan-price">$50<sub>/mo</sub></span>
 
     {% if user_settings.plan == PLANS['PLAN_PRO'] %}
-      <strong>{{ _('Current Plan') }}</strong>
+      <strong class="current-plan">{{ _('Current Plan') }}</strong>
     {% else %}
-      <button class="btn btn-plain">
-        {{ _('Choose Pro') }}
-      </button>
+      {% if user_settings.plan == PLANS['PLAN_ULTIMATE'] %}
+        <a class="btn btn-plain" href="#" data-plan="pro">
+          {{ _('Downgrade') }}
+        </a>
+      {% else %}
+        <a class="btn btn-plain" href="#" data-plan="pro">
+          {{ _('Upgrade') }}
+        </a>
+      {% endif %}
     {% endif %}
   </div>
+
   {#
-  <div class="card plan-card">
-    <strong>{{ _('Ultimate') }}</strong>
+  <div class="plan">
+    <h4>{{ _('Ultimate') }}</h4>
+    <span class="plan-price">$250<sub>/mo</sub></span>
     <ul>
       <li>{{ _('Complete analytics') }}</li>
       <li>{{ _('256MB limit per episode') }}</li>
       <li>{{ _('Faster episode downloads') }}</li>
     </ul>
-    <span class="plan-price">$250<sub>/mo</sub></span>
 
-    <button class="btn btn-plain">
-      {{ _('Downgrade to Ultimate') }}
-    </button>
+    <a class="btn btn-plain" href="#" data-plan="ultimate">
+      {{ _('Upgrade') }}
+    </a>
   </div>
   #}
+
 </div>
 
 {% if user_settings.plan != PLANS['PLAN_DEMO'] %}
   <div class="plan-free">
-    <p>{{ _('A free plan is always available. Free plans archive episodes past the last ten.') }}</p>
-    <button class="btn btn-plain">
-      {{ _('Downgrade to Free') }}
-    </button>
+    <p>
+      {{ _('You can return to a free plan at any time. Only ten episodes of each podcast will be shown.') }}
+    </p>
+    <a href="#" data-plan="demo">{{ _('Downgrade to Free') }}</a>
   </div>
 {% endif %}
 
-<div class="plan-footer">
-  <p>
-    {{ _('All plans include unlimited podcasts, unlimited storage, and unlimited bandwidth.') }}
-  </p>
-</div>
+<footer>
+  {{ _('All plans include unlimited podcasts, storage, and bandwidth.') }}
+</footer>
+
+<script>
+  document.body.addEventListener('click', function(e) {
+    if (!e.target.getAttribute('data-plan')) {
+      return;
+    }
+    e.preventDefault();
+    var plan = e.target.getAttribute('data-plan');
+
+    var form = document.getElementById('submit');
+    var type = form.querySelector('input');
+    type.value = plan;
+    form.submit();
+  })
+</script>
+<form id="submit" method="post" action="{{ url('upgrade_set_plan') }}" style="display:none">
+  <input type="hidden" name="plan" value="">
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>
