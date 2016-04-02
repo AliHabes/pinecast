@@ -6,12 +6,12 @@
 </header>
 
 <div class="upgrade-empty-state empty-state">
-  {% if user_settings.plan == PLAN.PLAN_DEMO %}
+  {% if user_settings.plan == PLANS.PLAN_DEMO %}
     {% trans %}
       With a free account, you can only create one podcast. If you're
       interested in creating another, you can upgrade to a paid account now.
     {% endtrans %}
-  {% elif user_settings.plan == PLAN.PLAN_COMMUNITY %}
+  {% elif user_settings.plan == PLANS.PLAN_COMMUNITY %}
     {% trans %}
       You currently have a community account which can host up to three
       podcasts. If you'd like to start another, please upgrade to a paid plan

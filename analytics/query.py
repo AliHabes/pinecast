@@ -158,7 +158,7 @@ def process_groups(groups, label_mapping=None, label_key=None, pick=None):
 def rotating_colors(sequence, key='color', highlight_key='highlight'):
     for x, c in zip(sequence, _colors_forever()):
         x[key] = c
-        x[highlight_key] = _colorscale(c, 1.2)
+        x[highlight_key] = _colorscale(c, 1.1)
         yield x
 
 
@@ -166,9 +166,8 @@ def _colors_forever():
     while 1:
         yield '#5395D3'
         yield '#52D1C7'
-        yield '#2196F3'
-        yield '#4CAF50'
         yield '#FF9800'
+        yield '#4CAF50'
         yield '#FF4081'
 
         yield '#1abc9c'

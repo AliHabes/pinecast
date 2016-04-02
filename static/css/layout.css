@@ -101,7 +101,12 @@ nav.tabs > ul li.selected {
 
 @media (max-width: 760px) {
     .subnav > ul {
+        display: flex;
+        font-size: 11px;
         justify-content: space-between;
         margin-right: 0;
+    }
+    .subnav > ul li {
+        margin: 0;
     }
 }

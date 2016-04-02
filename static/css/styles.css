@@ -175,6 +175,35 @@ button:disabled, .btn:disabled {
     color: #222;
 }
 
+.btn.card-btn {
+    float: right;
+    margin: 0;
+}
+.btn.card-btn + * {
+    display: block;
+    line-height: 30px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 700px) {
+    .card {
+        display: flex;
+        flex-direction: column;
+    }
+    .btn.card-btn {
+        float: none;
+        margin-bottom: 30px;
+        order: -1;
+        text-align: center;
+    }
+    .btn.card-btn + * {
+        display: block;
+        line-height: auto;
+        margin-bottom: 0;
+        order: -2;
+    }
+}
+
 
 .card {
     background: #fff;
@@ -184,11 +213,11 @@ button:disabled, .btn:disabled {
     position: relative;
 }
 .card > strong:first-child,
+.card > .card-btn:first-child + strong,
 .card .chart-title {
     display: block;
     font-size: 16px;
     font-weight: 600;
-    height: 20px;
     margin-bottom: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -208,48 +237,58 @@ button:disabled, .btn:disabled {
     padding-right: 0;
 }
 
-.card-comment {
+.card-item {
     display: flex;
+    flex-wrap: wrap;
 }
-.card-comment + .card-comment {
+.card-item + .card-item {
     border-top: 1px solid #ddd;
     margin-top: 20px;
     padding-top: 30px;
 }
-.card-comment .comment-from {
+.card-item > strong {
+    display: block;
+    font-size: 18px;
+    font-weight: 400;
+    width: 100%;
+}
+.card-item .comment-from {
     margin-right: 0.5em;
     padding-left: 5px;
 }
-.card-comment .comment-from img {
+.card-item .comment-from img {
     border-radius: 1.5em;
     height: 1.5em;
     vertical-align: middle;
     width: 1.5em;
 }
-.card-comment .feedback-date {
+.card-item .feedback-date {
     display: inline-block;
     font-size: 0.8em;
     opacity: 0.5;
     transition: opacity 0.25s;
 }
-.card-comment:hover .feedback-date {
+.card-item:hover .feedback-date {
     opacity: 0.8;
 }
-.card-comment p {
+.card-item p {
     flex: 1 1;
     line-height: 1.5em;
     margin-top: 0;
 }
-.card-comment:last-child p {
+.card-item:last-child p {
     margin-bottom: 0;
 }
-.card-comment menu {
+.card-item menu {
     margin: 0 0 0 30px;
     opacity: 0.2;
     transition: opacity 0.25s;
 }
-.card-comment:hover menu {
+.card-item:hover menu {
     opacity: 1;
+}
+.card-item:last-child {
+    margin-bottom: 10px;
 }
 
 .ticket {
@@ -461,6 +500,24 @@ ul .empty-state i {
     font-weight: 400;
 }
 
+@media (max-width: 700px) {
+    .card-block.card {
+        padding: 10px;
+    }
+
+    .stats-panel {
+        flex-wrap: wrap;
+        padding: 0;
+    }
+    .stats-panel .segment {
+        border: 0;
+        margin: 0 0 10px;
+        padding: 0;
+        text-align: center;
+        width: 50%;
+    }
+}
+
 .row {
     display: flex;
 }
@@ -493,6 +550,19 @@ section.row > :last-child {
     margin-right: 0;
 }
 
+@media (max-width: 700px) {
+    .row {
+        flex-direction: column;
+    }
+    .row.reverse-on-mobile {
+        flex-direction: column-reverse;
+    }
+    .row > * {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
 .stat-card span {
     display: block;
     font-size: 50px;
@@ -512,6 +582,10 @@ menu.toolbar li {
     display: inline-block;
     list-style: none;
     margin-right: 20px;
+}
+menu.toolbar button,
+menu.toolbar .btn {
+    margin: 0;
 }
 menu.toolbar-right {
     bottom: 0;
@@ -652,6 +726,17 @@ menu.tabs a.selected {
 .tab-buttons a:not(:last-child) {
     display: inline-block;
     margin-right: 15px;
+}
+@media (max-width: 700px) {
+    .tab-buttons {
+        flex-direction: column;
+        padding-top: 10px;
+    }
+    .tab-buttons a,
+    .tab-buttons a:not(:last-child) {
+        display: block;
+        margin: 0 0 10px;
+    }
 }
 
 .buttons-empty-state {
@@ -995,7 +1080,7 @@ main > header h2 {
 address.user-card {
     font-size: 14px;
     font-style: normal;
-    padding-left: 60px;
+    padding-left: 50px;
 }
 
 address.user-card img {
@@ -1011,8 +1096,8 @@ address.user-card > * {
 }
 
 address.user-card span.name {
-    font-size: 1.1em;
-    font-weight: bold;
+    font-size: 18px;
+    font-weight: 400;
 }
 
 .network-members {
@@ -1225,6 +1310,7 @@ li.user-card span.name {
 .chart-option-selector {
     display: inline-block;
     font-size: 12px;
+    margin-bottom: 5px;
     margin-right: 10px;
     text-transform: uppercase;
 }

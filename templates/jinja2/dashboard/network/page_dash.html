@@ -1,60 +1,73 @@
 {% extends 'dashboard/base.html' %}
-{% block dashboard_body %}
 
-<header>
-  {{ breadcrumb(_('All Podcasts'), url('dashboard')) }}
-
-  {% if minimum_plan(user, PLANS.PLAN_STARTER) %}
-    <menu class="toolbar toolbar-right">
-      <li><a class="btn btn-neutral" href="{{ url('network_edit', network_id=network.id) }}">{{ _('Edit') }}</a></li>
-    </menu>
-  {% endif %}
-
-  <h1>{{ network.name }}</h1>
-</header>
-
-{% if len(net_podcasts) %}
-  <div class="card-block card">
-    <div class="chart-placeholder"
-      data-type="network-listen-history"
-      data-extra="network_id={{ network.id }}"
-      data-title="{{ _('Listen history') }}"
-      data-chart-type="line"
-      data-has-legend="true"></div>
+{% block subheader %}
+<section class="subheader">
+  <div>
+    <hgroup>
+      <h1>{{ network.name }}</h1>
+      <h2>
+        {% trans n=net_podcasts.count() %}
+          {{ n }} Podcast
+        {% pluralize %}
+          {{ n }} Podcasts
+        {% endtrans %}
+      </h2>
+    </hgroup>
   </div>
-{% endif %}
-
-<menu class="tabs dynamic">
-  <li class="selected"><a data-tab=".tab-podcasts" href="">{{ _('Podcasts') }}</a></li>
-  <li><a data-tab=".tab-members" href="">{{ _('Members') }}</a></li>
-</menu>
-
-<div class="tab-podcasts">
-  <ul class="dashboard-podcasts">
-    {% for p in net_podcasts %}
-      <li class="ticket">
-        <a href="{{ url('podcast_dashboard', podcast_slug=p.slug) }}">{{ p.name }}</a>
-        {% if user == network.owner or p.owner == user %}
-          <div class="ticket-details">
-            <span>
-              <a class="b" href="{{ url('network_remove_podcast', network_id=network.id, podcast_slug=p.slug) }}">{{ _('Remove from Network') }}</a>
-            </span>
-          </div>
-        {% endif %}
-      </li>
-    {% endfor %}
-    <li class="ticket option">
-      <a href="{{ url('network_add_show', network_id=network.id) }}">
-        <span>
-          {% if network.podcast_set.count() %}
-            {{ _('Add another podcast to the network') }}
-          {% else %}
-            {{ _('Add first podcast to the network') }}
-          {% endif %}
-        </span>
+</section>
+<nav class="subnav">
+  <ul class="bottom-tabs tabs dynamic">
+    <li class="selected"><a data-tab=".tab-overview" href="">{{ _('Overview') }}</a></li>
+    <li><a data-tab=".tab-members" href="">{{ _('Members') }}</a></li>
+    <li>
+      <a href="{{ url('network_edit', network_id=network.id) }}">
+        {{ _('Settings') }}
       </a>
     </li>
   </ul>
+</nav>
+{% endblock %}
+
+{% block dashboard_body %}
+<div class="tab-overview">
+  {% if len(net_podcasts) %}
+    <div class="card-block card">
+      <div class="chart-placeholder"
+        data-type="network-listen-history"
+        data-extra="network_id={{ network.id }}"
+        data-title="{{ _('Listen history') }}"
+        data-chart-type="line"
+        data-has-legend="true"></div>
+    </div>
+
+  {% endif %}
+  <div class="card-block card">
+    <a href="{{ url('network_add_show', network_id=network.id) }}" class="btn card-btn">
+      {% if network.podcast_set.count() %}
+        {{ _('Add another podcast') }}
+      {% else %}
+        {{ _('Add a podcast') }}
+      {% endif %}
+    </a>
+    <strong>{{ _('Network Podcasts') }}</strong>
+    {% for p in net_podcasts %}
+      <div class="card-item">
+        <strong>
+          <a href="{{ url('podcast_dashboard', podcast_slug=p.slug) }}">{{ p.name }}</a>
+        </strong>
+
+        <p>{{ p.description }}</p>
+
+        {% if user == network.owner or p.owner == user %}
+          <menu class="toolbar">
+            <a href="{{ url('network_remove_podcast', network_id=network.id, podcast_slug=p.slug) }}" title="{{ _('Remove this podcast from the network') }}">
+              {{ _('Remove') }}
+            </a>
+          </menu>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
 </div>
 
 <div class="tab-members" style="overflow: hidden; height: 0">
@@ -91,22 +104,25 @@
     </div>
   {% endif %}
 
-  <div class="card card-block">
-    <strong>{{ _('Members') }}</strong>
-    <ul class="network-members">
-      {% for m in network.members.all() %}
-        <li class="user-card">
-          {% if m != network.owner or m == user and m != network.owner %}
-            <menu class="toolbar toolbar-right">
-              <li><a class="btn btn-danger" href="{{ url('network_remove_member', network_id=network.id, member_id=m.id) }}">{{ _('Remove') }}</a></li>
-            </menu>
-          {% endif %}
+  <div class="card-block card">
+    <strong>{{ _('Network Members') }}</strong>
+    {% for m in network.members.all() %}
+      <div class="card-item">
+        <a class="comment-from" href="mailto:{{ m.email }}">
           <img src="{{ gravatar(m.email) }}" alt="">
-          <span class="name">{{ m.email }}</span>
-          <a href="mailto:{{ m.email }}" class="email">{{ m.email }}</a>
-        </li>
-      {% endfor %}
-    </ul>
+        </a>
+
+        <p>{{ m.email }}</p>
+
+        {% if m != network.owner or m == user and m != network.owner %}
+          <menu class="toolbar">
+            <a href="{{ url('network_remove_member', network_id=network.id, member_id=m.id) }}">
+              {{ _('Remove') }}
+            </a>
+          </menu>
+        {% endif %}
+      </div>
+    {% endfor %}
   </div>
 </div>
 
