@@ -51,6 +51,9 @@ class Podcast(models.Model):
 
     networks = models.ManyToManyField(Network)
 
+    total_tips = models.PositiveIntegerField(
+        default=0,
+        help_text=ugettext_lazy('Tips collected over podcast lifetime in cents'))
     tip_value = models.PositiveIntegerField(
         default=0,
         help_text=ugettext_lazy('Unpaid tip value in cents'))

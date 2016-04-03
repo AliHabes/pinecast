@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'analytics',
     'dashboard',
     'feedback',
+    'payments',
     'podcasts',
     'sites',
 )

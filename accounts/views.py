@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import ugettext
 from django.views.decorators.http import require_POST
 
-from .models import BetaRequest, UserSettings
+from .models import UserSettings
 from dashboard.views import _pmrender
 from pinecast.email import get_expired_page, get_signed_url, request_must_be_confirmed, send_confirmation_email, send_notification_email
 from pinecast.helpers import reverse, tz_offset
