@@ -1,0 +1,52 @@
+
+button, .btn {
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -webkit-appearance: none;
+    background: #5395D3;
+    border: 0;
+    border-radius: 3px;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+    color: #fff;
+    display: block;
+    font-size: 13px;
+    margin: 20px 0;
+    padding: 9px 30px;
+    position: relative;
+    text-transform: uppercase;
+    transition: box-shadow 0.3s, top 0.1s;
+    top: 0;
+}
+
+button:hover, .btn:hover,
+button:focus, .btn:focus {
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+button:active, .btn:active {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    top: 3px;
+}
+
+button:disabled, .btn:disabled {
+    opacity: 0.4;
+}
+
+.btn-danger {
+    background: #FF5252;
+}
+
+.btn-neutral {
+    background: #ddd;
+    color: #222;
+}
+
+.btn.card-btn {
+    float: right;
+    margin: 0;
+}
+.btn.card-btn + * {
+    display: block;
+    line-height: 30px;
+    margin-bottom: 30px;
+}

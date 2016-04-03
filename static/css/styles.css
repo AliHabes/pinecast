@@ -1,6 +1,8 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:200,300,400,600);
 
+@import url(buttons.css);
 @import url(header.css);
+@import url(inputs.css);
 @import url(layout.css);
 
 *, *:before, *:after {
@@ -37,152 +39,8 @@ a:hover {
     text-decoration: underline;
 }
 
-label, .label {
-    display: block;
-    padding: 10px;
-}
-label > span,
-.label > span {
-    color: #888;
-    display: block;
-    font-size: 13px;
-}
-
-label > input[type="checkbox"] {
-    float: left;
-}
-label > input[type="checkbox"] + span {
-    margin-left: 25px;
-}
-
 ol, ul, dl {
     margin: 0 0 15px;
-}
-
-
-input[type="text"],
-input[type="email"],
-input[type="url"],
-input[type="number"],
-input[type="password"],
-input[type="datetime-local"],
-textarea {
-    background: #FBFBFB;
-    border: 1px solid #DCDADA;
-    border-radius: 3px;
-    box-shadow: 0 0 0 transparent;
-    font-size: 14px;
-    margin: 2px 0 5px;
-    padding: 10px 15px;
-    transition: box-shadow 0.2s, border-color 0.2s;
-    width: 100%;
-}
-input[type="text"],
-input[type="email"],
-input[type="url"],
-input[type="password"],
-input[type="datetime-local"],
-textarea {
-    display: block;
-}
-
-input[type="text"][readonly],
-input[type="email"][readonly],
-input[type="url"][readonly],
-input[type="number"][readonly],
-input[type="password"][readonly],
-input[type="datetime-local"][readonly]
-textarea[readonly] {
-    border-color: #ddd;
-    border-width: 1px;
-}
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="url"]:focus,
-input[type="number"]:focus,
-input[type="password"]:focus,
-input[type="datetime-local"]:focus,
-textarea:focus {
-    border-color: #555;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-}
-
-::-webkit-input-placeholder {
-   color: #ddd;
-}
-
-::-moz-placeholder {
-   color: #ddd;
-}
-
-:-ms-input-placeholder {
-   color: #ddd;
-}
-
-textarea {
-    height: 150px;
-    width: 100%;
-}
-
-select {
-    border-radius: 3px;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-    font-size: 15px;
-    padding: 7px;
-}
-
-
-button, .btn {
-    -moz-appearance: none;
-    -ms-appearance: none;
-    -webkit-appearance: none;
-    background: #5395D3;
-    border: 0;
-    border-radius: 3px;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
-    color: #fff;
-    display: block;
-    font-size: 13px;
-    margin: 20px 0;
-    padding: 9px 30px;
-    position: relative;
-    text-transform: uppercase;
-    transition: box-shadow 0.3s, top 0.1s;
-    top: 0;
-}
-
-button:hover, .btn:hover,
-button:focus, .btn:focus {
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
-}
-
-button:active, .btn:active {
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    top: 3px;
-}
-
-button:disabled, .btn:disabled {
-    opacity: 0.4;
-}
-
-.btn-danger {
-    background: #FF5252;
-}
-
-.btn-neutral {
-    background: #ddd;
-    color: #222;
-}
-
-.btn.card-btn {
-    float: right;
-    margin: 0;
-}
-.btn.card-btn + * {
-    display: block;
-    line-height: 30px;
-    margin-bottom: 30px;
 }
 
 @media (max-width: 700px) {
@@ -614,11 +472,6 @@ menu.tabs a.selected {
     color: #303F9F;
 }
 
-
-.duration-control input {
-    padding: 10px;
-    width: 60px;
-}
 
 
 .progress {
@@ -1209,26 +1062,6 @@ li.user-card span.name {
 }
 .flex-row > .col {
     flex: 1 1;
-}
-
-.username-field:not(:focus) {
-    border: 1px dotted #999;
-}
-.username-field::-webkit-input-placeholder {
-   color: black;
-}
-.username-field::-moz-placeholder {
-   color: black;
-}
-.username-field:focus::-webkit-input-placeholder {
-   color: transparent;
-}
-.username-field:focus::-moz-placeholder {
-   color: transparent;
-}
-.username-field:invalid + button {
-    display: none;
-    margin: 0;
 }
 
 

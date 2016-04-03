@@ -2,7 +2,9 @@
 {% block content %}
 <main>
   <img src="{{ podcast.cover_image|https }}" alt="{{ podcast.name }}" class="cover-image">
-  <h1>{{ podcast.name }}</h1>
+  <hgroup>
+    <h1>{{ podcast.name }}</h1>
+  </hgroup>
   <p>{{ _('Thank you for submitting feedback! It will be delivered shortly.') }}</p>
 </main>
 {% endblock %}

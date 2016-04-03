@@ -2,18 +2,19 @@
 {% block content %}
 <main>
   <img src="{{ podcast.cover_image|https }}" alt="{{ podcast.name }}" class="cover-image">
-  <h1>{{ podcast.name }}</h1>
-  <h2>{{ _('Leave feedback') }}</h2>
+  <hgroup>
+    <h1>{{ podcast.name }}</h1>
+    <h2>{{ _('Leave feedback') }}</h2>
+  </hgroup>
   {% if error %}
     <div class="error">
       {{ _('There was a problem submitting your feedback') }}
     </div>
   {% endif %}
-  <form action="#" method="post">
+  <form action="#" method="post" class="card">
     <label>
       <span>Email</span>
       <input type="email" placeholder="youremail@gmail.com" name="email" required value="{{ default.get('email') }}">
-      <small>{{ _('No junk, promise.') }}</small>
     </label>
 
     <label>
@@ -23,9 +24,7 @@
 
     <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>
 
-    <menu class="buttons">
-      <button>{{ _('Submit Feedback') }}</button>
-    </menu>
+    <button>{{ _('Submit Feedback') }}</button>
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
   </form>
 </main>
