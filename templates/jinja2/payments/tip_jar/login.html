@@ -1,0 +1,27 @@
+{% extends 'payments/tip_jar/base.html' %}
+
+{% block content_inner %}
+<form method="post" action="?" class="card">
+
+  {% if error %}
+    <div class="error">
+      <strong>{{ _('Error') }}</strong>
+      {% if error == 'bad_token' %}
+        {{ _('That URL is no longer valid. Try again.') }}
+      {% else %}
+        {{ error }}
+      {% endif %}
+    </div>
+  {% else %}
+    <p>{{ _('Please enter your email address.') }}</p>
+  {% endif %}
+
+  <label>
+    <span>{{ _('Email') }}</span>
+    <input type="email" name="email" placeholder="me@pinecast.com">
+  </label>
+
+  <button type="submit">{{ _('Submit') }}</button>
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>
+{% endblock %}

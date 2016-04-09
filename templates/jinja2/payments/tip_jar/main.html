@@ -1,10 +1,9 @@
 {% extends 'payments/tip_jar/base.html' %}
 
-{% block content %}
-  <main>
-    <hgroup>
-      <h1>Support {{ podcast.name }}</h1>
-      <h2></h2>
-    </hgroup>
-  </main>
+{% block content_inner %}
+  {% if not tipper.stripe_customer_id %}
+    {% include 'payments/tip_jar/steps/new_stripe_customer.html' %}
+  {% else %}
+    {% include 'payments/tip_jar/steps/choose_tip.html' %}
+  {% endif %}
 {% endblock %}

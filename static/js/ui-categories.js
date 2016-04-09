@@ -88,7 +88,7 @@ var CategoryComponent = React.createClass({
 
 var fields = document.querySelectorAll('.category-placeholder');
 Array.prototype.slice.call(fields).forEach(function(field) {
-    React.render(
+    ReactDOM.render(
         React.createElement(CategoryComponent, {
             name: field.getAttribute('data-name'),
             defCats: field.getAttribute('data-default-cats'),

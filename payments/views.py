@@ -3,11 +3,13 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
 import accounts.payment_plans as payment_plans
+import views_tips
+from .stripe_lib import stripe
 from accounts.models import UserSettings
 from dashboard.views import _pmrender
+from pinecast.email import CONFIRMATION_PARAM
 from pinecast.helpers import json_response, reverse
 from podcasts.models import Podcast
-from stripe_lib import stripe
 
 
 @login_required
@@ -22,12 +24,16 @@ def upgrade(req):
 def tips(req, podcast_slug):
     pod = get_object_or_404(Podcast, slug=podcast_slug)
     ctx = {'podcast': pod}
-    if not req.POST:
-        return _pmrender(req, 'payments/tip_jar/main.html', ctx)
+    if req.GET.get('error'):
+        ctx['error'] = req.GET.get('error')
 
-    # ...
+    if req.GET.get(CONFIRMATION_PARAM):
+        return views_tips.create_session(req, ctx)
 
-    return _pmrender(req, 'payments/tip_jar/main.html', ctx)
+    if not req.session.get('pay_session'):
+        return views_tips.no_session(req, ctx)
+
+    return views_tips.tip_flow(req, ctx)
 
 
 AVAILABLE_PLANS = {

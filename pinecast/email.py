@@ -62,6 +62,15 @@ The Pinecast Team
     return _send_mail(email, subject, body)
 
 
+def send_anon_confirmation_email(to, subject, body, url):
+    signed_url = get_signed_url(url)
+    constructed_body = ugettext('''{body}
+
+https://pinecast.com{url}
+''').format(body=body, url=signed_url)
+    return _send_mail(to, subject, constructed_body)
+
+
 def validate_confirmation(req, max_age=settings.EMAIL_CONFIRMATION_MAX_AGE):
     full_path = req.get_full_path()
     if CONFIRMATION_PARAM not in full_path:

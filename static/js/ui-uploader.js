@@ -239,7 +239,7 @@ var Uploader = React.createClass({
                     type: 'file',
                     accept: this.props.accept,
                     onChange: function(e) {
-                        var fileObj = this.refs.filePicker.getDOMNode().files[0];
+                        var fileObj = this.refs.filePicker.files[0];
                         this.setNewFile(fileObj);
                     }.bind(this),
                     ref: 'filePicker',
@@ -461,7 +461,7 @@ var Uploader = React.createClass({
 
 var fields = document.querySelectorAll('.upload-placeholder');
 Array.prototype.slice.call(fields).forEach(function(field) {
-    React.render(
+    ReactDOM.render(
         React.createElement(Uploader, {
             accept: field.getAttribute('data-accept'),
             name: field.getAttribute('data-name'),

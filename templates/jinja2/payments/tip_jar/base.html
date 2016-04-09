@@ -3,4 +3,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link type="text/css" rel="stylesheet" href="/static/css/tipjar.css">
 {% endblock %}
-{% block content %}{% endblock %}
+{% block content %}
+<main>
+  <img src="{{ podcast.cover_image|https }}" alt="{{ podcast.name }}" class="cover-image">
+  <hgroup>
+    <h1>Support {{ podcast.name }}</h1>
+  </hgroup>
+  {% block content_inner %}{% endblock %}
+</main>
+{% endblock %}

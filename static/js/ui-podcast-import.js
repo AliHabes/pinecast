@@ -70,7 +70,7 @@ var SlugField = React.createClass({
             this.setState({checkTimeout: null});
         }
 
-        var node = this.refs.inp.getDOMNode();
+        var node = this.refs.inp;
         if (!node.validity.valid || !node.value) {
             this.props.validityCB(false);
             return;
@@ -82,7 +82,7 @@ var SlugField = React.createClass({
         this.setState({checkTimeout: setTimeout(this.doCheck, 500)});
     },
     doCheck: function() {
-        var node = this.refs.inp.getDOMNode();
+        var node = this.refs.inp;
         var req = this.req(
             'get',
             '/dashboard/services/slug_available?slug=' + encodeURIComponent(node.value),
@@ -303,7 +303,7 @@ var PodcastImporter = React.createClass({
     },
 
     downloadFeed: function() {
-        var val = this.refs.s1url.getDOMNode().value;
+        var val = this.refs.s1url.value;
         if (!val) {
             this.setState({step1error: gettext('You must enter a feed URL')});
             return;
@@ -453,16 +453,16 @@ var PodcastImporter = React.createClass({
                 },
                 React.createElement('dt', {}, gettext('Homepage')),
                 React.createElement('dd', {}, data.homepage),
-                
+
                 React.createElement('dt', {}, gettext('Language')),
                 React.createElement('dd', {}, data.language),
-                
+
                 React.createElement('dt', {}, gettext('Copyright')),
                 React.createElement('dd', {}, data.copyright),
-                
+
                 React.createElement('dt', {}, gettext('Author Name')),
                 React.createElement('dd', {}, data.author_name),
-                
+
                 React.createElement('dt', {}, gettext('Explicit?')),
                 React.createElement('dd', {}, data.is_explicit ? gettext('Yes') : gettext('No'))
             ),
@@ -620,7 +620,7 @@ var PodcastImporter = React.createClass({
 
 var placeholders = document.querySelectorAll('.importer-placeholder');
 Array.prototype.slice.call(placeholders).forEach(function(placeholder) {
-    React.render(
+    ReactDOM.render(
         React.createElement(PodcastImporter, {
             origElement: placeholder,
             csrf: placeholder.getAttribute('data-csrf'),

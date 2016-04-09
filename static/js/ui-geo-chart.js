@@ -43,7 +43,7 @@ var GeoChartComponent = React.createClass({
             this.startLoadingData();
             return;
         }
-        var node = this.refs.surface.getDOMNode();
+        var node = this.refs.surface;
         var data = google.visualization.arrayToDataTable(this.state.data);
         var c = new google.visualization.GeoChart(node);
         c.draw(data, {});
@@ -81,7 +81,7 @@ google.setOnLoadCallback(doLoad);
 function doLoad() {
     var placeholders = document.querySelectorAll('.geo-chart-placeholder');
     Array.prototype.slice.call(placeholders).forEach(function(placeholder) {
-        React.render(
+        ReactDOM.render(
             React.createElement(GeoChartComponent, {
                 podcast: placeholder.getAttribute('data-podcast'),
                 episode: placeholder.getAttribute('data-episode'),
