@@ -49,5 +49,5 @@ def _get_country(ip, req=None):
         res = requests.get('http://geoip.nekudo.com/api/%s' % ip)
         return res.json()['country']['code']
     except Exception as e:
-        rollbar.report_message('Error resolving country IP: %s' % str(e), 'error')
+        rollbar.report_message('Error resolving country IP (%s): %s' % (ip, str(e)), 'error')
         return None
