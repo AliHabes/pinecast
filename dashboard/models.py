@@ -16,8 +16,8 @@ class AssetImportRequest(models.Model):
     episode = models.ForeignKey(PodcastEpisode, null=True, blank=True)
 
     expiration = models.DateTimeField()
-    audio_source_url = models.URLField(blank=True)
-    image_source_url = models.URLField(blank=True)
+    audio_source_url = models.URLField(blank=True, max_length=500)
+    image_source_url = models.URLField(blank=True, max_length=500)
     access_token = models.CharField(max_length=128)
 
     resolved = models.BooleanField(default=False)

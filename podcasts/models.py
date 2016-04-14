@@ -35,10 +35,10 @@ class Podcast(models.Model):
     subtitle = models.CharField(max_length=512, default='', blank=True)
 
     created = models.DateTimeField(auto_now=True)
-    cover_image = models.URLField()
+    cover_image = models.URLField(max_length=500)
     description = models.TextField()
     is_explicit = models.BooleanField()
-    homepage = models.URLField()
+    homepage = models.URLField(max_length=500)
 
     language = models.CharField(max_length=16)
     copyright = models.CharField(max_length=1024, blank=True)
@@ -46,7 +46,7 @@ class Podcast(models.Model):
 
     owner = models.ForeignKey(User)
 
-    rss_redirect = models.URLField(null=True, blank=True)
+    rss_redirect = models.URLField(null=True, blank=True, max_length=500)
     stats_base_listens = models.PositiveIntegerField(default=0)
 
     networks = models.ManyToManyField(Network)
@@ -146,11 +146,11 @@ class PodcastEpisode(models.Model):
     description = models.TextField(default='')
     duration = models.PositiveIntegerField(help_text=ugettext_lazy('Audio duration in seconds'))
 
-    audio_url = models.URLField()
+    audio_url = models.URLField(max_length=500)
     audio_size = models.PositiveIntegerField(default=0)
     audio_type = models.CharField(max_length=64)
 
-    image_url = models.URLField()
+    image_url = models.URLField(max_length=500)
 
     copyright = models.CharField(max_length=1024, blank=True)
     license = models.CharField(max_length=1024, blank=True)

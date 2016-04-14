@@ -66,10 +66,10 @@ class Site(models.Model):
     podcast = models.OneToOneField(Podcast)
     theme = models.CharField(choices=SITE_THEMES, max_length=16)
     custom_cname = models.CharField(blank=True, null=True, max_length=64)
-    cover_image_url = models.URLField(blank=True, null=True)
-    logo_url = models.URLField(blank=True, null=True)
-    itunes_url = models.URLField(blank=True, null=True)
-    stitcher_url = models.URLField(blank=True, null=True)
+    cover_image_url = models.URLField(blank=True, null=True, max_length=500)
+    logo_url = models.URLField(blank=True, null=True, max_length=500)
+    itunes_url = models.URLField(blank=True, null=True, max_length=500)
+    stitcher_url = models.URLField(blank=True, null=True, max_length=500)
 
     analytics_id = models.CharField(blank=True, null=True, max_length=32, validators=[GA_VALIDATOR])
 
@@ -89,7 +89,7 @@ class Site(models.Model):
 class SiteLink(models.Model):
     site = models.ForeignKey(Site)
     title = models.CharField(max_length=256)
-    url = models.URLField(blank=True)
+    url = models.URLField(blank=True, max_length=500)
     class_name = models.CharField(max_length=256, blank=True, null=True)
 
 class SiteBlogPost(models.Model):
