@@ -1,9 +1,14 @@
 {% extends 'payments/tip_jar/base.html' %}
 
 {% block content_inner %}
-  {% if not tipper.stripe_customer_id %}
-    {% include 'payments/tip_jar/steps/new_stripe_customer.html' %}
-  {% else %}
-    {% include 'payments/tip_jar/steps/choose_tip.html' %}
-  {% endif %}
+  <div class="tip-form"
+    data-csrf="{{ csrf_token }}"
+    data-existing-card='{{ existing_card|json }}'
+    data-podcast="{{ podcast.slug }}"
+    data-publishable-key="{{ STRIPE_PUBLISHABLE_KEY }}"></div>
+{% endblock %}
+
+{% block after_content %}
+<script src="https://js.stripe.com/v2/"></script>
+<script src="/static/js/ui-tip-form.js"></script>
 {% endblock %}

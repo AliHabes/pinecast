@@ -35,12 +35,12 @@ def get_details(req, parsed):
         'name': first_tag_text(rss, 'title'),
         'homepage': first_tag_text(rss, 'link'),
         'description': first_tag_text(rss, 'description'),
-        
+
         # Optional RSS elements
         'language': first_tag_text(rss, 'language', 'en-US'),
         'copyright': first_tag_text(rss, 'copyright', ''),
         'subtitle': first_tag_text(rss, 'itunes:subtitle', ''),
-        'author_name': first_tag_text(rss, 'itunes:author', req.user.username),
+        # 'author_name': first_tag_text(rss, 'itunes:author', req.user.username),
         'is_explicit': first_tag_bool(rss, 'itunes:explicit'),
         'cover_image': first_tag_attr(rss, 'itunes:image', 'href'),
         'categories': categories,

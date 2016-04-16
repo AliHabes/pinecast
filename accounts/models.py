@@ -42,6 +42,12 @@ class UserSettings(StripeCustomerMixin, models.Model):
     def get_tz_delta(self):
         return datetime.timedelta(hours=self.tz_offset)
 
+    def get_email(self):
+        return self.user.email
+
+    def get_stripe_description(self):
+        return 'user:%d' % self.user.id
+
 
 class Network(models.Model):
     owner = models.ForeignKey(User, related_name='network_ownership')

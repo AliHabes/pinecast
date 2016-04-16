@@ -13,6 +13,9 @@ class TipUser(StripeCustomerMixin, models.Model):
 
     stripe_customer_id = models.CharField(max_length=128, blank=True, null=True)
 
+    def get_email(self):
+        return self.email_address
+
 
 class RecurringTip(models.Model):
     tipper = models.ForeignKey(TipUser, related_name='tipper')

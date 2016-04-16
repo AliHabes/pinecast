@@ -86,13 +86,13 @@ form label > span {
     font-size: 12px;
     display: block;
 }
-form label > input[type="text"],
-form label > input[type="email"],
-form label > input[type="url"],
-form label > input[type="number"],
-form label > input[type="password"],
-form label > input[type="datetime-local"],
-form label > textarea {
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="password"],
+input[type="datetime-local"],
+textarea {
     background: #FBFBFB;
     border: 1px solid #DCDADA;
     border-radius: 3px;
@@ -103,7 +103,7 @@ form label > textarea {
     transition: box-shadow 0.2s, border-color 0.2s;
     width: 100%;
 }
-form label > input[type="password"] {
+input[type="password"] {
     letter-spacing: 4px;
 }
 form label > small {

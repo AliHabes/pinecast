@@ -14,8 +14,11 @@ class StripeCustomerMixin(object):
 
         customer = stripe.Customer.create(
             source=token,
-            email=self.user.email,
-            description=str(self.user.id))
+            email=self.get_email(),
+            description=self.get_stripe_description())
 
         self.stripe_customer_id = customer.id
         self.save()
+
+    def get_stripe_description(self):
+        return 'Anonymous'

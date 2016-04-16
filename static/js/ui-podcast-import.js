@@ -3,8 +3,13 @@
 function request(method, url, body, onload, onerror) {
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
-        if (xhr.status !== 200) onerror(xhr.responseText);
-        else onload(xhr.responseText);
+        if (xhr.status !== 200) {
+            if (onerror) {
+                onerror(xhr.responseText);
+            }
+        } else {
+            onload(xhr.responseText);
+        }
     };
     xhr.onerror = onerror;
 

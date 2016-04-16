@@ -8,6 +8,10 @@ main {
     margin: 0 auto;
     max-width: 560px;
     padding: 30px 30px 0;
+    text-align: left;
+}
+main hgroup {
+    text-align: center;
 }
 
 .cover-image {
@@ -33,5 +37,127 @@ main hgroup {
 }
 
 hgroup h1, hgroup h2, hgroup h3 {
-    font-weight: 400;
+    font-weight: 300;
+}
+
+form label, form .label {
+    display: block;
+    margin: 0;
+    padding: 10px;
+}
+label > span,
+.label > span {
+    color: #888;
+    display: block;
+    font-size: 13px;
+}
+
+.tip-form {
+    margin: 0 auto;
+    max-width: 400px;
+}
+
+.tip-existing-card {
+    border: 1px solid #DCDADA;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    padding: 15px;
+    position: relative;
+}
+
+.tip-existing-card h3 {
+    font-size: 18px;
+    font-weight: 300;
+    margin: 0;
+}
+
+.tip-existing-card .credit-card {
+    border: 2px solid #51D1C7;
+    border-radius: 5px;
+    font-family: "Lucida Console", Monaco, monospace;
+    font-weight: 600;
+    letter-spacing: 2px;
+    line-height: 1.5em;
+    margin: 25px auto 15px;
+    min-width: 250px;
+    padding: 20px 15px;
+    width: 60%;
+}
+.tip-existing-card .credit-card p {
+    margin: 0;
+}
+
+.tip-existing-card button {
+    background: transparent;
+    color: #b00;
+    font-size: 26px;
+    margin: 0;
+    padding: 0 10px;
+    position: absolute;
+    right: 0;
+    text-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+    top: 2px;
+    transition: text-shadow 0.3s;
+    width: auto;
+}
+.tip-existing-card button:hover {
+    box-shadow: none;
+    text-shadow: 0 3px 5px rgba(255, 0, 0, 0.5);
+}
+.tip-existing-card > p {
+    margin-bottom: 0;
+}
+
+
+.tip-amount-selector-wrapper {
+    padding: 0;
+}
+.tip-amount-selector-wrapper > span {
+    text-align: center;
+}
+.tip-amount-selector {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0 0;
+}
+.tip-amount-selector > label {
+    text-align: center;
+}
+.tip-amount-selector > label > span {
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.custom-tip-selector {
+    padding: 0;
+}
+
+
+input[type=radio] {
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    height: 0;
+    width: 0;
+}
+input[type=radio] + span:before {
+    border: 1px solid #dcdada;
+    border-radius: 25px;
+    content: "";
+    display: block;
+    height: 25px;
+    margin: 0 auto;
+    width: 25px;
+}
+input[type=radio]:checked + span:before {
+    background: #5395D3;
+    box-shadow: inset 0 0 0 2px #fff;
+}
+input[type=radio]:focus + span:before {
+    box-shadow: 0 0 4px #5395D3;
+}
+input[type=radio]:focus:checked + span:before {
+    box-shadow: inset 0 0 0 2px #fff, 0 0 4px #5395D3;
 }

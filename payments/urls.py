@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
 from . import views
+from . import views_tips
 
 
 urlpatterns = [
@@ -10,4 +11,6 @@ urlpatterns = [
     url(r'^upgrade/set_plan$', views.upgrade_set_plan, name='upgrade_set_plan'),
 
     url(r'^services/set_payment_method$', views.set_payment_method, name='set_payment_method'),
+    url(r'^services/set_tip_payment_method$', views_tips.set_tip_payment_method, name='set_tip_payment_method'),
+    url(r'^services/send_tip$', views_tips.send_tip, name='send_tip'),
 ]

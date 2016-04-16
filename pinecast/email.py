@@ -46,19 +46,19 @@ def send_confirmation_email(user, subject, description, url, email=None):
 To confirm this request, visit the link below.
 
 https://pinecast.com{url}
-''').format(username=user.username, description=description, url=signed_url)
+''').format(description=description, url=signed_url)
     return send_notification_email(user, subject, body, email)
 
 
 def send_notification_email(user, subject, description, email=None):
     email = email or user.email
-    body = ugettext('''Hello {username},
+    body = ugettext('''Hey Pinecaster,
 
 {description}
 
 Thanks,
 The Pinecast Team
-    ''').format(username=user.username, description=description)
+    ''').format(description=description)
     return _send_mail(email, subject, body)
 
 
