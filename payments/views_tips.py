@@ -74,21 +74,7 @@ def tip_flow(req, ctx, tip_user=None):
     tip_user = tip_user or TipUser.objects.get(id=req.session['pay_session'])
 
     ctx['tipper'] = tip_user
-
-    customer = tip_user.get_stripe_customer()
-    if customer:
-        source = customer.sources.data[0]
-        if source:
-            ctx['existing_card'] = {
-                'name': source.name,
-                'lastFour': source.last4,
-                'expiration': {
-                    'month': source.exp_month,
-                    'year': source.exp_year,
-                },
-            }
-
-    ctx.setdefault('existing_card')
+    ctx['existing_card'] = tip_user.get_card_info()
 
     return _pmrender(req, 'payments/tip_jar/main.html', ctx)
 

@@ -133,8 +133,11 @@ def forgot_password_finish(req):
 
 @login_required
 def user_settings_page(req):
-    return _pmrender(req, 'account/settings.html',
-                     {'success': req.GET.get('success'), 'error': req.GET.get('error')})
+    ctx = {
+        'success': req.GET.get('success'),
+        'error': req.GET.get('error'),
+    }
+    return _pmrender(req, 'account/settings.html', ctx)
 
 @login_required
 @require_POST

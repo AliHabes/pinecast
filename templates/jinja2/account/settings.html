@@ -114,7 +114,10 @@
   <form action="{{ url('user_settings_change_email') }}" method="post">
 
     <p>
-      {% trans %}To change your email, enter your new email address. We will send you a confirmation message containing a link that will finalize the process.{% endtrans %}
+      {% trans %}
+        To change your email, enter your new email address. We will send you a
+        confirmation message containing a link that will finalize the process.
+      {% endtrans %}
     </p>
 
     <label>
@@ -130,5 +133,30 @@
   </form>
 </div>
 
+<div class="card card-block">
+  <strong>{{ _('Credit Card') }}</strong>
 
+  {% if user_settings.has_payment_method() %}
+    {% set existing_card = user_settings.get_card_info() %}
+    <p>
+      {% trans last_four=existing_card['lastFour'],
+               month=existing_card['expiration']['month'],
+               year=existing_card['expiration']['year'] %}
+        A card exists with the last four digits "{{ last_four }}" and the
+        expiration {{ month }}/{{ year }}.
+      {% endtrans %}
+    </p>
+    <p>{{ _('You can use the form below to add a new payment method.') }}</p>
+  {% endif %}
+
+  <div class="payment-info-form"
+    data-publishable-key="{{ STRIPE_PUBLISHABLE_KEY }}"
+    data-csrf="{{ csrf_token }}"></div>
+</div>
+
+{% endblock %}
+
+{% block after_content %}
+<script src="https://js.stripe.com/v2/"></script>
+<script src="/static/js/ui-cc.js"></script>
 {% endblock %}
