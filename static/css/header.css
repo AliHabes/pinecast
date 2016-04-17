@@ -50,16 +50,27 @@
     width: 0;
     vertical-align: middle;
 }
+
+.main-header .upgrade-link,
 .main-header .support-link {
-    color: #273650;
     flex: 0 0 auto;
     font-size: 13px;
     text-decoration: none;
     text-transform: uppercase;
     vertical-align: middle;
 }
+.main-header .upgrade-link:hover,
 .main-header .support-link:hover {
     text-decoration: underline;
+}
+
+
+.main-header .upgrade-link {
+    color: #52D1C7;
+    margin-right: 20px;
+}
+.main-header .support-link {
+    color: #273650;
 }
 
 .main-header .user-card {

@@ -1217,7 +1217,7 @@ li.user-card span.name {
 
 .plan {
     font-size: 1.1em;
-    padding: 0 15px;
+    padding: 0 15px 40px;
     position: relative;
     text-align: center;
     transform: scale(1);
@@ -1242,8 +1242,14 @@ li.user-card span.name {
     padding: 5px 0;
 }
 .plan .btn {
+    bottom: 0;
     display: inline-block;
+    left: 0;
     margin: 25px auto 0;
+    position: absolute;
+    right: 0;
+    top: auto;
+    width: 140px;
 }
 .plan .current-plan {
     color: #52D1C7;
