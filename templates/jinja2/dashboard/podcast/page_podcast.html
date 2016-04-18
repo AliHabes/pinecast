@@ -117,8 +117,11 @@
           readonly
           value="https://pinecast.com{{ url('feed', podcast_slug=podcast.slug) }}">
         <div>
-          <a href="https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/publishPodcast" target="_blank">
+          <a href="https://podcastsconnect.apple.com/" target="_blank">
             {{ _('Submit to iTunes') }}
+          </a>
+          <a href="https://play.google.com/music/podcasts/portal/" target="_blank">
+            {{ _('Submit to Google Play') }}
           </a>
         </div>
       </div>
