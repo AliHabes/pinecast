@@ -39,8 +39,8 @@ def get_details(req, parsed):
         # Optional RSS elements
         'language': first_tag_text(rss, 'language', 'en-US'),
         'copyright': first_tag_text(rss, 'copyright', ''),
+        'author_name': first_tag_text(rss, 'itunes:author', ''),
         'subtitle': first_tag_text(rss, 'itunes:subtitle', ''),
-        # 'author_name': first_tag_text(rss, 'itunes:author', req.user.username),
         'is_explicit': first_tag_bool(rss, 'itunes:explicit'),
         'cover_image': first_tag_attr(rss, 'itunes:image', 'href'),
         'categories': categories,
