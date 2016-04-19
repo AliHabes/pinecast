@@ -36,13 +36,13 @@ class Podcast(models.Model):
 
     created = models.DateTimeField(auto_now=True)
     cover_image = models.URLField(max_length=500)
-    description = models.TextField()
-    is_explicit = models.BooleanField()
-    homepage = models.URLField(max_length=500)
+    description = models.TextField(blank=True)
+    is_explicit = models.BooleanField(default=False)
+    homepage = models.URLField(max_length=500, blank=True)
 
-    language = models.CharField(max_length=16)
+    language = models.CharField(max_length=16, default='en-US')
     copyright = models.CharField(max_length=1024, blank=True)
-    author_name = models.CharField(max_length=1024)
+    author_name = models.CharField(max_length=1024, blank=True)
 
     owner = models.ForeignKey(User)
 
