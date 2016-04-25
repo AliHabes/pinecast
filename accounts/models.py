@@ -7,10 +7,10 @@ from django.utils.translation import ugettext_lazy
 
 import payment_plans
 from pinecast.helpers import cached_method
-from payments.mixins import StripeCustomerMixin
+from payments.mixins import StripeCustomerMixin, StripeManagedAccountMixin
 
 
-class UserSettings(StripeCustomerMixin, models.Model):
+class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model):
     user = models.OneToOneField(User)
     plan = models.PositiveIntegerField(default=0, choices=payment_plans.PLANS)
     tz_offset = models.SmallIntegerField(default=0)  # Default to UTC

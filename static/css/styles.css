@@ -1272,3 +1272,64 @@ li.user-card span.name {
     opacity: 0.6;
     padding: 0 40px 20px;
 }
+
+
+.bank-form-update-account-btn {
+    -ms-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid #aaa;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    background: 0;
+    color: #444;
+    margin: 20px auto;
+    padding: 30px 50px;
+    text-transform: none;
+}
+.bank-form-update-account-btn .arrowicon {
+    display: inline-block;
+    height: 1em;
+    margin: 0 0 0 20px;
+    position: relative;
+    transform: scale(1, 1);
+    transition: transform 0.2s;
+    width: 0;
+}
+.bank-form-update-account-btn .arrowicon:before {
+    background: #444;
+    content: "";
+    display: block;
+    height: 2px;
+    left: -2px;
+    position: absolute;
+    bottom: 3px;
+    transform: rotate(-40deg);
+    width: 10px;
+}
+.bank-form-update-account-btn .arrowicon:after {
+    background: #444;
+    content: "";
+    display: block;
+    height: 2px;
+    position: absolute;
+    bottom: 3px;
+    right: -2px;
+    transform: rotate(40deg);
+    width: 10px;
+}
+
+.bank-form-update-account-btn:hover {
+    box-shadow: none;
+}
+.bank-form-update-account-btn:hover .arrowicon {
+    transform: scale(1.1, 1.1);
+}
+.bank-form-update-account-btn:active {
+    top: 0;
+}
+
+.bank-form div:last-child {
+    flex: 1 1;
+}

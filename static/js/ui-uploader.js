@@ -333,6 +333,10 @@ var Uploader = React.createClass({
                 this.setState({
                     error: 'min_size',
                 });
+            } else if (i.width > 3000 || i.height > 3000) {
+                this.setState({
+                    error: 'max_size',
+                });
             } else if (i.width !== i.height) {
                 this.setState({
                     error: 'not_square',
@@ -429,6 +433,12 @@ var Uploader = React.createClass({
                     'div',
                     {className: 'warning'},
                     gettext('Warning! The image does not meet the iTunes minimum size of 1400x1400px.')
+                );
+            case 'max_size':
+                return React.createElement(
+                    'div',
+                    {className: 'warning'},
+                    gettext('Warning! The image exceeds the iTunes maximum size of 3000x3000px.')
                 );
             case 'not_square':
                 return React.createElement(

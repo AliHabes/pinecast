@@ -8,6 +8,7 @@ gfm==0.0.3
 greenlet==0.4.7
 grequests==0.2.0
 html5lib==1.0b7
+iso8601==0.1.11
 itsdangerous==0.24
 Jinja2==2.7.3
 MarkupSafe==0.23

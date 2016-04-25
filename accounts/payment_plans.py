@@ -1,5 +1,6 @@
 from django.utils.translation import ugettext_lazy
 
+
 PLAN_DEMO = 0
 PLAN_STARTER = 1
 PLAN_PRO = 2
@@ -68,9 +69,19 @@ MAX_FILE_SIZE = {
 }
 
 PLAN_PODCAST_LIMITS = {
-    PLAN_DEMO: 1,
-    PLAN_COMMUNITY: 3,
+    PLAN_DEMO: 3,
+    PLAN_COMMUNITY: 5,
 }
+
+PLAN_TIP_LIMITS = {
+    # in cents
+    PLAN_DEMO: 1500,
+    PLAN_STARTER: 3000,
+    PLAN_COMMUNITY: 10000,
+    PLAN_PRO: 25000,
+    PLAN_ULTIMATE: 100000,
+}
+
 
 def minimum(plan_to_compare, minimum_plan):
     return PLAN_RANKS[plan_to_compare] >= PLAN_RANKS[minimum_plan]

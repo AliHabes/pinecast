@@ -2,6 +2,7 @@ import re
 from urllib import quote as urlencode
 
 import pytz
+from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -19,6 +20,9 @@ from pinecast.signatures import signer
 def home(req):
     if not req.user.is_anonymous():
         return redirect('dashboard')
+
+    if settings.DEBUG:
+        return redirect('login')
 
     return redirect('https://www.pinecast.com/')
 

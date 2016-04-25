@@ -133,6 +133,29 @@
   </form>
 </div>
 
+<div class="card card-block" id="bank-account-details">
+  <strong>{{ _('Bank Account') }}</strong>
+
+  <p>
+    {% trans %}By adding bank account details to Pinecast, you can begin accepting tips for your podcasts.{% endtrans %}
+  </p>
+
+  {% if user_settings.stripe_payout_managed_account %}
+    {% set existing_acc = user_settings.get_account_info() %}
+    <p>
+      {% trans holder_name=existing_acc['name'],
+               bank_name=existing_acc['bank_name'] %}
+        A bank account has already been associated with this account belonging to <b>{{ holder_name }}</b> with <b>{{ bank_name }}</b>.
+      {% endtrans %}
+  {% endif %}
+  <div class="bank-info-form"
+      data-has-existing="{{ 'true' if user_settings.stripe_payout_managed_account else 'false'}}"
+      data-publishable-key="{{ STRIPE_PUBLISHABLE_KEY }}"></div>
+  <p>
+    {% trans %}By adding or updating bank account information, you agree to Stripe's <a href="https://stripe.com/connect/account-terms" target="_blank">Connected Account Agreement</a>.{% endtrans %}
+  </p>
+</div>
+
 <div class="card card-block">
   <strong>{{ _('Credit Card') }}</strong>
 
@@ -149,9 +172,7 @@
     <p>{{ _('You can use the form below to add a new payment method.') }}</p>
   {% endif %}
 
-  <div class="payment-info-form"
-    data-publishable-key="{{ STRIPE_PUBLISHABLE_KEY }}"
-    data-csrf="{{ csrf_token }}"></div>
+  <div class="payment-info-form" data-publishable-key="{{ STRIPE_PUBLISHABLE_KEY }}"></div>
 </div>
 
 {% endblock %}
@@ -159,4 +180,5 @@
 {% block after_content %}
 <script src="https://js.stripe.com/v2/"></script>
 <script src="/static/js/ui-cc.js"></script>
+<script src="/static/js/ui-bank.js"></script>
 {% endblock %}

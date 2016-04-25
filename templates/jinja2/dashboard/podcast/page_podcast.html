@@ -34,6 +34,7 @@
   <ul class="bottom-tabs tabs dynamic">
     <li class="selected"><a data-tab=".tab-overview" href="">{{ _('Overview') }}</a></li>
     <li><a data-tab=".tab-analytics" href="">{{ _('Analytics') }}</a></li>
+    <li><a data-tab=".tab-tips" href="">{{ _('Tips') }}</a></li>
     <li><a data-tab=".tab-feedback" href="">{{ _('Feedback') }}</a></li>
     <li>
       <a href="{{ url('edit_podcast', podcast_slug=podcast.slug) }}">
@@ -156,6 +157,10 @@
 
 <div class="tab-analytics" style="overflow: hidden; height: 0">
   {% include 'dashboard/podcast/tab_analytics.html' %}
+</div>
+
+<div class="tab-tips" style="overflow: hidden; height: 0">
+  {% include 'dashboard/podcast/tab_tips.html' %}
 </div>
 
 <div class="tab-feedback" style="overflow: hidden; height: 0">

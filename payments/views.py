@@ -1,3 +1,4 @@
+import iso8601
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
@@ -23,6 +24,10 @@ def upgrade(req):
 
 def tips(req, podcast_slug):
     pod = get_object_or_404(Podcast, slug=podcast_slug)
+    us = UserSettings.get_from_user(pod.owner)
+    if not us.stripe_payout_managed_account:
+        redirect(pod.homepage)
+
     ctx = {'podcast': pod}
     if req.GET.get('error'):
         ctx['error'] = req.GET.get('error')
@@ -98,3 +103,49 @@ def set_payment_method(req):
         us.create_stripe_customer(req.POST.get('token'))
 
     return {'success': True, 'id': us.stripe_customer_id}
+
+
+@require_POST
+@login_required
+@json_response
+def set_tip_cashout(req):
+    try:
+        dob = iso8601.parse_date(req.POST.get('dob'))
+    except Exception:
+        return {'success': False, 'error': 'invalid dob'}
+
+    us = UserSettings.get_from_user(req.user)
+    account = us.get_stripe_managed_account()
+    if account:
+        us.stripe_payout_managed_account = None
+        us.save()
+        account.delete()
+
+    forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if forwarded_for:
+        ip = forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
+    legal_entity = {
+        'address': {
+            'city': req.POST.get('addressCity'),
+            'state': req.POST.get('addressState'),
+            'postal_code': req.POST.get('addressZip'),
+            'line1': req.POST.get('addressStreet'),
+            'line2': req.POST.get('addressSecond'),
+        },
+        'ssn_last_4': req.POST.get('ssnLastFour'),
+        'dob': {
+            'day': dob.day,
+            'month': dob.month,
+            'year': dob.year,
+        },
+        'first_name': req.POST.get('firstName'),
+        'last_name': req.POST.get('lastName'),
+        'type': 'individual',
+    }
+    us.create_stripe_managed_account(
+        req.POST.get('token'), ip, legal_entity)
+
+    return {'success': True}

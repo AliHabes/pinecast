@@ -40,11 +40,20 @@ hgroup h1, hgroup h2, hgroup h3 {
     font-weight: 300;
 }
 
-form label, form .label {
+.cc-form label, .cc-form .label {
     display: block;
     margin: 0;
-    padding: 10px;
 }
+
+.cc-form .cvc-label,
+.cc-form .expiration-label  {
+    padding-left: 10px;
+}
+
+.cc-form div:last-child {
+    flex: 1 1;
+}
+
 label > span,
 .label > span {
     color: #888;
@@ -59,7 +68,8 @@ label > span,
 
 .tip-existing-card {
     border: 1px solid #DCDADA;
-    border-radius: 3px;
+    border-left: 0;
+    border-right: 0;
     margin-bottom: 20px;
     padding: 15px;
     position: relative;
@@ -118,7 +128,7 @@ label > span,
 .tip-amount-selector {
     display: flex;
     justify-content: space-around;
-    padding: 15px 0 0;
+    padding: 15px 0 25px;
 }
 .tip-amount-selector > label {
     text-align: center;
@@ -130,6 +140,10 @@ label > span,
 
 .custom-tip-selector {
     padding: 0;
+}
+.custom-tip-selector input {
+    font-size: 36px;
+    font-weight: 300;
 }
 
 

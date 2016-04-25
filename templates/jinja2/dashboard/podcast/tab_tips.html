@@ -1,0 +1,15 @@
+<div class="card-block card">
+  <strong>{{ _('Tip Jar') }}</strong>
+  <p>
+    {% trans %}Make money through your podcast with your Pinecast Tip Jar.{% endtrans %}
+  </p>
+
+  {% if not user_settings.has_connected_account() %}
+    <p>
+      {% trans us_url=(url('user_settings') + '#bank-account-details') %}
+        Before you can start accepting tips, you must <a href="{{ us_url }}">add bank account details</a> to your account.
+      {% endtrans %}
+    </p>
+  {% endif %}
+
+</div>

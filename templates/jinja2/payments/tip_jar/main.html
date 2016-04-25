@@ -2,7 +2,6 @@
 
 {% block content_inner %}
   <div class="tip-form"
-    data-csrf="{{ csrf_token }}"
     data-existing-card='{{ existing_card|json }}'
     data-podcast="{{ podcast.slug }}"
     data-publishable-key="{{ STRIPE_PUBLISHABLE_KEY }}"></div>

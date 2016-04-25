@@ -17,9 +17,20 @@ class TipUser(StripeCustomerMixin, models.Model):
         return self.email_address
 
 
+class TipEvent(models.Model):
+    tipper = models.ForeignKey(TipUser, related_name='tip_events')
+    podcast = models.ForeignKey(Podcast, related_name='tip_events')
+    occurred_at = models.DateTimeField(auto_now=True)
+
+    amount = models.PositiveIntegerField(
+        default=0, help_text=ugettext_lazy('Value of tip in cents'))
+    fee_amount = models.PositiveIntegerField(
+        default=0, help_text=ugettext_lazy('Value of application fee in cents'))
+
+
 class RecurringTip(models.Model):
-    tipper = models.ForeignKey(TipUser, related_name='tipper')
-    podcast = models.ForeignKey(Podcast, related_name='podcast')
+    tipper = models.ForeignKey(TipUser, related_name='recurring_tips')
+    podcast = models.ForeignKey(Podcast, related_name='recurring_tips')
 
     amount = models.PositiveIntegerField(
         default=0, help_text=ugettext_lazy('Value of recurring tip in cents'))

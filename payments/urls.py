@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^services/set_payment_method$', views.set_payment_method, name='set_payment_method'),
     url(r'^services/set_tip_payment_method$', views_tips.set_tip_payment_method, name='set_tip_payment_method'),
     url(r'^services/send_tip$', views_tips.send_tip, name='send_tip'),
+    url(r'^services/set_tip_cashout$', views.set_tip_cashout, name='set_tip_cashout'),
 ]

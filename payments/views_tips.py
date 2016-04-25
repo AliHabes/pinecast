@@ -5,8 +5,10 @@ from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext
 from django.views.decorators.http import require_POST
 
+from .models import TipEvent, TipUser
 from .stripe_lib import stripe
-from payments.models import TipUser
+from accounts.payment_plans import PLAN_DEMO, PLAN_TIP_LIMITS
+from accounts.models import UserSettings
 from dashboard.views import _pmrender
 from pinecast.email import (send_anon_confirmation_email as send_email,
                             send_notification_email,
@@ -111,35 +113,56 @@ def send_tip(req):
 
 
     pod = get_object_or_404(Podcast, slug=req.POST.get('podcast'))
+    owner_us = UserSettings.get_from_user(pod.owner)
+    if amount > PLAN_TIP_LIMITS[owner_us.plan]:
+        return {'error': ugettext('That tip is too large for %s') % pod.name}
+
 
     tip_user = get_object_or_404(TipUser, id=req.session['pay_session'])
     customer = tip_user.get_stripe_customer()
     if not customer:
         return {'error': 'no customer'}
 
+    application_fee = int(amount * 0.05) if owner_us.plan == PLAN_DEMO else 0
+
     try:
         stripe.Charge.create(
             amount=amount,
+            application_fee=application_fee,
             currency='usd',
             customer=customer.id,
             description='Tip for %s' % pod.name,
+            destination=owner_us.stripe_payout_managed_account,
         )
-
-        pod.total_tips += amount
-        pod.tip_value += amount
 
     except Exception as e:
         rollbar.report_message('Error when sending tip: %s' % str(e), 'error')
         return {'error': str(e)}
 
+    else:
+        pod.total_tips += amount
+        pod.tip_value += amount - application_fee
+        pod.save()
+
+        tip_event = TipEvent(
+            tipper=tip_user,
+            podcast=pod,
+            amount=amount,
+            fee_amount=application_fee)
+        tip_event.save()
+
+    send_notification_email(
+        None,
+        'Thanks for leaving a tip!',
+        'Your tip was processed: %s received $%d. Thanks for supporting your '
+            'favorite content creators!' % (
+                pod.name, float(amount) / 100),
+        email=tip_user.email_address)
     send_notification_email(
         pod.owner,
         'Your podcast was tipped!',
-        '%s received a tip for $%d from %s. You should send them an email '
+        '%s received was tipped $%d by %s. You should send them an email '
             'thanking them for their generosity.' % (
-                pod.name,
-                float(amount) / 100,
-                tip_user.email_address)
-    )
+                pod.name, float(amount) / 100, tip_user.email_address))
 
     return {'success': True}
