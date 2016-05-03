@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import TipUser, RecurringTip
+from .models import RecurringTip, TipEvent, TipUser
 
-admin.site.register(TipUser)
 admin.site.register(RecurringTip)
+admin.site.register(TipEvent)
+admin.site.register(TipUser)

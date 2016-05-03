@@ -1,6 +1,7 @@
 import iso8601
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.translation import ugettext
 from django.views.decorators.http import require_POST
 
 import accounts.payment_plans as payment_plans
@@ -8,7 +9,7 @@ import views_tips
 from .stripe_lib import stripe
 from accounts.models import UserSettings
 from dashboard.views import _pmrender
-from pinecast.email import CONFIRMATION_PARAM
+from pinecast.email import CONFIRMATION_PARAM, send_notification_email
 from pinecast.helpers import json_response, reverse
 from podcasts.models import Podcast
 
@@ -57,6 +58,7 @@ def upgrade_set_plan(req):
     if not customer or new_plan not in AVAILABLE_PLANS:
         return redirect('upgrade')
 
+    orig_plan = us.plan
     new_plan_val = AVAILABLE_PLANS[new_plan]
     existing_subs = customer.subscriptions.all(limit=1)['data']
 
@@ -86,6 +88,17 @@ def upgrade_set_plan(req):
 
     us.plan = new_plan_val
     us.save()
+
+    was_upgrade = payment_plans.PLAN_RANKS[orig_plan] <= new_plan_val
+    send_notification_email(
+        req.user,
+        ugettext('Your account has been %s') %
+            (ugettext('upgraded') if was_upgrade else ugettext('downgraded')),
+        ugettext('''Your Pinecast account has been updated successfully.
+Your account is now marked as "%s".
+
+Please contact Pinecast support if you have any questions.''') %
+            payment_plans.PLANS_MAP[new_plan_val])
 
     return redirect('upgrade')
 

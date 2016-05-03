@@ -23,7 +23,7 @@ from accounts.models import Network, UserSettings
 from feedback.models import Feedback, EpisodeFeedbackPrompt
 from pinecast.helpers import json_response, reverse
 from podcasts.models import (CATEGORIES, Podcast, PodcastCategory,
-                             PodcastEpisode, PodcastReviewAssociation)
+                             PodcastEpisode)
 from sites.models import Site
 
 
@@ -482,43 +482,6 @@ def delete_comment(req, podcast_slug, comment_id):
         return redirect(
             reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#tab-feedback'
         )
-
-
-@login_required
-def podcast_ratings(req, podcast_slug, service=None):
-    pod = get_podcast(req, podcast_slug)
-    if service:
-        service = service.upper()
-    data = {
-        'podcast': pod,
-        'service': service,
-        'service_obj': None,
-        'PRA': PodcastReviewAssociation,
-        'connected_services': set(x.service for x in PodcastReviewAssociation.objects.filter(podcast=pod)),
-    }
-
-    if service and service not in PodcastReviewAssociation.SERVICES_MAP:
-        return Http404('Unknown service')
-
-    try:
-        service_obj = PodcastReviewAssociation.objects.get(podcast=pod, service=service)
-        data['service_obj'] = service_obj
-    except PodcastReviewAssociation.DoesNotExist:
-        service_obj = None
-
-    if req.POST:
-        url = req.POST.get('url')
-        try:
-            pra = PodcastReviewAssociation.create_for_service(service, podcast=pod, url=url)
-            if service_obj:
-                service_obj.delete()
-            pra.save()
-            service_obj = data['service_obj'] = pra
-        except Exception as e:
-            print e
-            data['error'] = ugettext('Could not connect service')
-
-    return _pmrender(req, 'dashboard/podcast_ratings.html', data)
 
 @login_required
 @require_GET

@@ -126,7 +126,7 @@ def send_tip(req):
     application_fee = int(amount * 0.05) if owner_us.plan == PLAN_DEMO else 0
 
     try:
-        stripe.Charge.create(
+        stripe_charge = stripe.Charge.create(
             amount=amount,
             application_fee=application_fee,
             currency='usd',
@@ -141,14 +141,14 @@ def send_tip(req):
 
     else:
         pod.total_tips += amount
-        pod.tip_value += amount - application_fee
         pod.save()
 
         tip_event = TipEvent(
             tipper=tip_user,
             podcast=pod,
             amount=amount,
-            fee_amount=application_fee)
+            fee_amount=application_fee,
+            stripe_charge=stripe_charge.id)
         tip_event.save()
 
     send_notification_email(

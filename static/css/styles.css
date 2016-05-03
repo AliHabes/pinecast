@@ -1236,12 +1236,13 @@ li.user-card span.name {
 .plan ul {
     font-size: 13px;
     list-style: none;
-    padding: 0 0 0 10px;
+    padding: 0;
 }
 .plan li {
     padding: 5px 0;
 }
-.plan .btn {
+.plan .btn,
+.plan .current-plan {
     bottom: 0;
     display: inline-block;
     left: 0;
@@ -1255,7 +1256,7 @@ li.user-card span.name {
     color: #52D1C7;
     display: block;
     font-weight: 400;
-    padding: 30px 0;
+    padding-bottom: 10px;
 }
 .plan .plan-price {
     display: block;
@@ -1271,6 +1272,9 @@ li.user-card span.name {
 .plan-free {
     opacity: 0.6;
     padding: 0 40px 20px;
+}
+.plan-free p {
+    text-align: justify;
 }
 
 

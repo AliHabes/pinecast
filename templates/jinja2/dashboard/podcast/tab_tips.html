@@ -1,15 +1,61 @@
-<div class="card-block card">
-  <strong>{{ _('Tip Jar') }}</strong>
-  <p>
-    {% trans %}Make money through your podcast with your Pinecast Tip Jar.{% endtrans %}
-  </p>
-
-  {% if not user_settings.has_connected_account() %}
+{% if not user_settings.has_connected_account() %}
+  <div class="card-block card">
+    <strong>{{ _('Tip Jar') }}</strong>
+    <p>
+      {% trans %}Make money through your podcast with your Pinecast Tip Jar.{% endtrans %}
+    </p>
     <p>
       {% trans us_url=(url('user_settings') + '#bank-account-details') %}
         Before you can start accepting tips, you must <a href="{{ us_url }}">add bank account details</a> to your account.
       {% endtrans %}
     </p>
+  </div>
+{% else %}
+  <div class="card-block card">
+    <div class="stats-panel">
+      <div class="segment">
+        <span>{{ _('All Time') }}</span>
+        <em>
+          {{ '$%0.2f' % (podcast.total_tips / 100) }}
+        </em>
+      </div>
+      <div class="segment">
+        <span>{{ _('Last Payout') }}</span>
+        {% set last_payout_date = podcast.last_payout_date() %}
+        <em title="{{ last_payout_date }}">
+          {{ last_payout_date|pretty_date if last_payout_date else _('Never') }}
+        </em>
+      </div>
+      {% set average_tip_this_month = podcast.average_tip_value_this_month() %}
+      {% if average_tip_this_month %}
+        <div class="segment">
+          <span>{{ _('Month Average') }}</span>
+          <em>
+            {{ '$%0.2f' % (average_tip_this_month / 100) }}
+          </em>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% set next_payout_date = podcast.next_payout_date() %}
+  {% if next_payout_date %}
+    <div class="card-block card">
+      <strong>{{ _('Next Payout') }}</strong>
+      <p>
+        {# TODO: this is not how to properly localize dates #}
+        {% trans payout_date=next_payout_date, payout_friendly=next_payout_date|pretty_date %}
+          Your podcast's tips will be deposited in your account {{ payout_friendly }} on {{ payout_date }}.
+        {% endtrans %}
+      </p>
+    </div>
+  {% else %}
+    <div class="card-block card">
+      <strong>{{ _('Next Payout') }}</strong>
+      <p>
+        {% trans %}
+          There are no pending tips for your podcast. Earn some tips and we'll schedule a payout date!
+        {% endtrans %}
+      </p>
+    </div>
   {% endif %}
-
-</div>
+{% endif %}

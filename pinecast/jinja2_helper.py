@@ -80,6 +80,9 @@ def pretty_date(time=None):
         diff = now - datetime.datetime.fromtimestamp(time)
     elif isinstance(time, datetime.datetime):
         diff = now - time
+    elif isinstance(time, datetime.date):
+        diff = now - datetime.datetime.combine(
+            time, datetime.datetime.min.time())
     elif not time:
         diff = now - now
     second_diff = diff.seconds

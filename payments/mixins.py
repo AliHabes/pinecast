@@ -77,6 +77,7 @@ class StripeManagedAccountMixin(object):
             transfer_schedule={
                 'delay_days': 7,
                 'interval': 'daily',
+                'weekly_anchor': 'friday',
             })
 
         self.stripe_payout_managed_account = account.id

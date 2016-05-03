@@ -53,15 +53,8 @@ class Podcast(models.Model):
 
     total_tips = models.PositiveIntegerField(
         default=0,
-        help_text=ugettext_lazy('Tips collected over podcast lifetime in cents'))
-    tip_value = models.PositiveIntegerField(
-        default=0,
-        help_text=ugettext_lazy('Unpaid tip value in cents'))
-    tip_last_payout = models.DateTimeField(default=None, null=True)
-    tip_last_payout_amount = models.PositiveIntegerField(
-        default=0,
-        help_text=ugettext_lazy('Last tip payout value paid out in cents'))
-
+        help_text=ugettext_lazy(
+            'Tips collected over podcast lifetime in cents'))
 
     @cached_method
     def get_category_list(self):
@@ -85,20 +78,24 @@ class Podcast(models.Model):
     @cached_method
     def is_still_importing(self):
         return bool(
-            self.assetimportrequest_set.filter(failed=False, resolved=False).count())
+            self.assetimportrequest_set
+                .filter(failed=False, resolved=False)
+                .count())
 
     @cached_method
     def get_episodes(self):
         episodes = self.podcastepisode_set.filter(
             publish__lt=datetime.datetime.now(),
             awaiting_import=False).order_by('-publish')
-        if UserSettings.get_from_user(self.owner).plan == payment_plans.PLAN_DEMO:
+        us = UserSettings.get_from_user(self.owner)
+        if us.plan == payment_plans.PLAN_DEMO:
             episodes = episodes[:10]
         return episodes
 
     @cached_method
     def get_unpublished_count(self):
-        return self.podcastepisode_set.filter(publish__gt=datetime.datetime.now()).count()
+        return self.podcastepisode_set.filter(
+            publish__gt=datetime.datetime.now()).count()
 
     @cached_method
     def get_most_recent_episode(self):
@@ -117,10 +114,12 @@ class Podcast(models.Model):
             # This is inside a conditional because it's forced on for free
             # users.
             flags.append(FLAIR_POWERED_BY)
-        if payment_plans.minimum(plan, payment_plans.FEATURE_MIN_COMMENT_BOX):
+        if payment_plans.minimum(
+                plan, payment_plans.FEATURE_MIN_COMMENT_BOX):
             flags.append(FLAIR_FEEDBACK)
         try:
-            if payment_plans.minimum(plan, payment_plans.FEATURE_MIN_SITES) and self.site:
+            if payment_plans.minimum(
+                    plan, payment_plans.FEATURE_MIN_SITES) and self.site:
                 flags.append(FLAIR_SITE_LINK)
         except Exception:
             # FIXME: Catch the correct exception here.
@@ -135,6 +134,47 @@ class Podcast(models.Model):
     def __unicode__(self):
         return self.name
 
+    def last_eligible_payout_date(self):
+        today = datetime.date.today()
+        days_since_friday = (today.isoweekday() - 5) % 7
+        return today - datetime.timedelta(days=days_since_friday)
+
+
+    def last_payout_date(self):
+        last_eligible_payout_date = self.last_eligible_payout_date()
+
+        last_day_for_charges_in_last_payout = (
+            last_eligible_payout_date - datetime.timedelta(days=7))
+
+        last_tip = (self.tip_events
+            .filter(occurred_at__lte=last_day_for_charges_in_last_payout)
+            .order_by('-occurred_at')
+            .first())
+
+        if not last_tip:
+            return None
+
+        return last_tip.payout_date()
+
+    def next_payout_date(self):
+        last_eligible_payout_date = self.last_eligible_payout_date()
+        last_tip = (self.tip_events
+                        .filter(occurred_at__gt=last_eligible_payout_date -
+                                    datetime.timedelta(days=7))
+                        .order_by('-occurred_at')
+                        .first())
+
+        if not last_tip:
+            return None
+
+        return last_tip.payout_date()
+
+    def average_tip_value_this_month(self):
+        events = (self.tip_events
+            .filter(occurred_at__gt=datetime.datetime.now() -
+                        datetime.timedelta(days=30)))
+        return events.aggregate(models.aggregates.Avg('amount'))['amount__avg']
+
 
 class PodcastEpisode(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -144,7 +184,8 @@ class PodcastEpisode(models.Model):
     created = models.DateTimeField(auto_now=True)
     publish = models.DateTimeField()
     description = models.TextField(default='')
-    duration = models.PositiveIntegerField(help_text=ugettext_lazy('Audio duration in seconds'))
+    duration = models.PositiveIntegerField(
+        help_text=ugettext_lazy('Audio duration in seconds'))
 
     audio_url = models.URLField(max_length=500)
     audio_size = models.PositiveIntegerField(default=0)
@@ -178,7 +219,8 @@ class PodcastEpisode(models.Model):
     @cached_method
     def formatted_duration(self):
         seconds = self.duration
-        return '%02d:%02d:%02d' % (seconds // 3600, seconds % 3600 // 60, seconds % 60)
+        return '%02d:%02d:%02d' % (
+            seconds // 3600, seconds % 3600 // 60, seconds % 60)
 
     @cached_method
     def is_published(self):
@@ -197,7 +239,8 @@ class PodcastEpisode(models.Model):
     def get_html_description(self, is_demo=None):
         raw = self.description
         if is_demo is None:
-            is_demo = UserSettings.get_from_user(self.podcast.owner).plan == payment_plans.PLAN_DEMO
+            us = UserSettings.get_from_user(self.podcast.owner)
+            is_demo = us.plan == payment_plans.PLAN_DEMO
         available_flags = self.podcast.get_available_flair_flags(flatten=True)
 
         if (self.description_flair.site_link and
@@ -209,12 +252,16 @@ class PodcastEpisode(models.Model):
             FLAIR_FEEDBACK in available_flags):
             prompt = self.get_feedback_prompt()
             fb_url = 'https://pinecast.com%s' % reverse(
-                'ep_comment_box', podcast_slug=self.podcast.slug, episode_id=str(self.id))
+                'ep_comment_box',
+                podcast_slug=self.podcast.slug,
+                episode_id=str(self.id))
             raw += '\n\n%s [%s](%s)' % (prompt, fb_url, fb_url)
 
         if (is_demo or
-            self.description_flair.powered_by and FLAIR_SITE_LINK in available_flags):
-            raw += '\n\nThis podcast is powered by [Pinecast](https://pinecast.com).'
+                self.description_flair.powered_by and
+                FLAIR_SITE_LINK in available_flags):
+            raw += ('\n\nThis podcast is powered by '
+                    '[Pinecast](https://pinecast.com).')
 
         markdown = gfm.markdown(raw)
         return sanitize(markdown)
@@ -224,7 +271,8 @@ class PodcastEpisode(models.Model):
             prompt = self.episodefeedbackprompt
             return prompt.prompt
         except ObjectDoesNotExist:
-            return default if default is not None else ugettext('Send us your feedback online:')
+            return default if default is not None else ugettext(
+                'Send us your feedback online:')
 
     def delete_feedback_prompt(self):
         try:
@@ -355,54 +403,3 @@ class PodcastCategory(models.Model):
 
     def __unicode__(self):
         return '%s: %s' % (self.podcast.name, self.category)
-
-
-class PodcastReviewAssociation(models.Model):
-    SERVICE_ITUNES = 'ITUNES'
-    SERVICE_STITCHER = 'STITCHER'
-    SERVICES = (
-        (SERVICE_ITUNES, 'iTunes'),
-        (SERVICE_STITCHER, 'Stitcher Radio'),
-    )
-    SERVICES_SET = set(x for x, y in SERVICES)
-    SERVICES_MAP = {x: y for x, y in SERVICES}
-
-    EXAMPLE_URLS = {
-        SERVICE_ITUNES: 'https://itunes.apple.com/us/podcast/this-american-life/id201671138',
-        SERVICE_STITCHER: 'http://www.stitcher.com/podcast/this-american-life',
-    }
-
-    podcast = models.ForeignKey(Podcast)  # Not one-to-one because you can have multiple services
-    service = models.CharField(choices=SERVICES, max_length=16)
-    payload = models.CharField(max_length=256)
-
-    def __unicode__(self):
-        return '%s: %s' % (self.podcast.name, self.service)
-
-    @classmethod
-    def create_for_service(cls, service, **kwargs):
-        kwargs['service'] = service
-        if service == SERVICE_STITCHER:
-            return cls.create_service_stitcher(**kwargs)
-        elif service == SERVICE_ITUNES:
-            return cls.create_service_itunes(**kwargs)
-        else:
-            raise Exception('Unknown service')
-
-    @classmethod
-    def create_service_stitcher(cls, **kwargs):
-        stitcher_page = requests.get(kwargs['url'], timeout=5)
-        result = re.search(r'productId:\s+"(\w+)"', stitcher_page.text)
-        if not result:
-            raise Exception(ugettext('Could not find podcast ID'))
-
-        return cls(payload=result.group(1), **kwargs)
-
-    @classmethod
-    def create_service_itunes(cls, **kwargs):
-        page = requests.get(kwargs['url'], timeout=5, headers={'user-agent': 'iTunes/9.1.1'})
-        result = re.search(r'<string>\s*(https://itunes\.apple\.com/.*)\s*</string>', page.text)
-        if not result:
-            raise Exception(ugettext('Could not find podcast ID'))
-
-        return cls(payload=result.group(1), **kwargs)

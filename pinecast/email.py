@@ -21,7 +21,7 @@ def _send_mail(to, subject, body, email_format='Text'):
     conn = session.client('ses')
     print 'Sending email to %s' % to
     conn.send_email(
-        Source='mattbasta@gmail.com',
+        Source=settings.SUPPORT_EMAIL,
         Destination={'ToAddresses': [to]},
         Message={
             'Subject': {
