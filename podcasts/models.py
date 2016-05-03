@@ -175,6 +175,12 @@ class Podcast(models.Model):
                         datetime.timedelta(days=30)))
         return events.aggregate(models.aggregates.Avg('amount'))['amount__avg']
 
+    def tip_fees_paid(self):
+        return (self.tip_events.all()
+                    .aggregate(
+                        models.aggregates.Sum('fee_amount')))['fee_amount__sum']
+
+
 
 class PodcastEpisode(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

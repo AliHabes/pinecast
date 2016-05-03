@@ -46,7 +46,6 @@ class TipEvent(models.Model):
         return following_payout + datetime.timedelta(days=7)
 
 
-
 class RecurringTip(models.Model):
     tipper = models.ForeignKey(TipUser, related_name='recurring_tips')
     podcast = models.ForeignKey(Podcast, related_name='recurring_tips')

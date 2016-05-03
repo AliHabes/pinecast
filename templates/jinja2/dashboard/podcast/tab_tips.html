@@ -35,6 +35,15 @@
           </em>
         </div>
       {% endif %}
+
+      {% if user_settings.plan == PLANS['PLAN_DEMO'] %}
+        <div class="segment">
+          <span>{{ _('Fees Paid') }}</span>
+          <em>
+            {{ '$%0.2f' % (podcast.tip_fees_paid() / 100) }}
+          </em>
+        </div>
+      {% endif %}
     </div>
   </div>
   {% set next_payout_date = podcast.next_payout_date() %}
