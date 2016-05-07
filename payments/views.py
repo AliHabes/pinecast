@@ -19,7 +19,10 @@ def upgrade(req):
     us = UserSettings.get_from_user(req.user)
     customer = us.get_stripe_customer()
 
-    ctx = {'stripe_customer': customer}
+    ctx = {
+        'error': req.GET.get('error'),
+        'stripe_customer': customer,
+    }
     return _pmrender(req, 'payments/main.html', ctx)
 
 
@@ -83,6 +86,8 @@ def upgrade_set_plan(req):
     else:
         try:
             sub = customer.subscriptions.create(plan=plan_stripe_id)
+        except stripe.error.CardError:
+            return redirect(reverse('upgrade') + '?error=card')
         except Exception:
             return redirect('upgrade')
 

@@ -6,6 +6,12 @@
   <h1>{{ _('Upgrade') }}</h1>
 </header>
 
+{% if error == 'card' %}
+  <div class="error">
+    {{ _('There was a problem processing your card. Please contact your credit card company.') }}
+  </div>
+{% endif %}
+
 {% if not stripe_customer %}
   <div class="card card-upgrade">
     <div class="upgrade-progress" data-progress="1"></div>
