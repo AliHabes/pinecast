@@ -104,7 +104,7 @@ def start_import(req):
                 p.delete()
             except Exception:
                 pass
-        return {'error': ugettext('There was a problem saving the podcast: %s') % str(e)}
+        return {'error': ugettext('There was a problem saving the podcast: %u') % unicode(e)}
 
     created_items = []
     try:
@@ -150,7 +150,7 @@ def start_import(req):
                 i.delete()
             except Exception:
                 pass
-        return {'error': ugettext('There was a problem saving the podcast items: %s') % str(e)}
+        return {'error': ugettext('There was a problem saving the podcast items: %u') % unicode(e)}
 
     for ir in asset_requests:
         ir.save()
