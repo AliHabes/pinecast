@@ -67,4 +67,16 @@
       </p>
     </div>
   {% endif %}
+  <div class="card-block card">
+    <strong>{{ _('Tip Jar URL') }}</strong>
+      <p>
+        {% trans %}
+          Share this address with your listeners to receive contributions to your podcast.
+        {% endtrans %}
+      </p>
+    <input type="url"
+      title="{{ _('Tip Jar') }}"
+      readonly
+      value="https://pinecast.com{{ url('tip_jar', podcast_slug=podcast.slug) }}">
+  </div>
 {% endif %}
