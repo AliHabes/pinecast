@@ -24,8 +24,8 @@ class TipEvent(models.Model):
     tipper = models.ForeignKey(TipUser, related_name='tip_events')
     podcast = models.ForeignKey(Podcast, related_name='tip_events')
     occurred_at = models.DateTimeField(auto_now=True)
-    if settings.DEBUG:
-        occurred_at.editable = True
+    # if settings.DEBUG:
+    #     occurred_at.editable = True
 
     stripe_charge = models.CharField(max_length=64, null=True)
 

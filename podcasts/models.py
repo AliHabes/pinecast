@@ -20,11 +20,11 @@ FLAIR_FEEDBACK = 'feedback_link'
 FLAIR_SITE_LINK = 'site_link'
 FLAIR_POWERED_BY = 'powered_by'
 FLAIR_FLAGS = (
-    (FLAIR_FEEDBACK, ugettext_lazy('Feedback Link')),
-    (FLAIR_SITE_LINK, ugettext_lazy('Site Link')),
-    (FLAIR_POWERED_BY, ugettext_lazy('Powered By Pinecast')),
+    (FLAIR_FEEDBACK, ugettext_lazy('Feedback Link'), 'flair_feedback'),
+    (FLAIR_SITE_LINK, ugettext_lazy('Site Link'), 'flair_site_link'),
+    (FLAIR_POWERED_BY, ugettext_lazy('Powered By Pinecast'), 'flair_powered_by'),
 )
-FLAIR_FLAGS_MAP = {k: v for k, v in FLAIR_FLAGS}
+FLAIR_FLAGS_MAP = {k: v for k, v, _ in FLAIR_FLAGS}
 
 
 class Podcast(models.Model):
@@ -34,7 +34,7 @@ class Podcast(models.Model):
     name = models.CharField(max_length=256)
     subtitle = models.CharField(max_length=512, default='', blank=True)
 
-    created = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now=True, editable=False)
     cover_image = models.URLField(max_length=500)
     description = models.TextField(blank=True)
     is_explicit = models.BooleanField(default=False)
@@ -187,7 +187,7 @@ class PodcastEpisode(models.Model):
     podcast = models.ForeignKey(Podcast)
     title = models.CharField(max_length=1024)
     subtitle = models.CharField(max_length=1024, default='', blank=True)
-    created = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now=True, editable=False)
     publish = models.DateTimeField()
     description = models.TextField(default='')
     duration = models.PositiveIntegerField(
@@ -205,9 +205,13 @@ class PodcastEpisode(models.Model):
     awaiting_import = models.BooleanField(default=False)
 
     description_flair = BitField(
-        flags=FLAIR_FLAGS,
+        flags=tuple((x, y) for x, y, _ in FLAIR_FLAGS),
         default=0
     )
+
+    flair_feedback = models.BooleanField(default=False)
+    flair_site_link = models.BooleanField(default=False)
+    flair_powered_by = models.BooleanField(default=False)
 
     EXPLICIT_OVERRIDE_CHOICE_NONE = 'none'
     EXPLICIT_OVERRIDE_CHOICE_EXPLICIT = 'expl'
@@ -234,9 +238,9 @@ class PodcastEpisode(models.Model):
 
 
     def set_flair(self, post, no_save=False):
-        val = 0
-        for flag, _ in FLAIR_FLAGS:
+        for flag, _, attr in FLAIR_FLAGS:
             if post.get('flair_%s' % flag):
+                setattr(self, attr, True)
                 val = val | getattr(PodcastEpisode.description_flair, flag)
         self.description_flair = val
         if not no_save:
