@@ -76,7 +76,7 @@ class StripeManagedAccountMixin(object):
             },
             transfer_schedule={
                 'delay_days': 7,
-                'interval': 'daily',
+                'interval': 'weekly',
                 'weekly_anchor': 'friday',
             })
 
