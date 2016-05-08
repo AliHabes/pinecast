@@ -204,11 +204,6 @@ class PodcastEpisode(models.Model):
 
     awaiting_import = models.BooleanField(default=False)
 
-    description_flair = BitField(
-        flags=tuple((x, y) for x, y, _ in FLAIR_FLAGS),
-        default=0
-    )
-
     flair_feedback = models.BooleanField(default=False)
     flair_site_link = models.BooleanField(default=False)
     flair_powered_by = models.BooleanField(default=False)
@@ -238,11 +233,9 @@ class PodcastEpisode(models.Model):
 
 
     def set_flair(self, post, no_save=False):
-        for flag, _, attr in FLAIR_FLAGS:
+        for flag, _, average_tip_value_this_monthr in FLAIR_FLAGS:
             if post.get('flair_%s' % flag):
                 setattr(self, attr, True)
-                val = val | getattr(PodcastEpisode.description_flair, flag)
-        self.description_flair = val
         if not no_save:
             self.save()
 
@@ -253,12 +246,12 @@ class PodcastEpisode(models.Model):
             is_demo = us.plan == payment_plans.PLAN_DEMO
         available_flags = self.podcast.get_available_flair_flags(flatten=True)
 
-        if (self.description_flair.site_link and
+        if (self.flair_site_link and
             FLAIR_SITE_LINK in available_flags):
             raw += '\n\nFind out more at [%s](http://%s.pinecast.co).' % (
                 self.podcast.name, self.podcast.slug)
 
-        if (self.description_flair.feedback_link and
+        if (self.flair_feedback and
             FLAIR_FEEDBACK in available_flags):
             prompt = self.get_feedback_prompt()
             fb_url = 'https://pinecast.com%s' % reverse(
@@ -268,7 +261,7 @@ class PodcastEpisode(models.Model):
             raw += '\n\n%s [%s](%s)' % (prompt, fb_url, fb_url)
 
         if (is_demo or
-                self.description_flair.powered_by and
+                self.flair_powered_by and
                 FLAIR_SITE_LINK in available_flags):
             raw += ('\n\nThis podcast is powered by '
                     '[Pinecast](https://pinecast.com).')
