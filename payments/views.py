@@ -132,13 +132,6 @@ def set_tip_cashout(req):
     except Exception:
         return {'success': False, 'error': 'invalid dob'}
 
-    us = UserSettings.get_from_user(req.user)
-    account = us.get_stripe_managed_account()
-    if account:
-        us.stripe_payout_managed_account = None
-        us.save()
-        account.delete()
-
     forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
     if forwarded_for:
         ip = forwarded_for.split(',')[0]
@@ -163,7 +156,16 @@ def set_tip_cashout(req):
         'last_name': req.POST.get('lastName'),
         'type': 'individual',
     }
-    us.create_stripe_managed_account(
-        req.POST.get('token'), ip, legal_entity)
+
+    us = UserSettings.get_from_user(req.user)
+    account = us.get_stripe_managed_account()
+    if account:
+        account.external_account = req.POST.get('token')
+        for key in legal_entity:
+            setattr(account.legal_entity, key, legal_entity[key])
+        account.save()
+    else:
+        us.create_stripe_managed_account(
+            req.POST.get('token'), ip, legal_entity)
 
     return {'success': True}
