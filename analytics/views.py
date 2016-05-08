@@ -134,7 +134,7 @@ def podcast_listen_platform_breakdown(req, pod):
     return f.format_breakdown(None)
 
 
-@restrict(plans.PLAN_PRO)
+@restrict(plans.PLAN_STARTER)
 def episode_listen_breakdown(req, pod):
     ep = get_object_or_404(PodcastEpisode, podcast=pod, id=req.GET.get('episode'))
     f = (Format(req, 'listen')
