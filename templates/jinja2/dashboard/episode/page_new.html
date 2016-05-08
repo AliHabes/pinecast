@@ -74,7 +74,7 @@
           {% for flag, flag_name in flags %}
             <li>
               <label class="checkbox">
-                <input type="checkbox" name="flair_{{ flag }}"{{ ' checked' if default.get('flair_%s' % flag, getattr(latest_ep.description_flair, flag) if latest_ep else False) else '' }}>
+                <input type="checkbox" name="flair_{{ flag }}"{{ ' checked' if default.get('flair_%s' % flag, getattr(latest_ep, flag) if latest_ep else False) else '' }}>
                 <span>{{ flag_name }}</span>
               </label>
             </li>

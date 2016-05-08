@@ -16,15 +16,15 @@ from accounts.models import Network, UserSettings
 from pinecast.helpers import cached_method, reverse, sanitize
 
 
-FLAIR_FEEDBACK = 'feedback_link'
-FLAIR_SITE_LINK = 'site_link'
-FLAIR_POWERED_BY = 'powered_by'
+FLAIR_FEEDBACK = 'flair_feedback'
+FLAIR_SITE_LINK = 'flair_site_link'
+FLAIR_POWERED_BY = 'flair_powered_by'
 FLAIR_FLAGS = (
-    (FLAIR_FEEDBACK, ugettext_lazy('Feedback Link'), 'flair_feedback'),
-    (FLAIR_SITE_LINK, ugettext_lazy('Site Link'), 'flair_site_link'),
-    (FLAIR_POWERED_BY, ugettext_lazy('Powered By Pinecast'), 'flair_powered_by'),
+    (FLAIR_FEEDBACK, ugettext_lazy('Feedback Link')),
+    (FLAIR_SITE_LINK, ugettext_lazy('Site Link')),
+    (FLAIR_POWERED_BY, ugettext_lazy('Powered By Pinecast')),
 )
-FLAIR_FLAGS_MAP = {k: v for k, v, _ in FLAIR_FLAGS}
+FLAIR_FLAGS_MAP = {k: v for k, v in FLAIR_FLAGS}
 
 
 class Podcast(models.Model):
@@ -233,9 +233,8 @@ class PodcastEpisode(models.Model):
 
 
     def set_flair(self, post, no_save=False):
-        for flag, _, average_tip_value_this_monthr in FLAIR_FLAGS:
-            if post.get('flair_%s' % flag):
-                setattr(self, attr, True)
+        for flag, _ in FLAIR_FLAGS:
+            setattr(self, flag, bool(post.get('flair_%s' % flag)))
         if not no_save:
             self.save()
 
