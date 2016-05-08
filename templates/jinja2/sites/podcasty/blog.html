@@ -7,7 +7,7 @@
       <div>
         <h1><a href="{{ url('site_post', podcast_slug=site.podcast.slug, post_slug=post.slug) }}">{{ post.title }}</a></h1>
         <div>
-          {{ post.body|markdown|safe }}
+          {{ post.body|markdown|sanitize|safe }}
         </div>
       </div>
     </article>
