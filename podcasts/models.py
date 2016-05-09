@@ -19,10 +19,12 @@ from pinecast.helpers import cached_method, reverse, sanitize
 FLAIR_FEEDBACK = 'flair_feedback'
 FLAIR_SITE_LINK = 'flair_site_link'
 FLAIR_POWERED_BY = 'flair_powered_by'
+FLAIR_TIP_JAR = 'flair_tip_jar'
 FLAIR_FLAGS = (
     (FLAIR_FEEDBACK, ugettext_lazy('Feedback Link')),
     (FLAIR_SITE_LINK, ugettext_lazy('Site Link')),
     (FLAIR_POWERED_BY, ugettext_lazy('Powered By Pinecast')),
+    (FLAIR_TIP_JAR, ugettext_lazy('Tip Jar')),
 )
 FLAIR_FLAGS_MAP = {k: v for k, v in FLAIR_FLAGS}
 
@@ -108,7 +110,8 @@ class Podcast(models.Model):
         return latest.publish if latest else None
 
     def get_available_flair_flags(self, flatten=False):
-        plan = UserSettings.get_from_user(self.owner).plan
+        us = UserSettings.get_from_user(self.owner)
+        plan = us.plan
         flags = []
         if payment_plans.minimum(plan, payment_plans.PLAN_STARTER):
             # This is inside a conditional because it's forced on for free
@@ -117,6 +120,8 @@ class Podcast(models.Model):
         if payment_plans.minimum(
                 plan, payment_plans.FEATURE_MIN_COMMENT_BOX):
             flags.append(FLAIR_FEEDBACK)
+        if us.stripe_payout_managed_account:
+            flags.append(FLAIR_TIP_JAR)
         try:
             if payment_plans.minimum(
                     plan, payment_plans.FEATURE_MIN_SITES) and self.site:
@@ -207,6 +212,7 @@ class PodcastEpisode(models.Model):
     flair_feedback = models.BooleanField(default=False)
     flair_site_link = models.BooleanField(default=False)
     flair_powered_by = models.BooleanField(default=False)
+    flair_tip_jar = models.BooleanField(default=False)
 
     EXPLICIT_OVERRIDE_CHOICE_NONE = 'none'
     EXPLICIT_OVERRIDE_CHOICE_EXPLICIT = 'expl'
@@ -244,6 +250,11 @@ class PodcastEpisode(models.Model):
             us = UserSettings.get_from_user(self.podcast.owner)
             is_demo = us.plan == payment_plans.PLAN_DEMO
         available_flags = self.podcast.get_available_flair_flags(flatten=True)
+
+        if (self.flair_tip_jar and
+            FLAIR_TIP_JAR in available_flags):
+            raw += '\n\nSupport %s by donating to the [tip jar](https://pinecast.com/payments/tips/%s).' % (
+                self.podcast.name, self.podcast.slug)
 
         if (self.flair_site_link and
             FLAIR_SITE_LINK in available_flags):
