@@ -1,14 +1,23 @@
-{% if not user_settings.has_connected_account() %}
+{% set owner_us = get_user_settings(podcast.owner) %}
+{% if not owner_us.has_connected_account() %}
   <div class="card-block card">
     <strong>{{ _('Tip Jar') }}</strong>
     <p>
       {% trans %}Make money through your podcast with your Pinecast Tip Jar.{% endtrans %}
     </p>
-    <p>
-      {% trans us_url=(url('user_settings') + '#bank-account-details') %}
-        Before you can start accepting tips, you must <a href="{{ us_url }}">add bank account details</a> to your account.
-      {% endtrans %}
-    </p>
+    {% if user == podcast.owner %}
+      <p>
+        {% trans us_url=(url('user_settings') + '#bank-account-details') %}
+          Before you can start accepting tips, you must <a href="{{ us_url }}">add bank account details</a> to your account.
+        {% endtrans %}
+      </p>
+    {% else %}
+      <p>
+        {% trans %}
+          The owner of this podcast needs to add their bank account details to their account in order to start accepting tips on this podcast. An account is required in order for us to process payments.
+        {% endtrans %}
+      </p>
+    {% endif %}
   </div>
 {% else %}
   <div class="card-block card">
@@ -36,7 +45,7 @@
         </div>
       {% endif %}
 
-      {% if user_settings.plan == PLANS['PLAN_DEMO'] %}
+      {% if owner_us.plan == PLANS['PLAN_DEMO'] %}
         <div class="segment">
           <span>{{ _('Fees Paid') }}</span>
           <em>
