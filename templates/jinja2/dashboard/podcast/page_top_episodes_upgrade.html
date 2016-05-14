@@ -7,11 +7,11 @@
 
 <div class="upgrade-empty-state empty-state">
   {% if user == podcast.owner %}
-    {{ _('Top episode counts are only to Pro and Ultimate customers.') }}
+    {{ _('Top episode counts are only to Pro customers.') }}
     <br>
     <a class="btn" href="{{ url('upgrade') }}">{{ _('Upgrade Now') }}</a>
   {% else %}
-    {{ _('Top episode counts are only available to podcasts owned by Pro and Ultimate customers.') }}
+    {{ _('Top episode counts are only available to podcasts owned by Pro customers.') }}
   {% endif %}
 </div>
 

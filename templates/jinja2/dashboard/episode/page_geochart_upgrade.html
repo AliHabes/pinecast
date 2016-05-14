@@ -9,11 +9,11 @@
 
 <div class="upgrade-empty-state empty-state">
   {% if user == podcast.owner %}
-    {{ _('Episode geographic analytics data are only to Ultimate customers.') }}
+    {{ _('Episode geographic analytics data are only to Pro customers.') }}
     <br>
     <a class="btn" href="{{ url('upgrade') }}">{{ _('Upgrade Now') }}</a>
   {% else %}
-    {{ _('Episode geographic analytics data are only available to podcasts owned by Ultimate customers.') }}
+    {{ _('Episode geographic analytics data are only available to podcasts owned by Pro customers.') }}
   {% endif %}
 </div>
 
