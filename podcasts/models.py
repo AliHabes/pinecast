@@ -51,7 +51,7 @@ class Podcast(models.Model):
     rss_redirect = models.URLField(null=True, blank=True, max_length=500)
     stats_base_listens = models.PositiveIntegerField(default=0)
 
-    networks = models.ManyToManyField(Network)
+    networks = models.ManyToManyField(Network, blank=True)
 
     total_tips = models.PositiveIntegerField(
         default=0,
