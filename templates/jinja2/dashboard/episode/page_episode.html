@@ -44,6 +44,12 @@
 
 {% block dashboard_body %}
 
+{% if podcast.owner == user %}
+  {% set owner_settings = user_settings %}
+{% else %}
+  {% set owner_settings = get_user_settings(podcast.owner) %}
+{% endif %}
+
 <div class="tab-overview">
   <div class="card-block card">
     <div class="stats-panel">
@@ -73,7 +79,7 @@
       {{ episode.get_html_description()|safe }}
     </div>
     <div class="sidebar">
-      {% if podcast.site %}
+      {% if podcast.get_site() %}
         <div class="card-block card">
           <strong>{{ _('Site Page URL') }}</strong>
           <input type="url"
@@ -191,7 +197,7 @@
 
   <div class="card-block card">
     <strong>{{ _('Embed Code') }}</strong>
-    {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_PLAYER) %}
+    {% if minimum_plan(owner_settings, PLANS.FEATURE_MIN_PLAYER) %}
       <textarea readonly class="embed-textarea"><iframe src="https://pinecast.com{{ url('player', episode_id=str(episode.id)) }}" seamless height="60" style="border:0" class="pinecast-embed" frameborder="0"></iframe></textarea>
     {% else %}
       <div class="upgrade-empty-state empty-state">
@@ -212,7 +218,7 @@
       value="https://pinecast.com{{ url('listen', kwargs={'episode_id': str(episode.id)}) }}">
   </div>
 
-  {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_TORRENT) %}
+  {% if minimum_plan(owner_settings, PLANS.FEATURE_MIN_TORRENT) %}
     <div class="card-block card">
       <strong>{{ _('Torrent URL') }}</strong>
       <p>{{ _('Note that downloads via BitTorrent are not counted towards listen stats.') }}</p>

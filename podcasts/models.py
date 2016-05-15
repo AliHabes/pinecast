@@ -59,6 +59,10 @@ class Podcast(models.Model):
             'Tips collected over podcast lifetime in cents'))
 
     @cached_method
+    def get_site(self):
+        return self.site
+
+    @cached_method
     def get_category_list(self):
         return ','.join(x.category for x in self.podcastcategory_set.all())
 
@@ -123,7 +127,7 @@ class Podcast(models.Model):
             flags.append(FLAIR_TIP_JAR)
         try:
             if payment_plans.minimum(
-                    plan, payment_plans.FEATURE_MIN_SITES) and self.site:
+                    plan, payment_plans.FEATURE_MIN_SITES) and self.get_site():
                 flags.append(FLAIR_SITE_LINK)
         except Exception:
             # FIXME: Catch the correct exception here.
