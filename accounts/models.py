@@ -27,7 +27,7 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
     @classmethod
     def get_from_user(cls, user):
         try:
-            return cls.objects.get(user=user)
+            return user.usersettings
         except cls.DoesNotExist:
             us = UserSettings(user=user)
             us.save()
