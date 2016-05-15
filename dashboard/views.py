@@ -49,10 +49,8 @@ def _pmrender(req, template, data=None):
         networks = req.user.network_set.filter(deactivated=False)
         data.setdefault('networks', networks)
 
-        podcasts = set(req.user.podcast_set.all())
-        for network in networks:
-            for p in network.podcast_set.all():
-                podcasts.add(p)
+        podcasts = (req.user.podcast_set.all() |
+                    Podcast.objects.filter(networks__in=networks))
         data.setdefault('podcasts', podcasts)
 
         uset = UserSettings.get_from_user(req.user)
