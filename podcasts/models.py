@@ -13,7 +13,7 @@ from django.utils.translation import ugettext, ugettext_lazy
 
 import accounts.payment_plans as payment_plans
 from accounts.models import Network, UserSettings
-from pinecast.helpers import cached_method, reverse, sanitize
+from pinecast.helpers import cached_method, reverse, round_now, sanitize
 
 
 FLAIR_FEEDBACK = 'flair_feedback'
@@ -87,7 +87,7 @@ class Podcast(models.Model):
     @cached_method
     def get_episodes(self):
         episodes = self.podcastepisode_set.filter(
-            publish__lt=datetime.datetime.now(),
+            publish__lt=round_now(),
             awaiting_import=False).order_by('-publish')
         us = UserSettings.get_from_user(self.owner)
         if us.plan == payment_plans.PLAN_DEMO:
@@ -97,13 +97,12 @@ class Podcast(models.Model):
     @cached_method
     def get_unpublished_count(self):
         return self.podcastepisode_set.filter(
-            publish__gt=datetime.datetime.now()).count()
+            publish__gt=round_now()).count()
 
     @cached_method
     def get_most_recent_episode(self):
-        if not self.get_episodes().count():
-            return None
-        return self.get_episodes()[0]
+        episodes = list(self.get_episodes())
+        return None if not episodes else episodes[0]
 
     def get_most_recent_publish_date(self):
         latest = self.get_most_recent_episode()
@@ -176,8 +175,7 @@ class Podcast(models.Model):
 
     def average_tip_value_this_month(self):
         events = (self.tip_events
-            .filter(occurred_at__gt=datetime.datetime.now() -
-                        datetime.timedelta(days=30)))
+            .filter(occurred_at__gt=round_now() - datetime.timedelta(days=30)))
         return events.aggregate(models.aggregates.Avg('amount'))['amount__avg']
 
     def tip_fees_paid(self):
@@ -235,7 +233,7 @@ class PodcastEpisode(models.Model):
 
     @cached_method
     def is_published(self):
-        return not self.awaiting_import and self.publish <= datetime.datetime.now()
+        return not self.awaiting_import and self.publish <= round_now()
 
 
     def set_flair(self, post, no_save=False):

@@ -1,3 +1,4 @@
+import datetime
 from functools import wraps
 
 import bleach
@@ -40,16 +41,17 @@ def tz_offset(tz_name):
 
 
 def cached_method(func):
-    return func # temporary
     @wraps(func)
     def memoized(self, *args):
-        cache = getattr(self, '__pccache__', None)
+        cache = getattr(self, '__pccache__%s__' % func.__name__, None)
         if not cache:
             cache = {}
-            setattr(self, '__pccache__', cache)
-        if args not in cache:
-            cache[args] = func(self, *args)
-        return cache[args]
+            setattr(self, '__pccache__%s__' % func.__name__, cache)
+
+        targs = tuple(args)
+        if targs not in cache:
+            cache[targs] = func(self, *args)
+        return cache[targs]
     return memoized
 
 
@@ -77,3 +79,8 @@ def validate_recaptcha(response, ip):
         print parsed.get('error-codes')
 
     return parsed['success']
+
+
+def round_now():
+    now = datetime.datetime.now()
+    return now - datetime.timedelta(microseconds=now.microsecond)
