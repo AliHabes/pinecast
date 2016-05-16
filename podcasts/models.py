@@ -60,7 +60,10 @@ class Podcast(models.Model):
 
     @cached_method
     def get_site(self):
-        return self.site
+        try:
+            return self.site
+        except Exception:
+            return None
 
     @cached_method
     def get_category_list(self):
@@ -125,14 +128,10 @@ class Podcast(models.Model):
             flags.append(FLAIR_FEEDBACK)
         if us.stripe_payout_managed_account:
             flags.append(FLAIR_TIP_JAR)
-        try:
-            if payment_plans.minimum(
-                    plan, payment_plans.FEATURE_MIN_SITES) and self.get_site():
-                flags.append(FLAIR_SITE_LINK)
-        except Exception:
-            # FIXME: Catch the correct exception here.
-            # `RelatedObjectDoesNotExist` is a strange and fickle beast.
-            pass
+
+        if payment_plans.minimum(
+                plan, payment_plans.FEATURE_MIN_SITES) and self.get_site():
+            flags.append(FLAIR_SITE_LINK)
 
         if flatten:
             return flags
