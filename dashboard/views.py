@@ -76,6 +76,9 @@ def get_podcast(req, slug):  # TODO: move to the Podcast model
     except Podcast.DoesNotExist:
         raise Http404()
 
+    if req.user.is_staff:  # Admins should be able to see everything
+        return pod
+
     if pod.owner == req.user:
         return pod
     pods = Network.objects.filter(deactivated=False, members__in=[req.user], podcast__in=[pod])
