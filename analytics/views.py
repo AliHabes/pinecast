@@ -26,7 +26,8 @@ def restrict(minimum_plan):
             pod = get_podcast(req, req.GET.get('podcast'))
 
             uset = UserSettings.get_from_user(pod.owner)
-            if not plans.minimum(uset.plan, minimum_plan):
+            if (not plans.minimum(uset.plan, minimum_plan) and
+                not req.user.is_staff):
                 return HttpResponseForbidden()
 
             resp = view(req, pod, *args[1:], **kwargs)
@@ -134,7 +135,7 @@ def podcast_listen_platform_breakdown(req, pod):
     return f.format_breakdown(None)
 
 
-@restrict(plans.PLAN_STARTER)
+@restrict(plans.PLAN_DEMO)
 def episode_listen_breakdown(req, pod):
     ep = get_object_or_404(PodcastEpisode, podcast=pod, id=req.GET.get('episode'))
     f = (Format(req, 'listen')
