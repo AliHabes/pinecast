@@ -213,9 +213,13 @@ EMAIL_CONFIRMATION_MAX_AGE = 3600 * 24 * 2  # Two days
 SUPPORT_URL = 'https://pinecast.zendesk.com'
 SUPPORT_EMAIL = 'support@pinecast.zendesk.com'
 
+from django.http import Http404
 ROLLBAR = {
     'access_token': os.environ.get('ROLLBAR_ACCESS_TOKEN'),
     'environment': 'development' if DEBUG else 'production',
+    'exception_level_filters': [
+        (Http404, 'info'),
+    ],
     'branch': 'master',
     'root': os.getcwd(),
 }
