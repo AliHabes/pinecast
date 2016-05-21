@@ -58,6 +58,8 @@ def _pmrender(req, template, data=None):
         data.setdefault('tz_delta', uset.get_tz_delta())
         data.setdefault('max_upload_size', payment_plans.MAX_FILE_SIZE[uset.plan])
 
+    data['is_admin'] = req.user.is_staff and bool(req.GET.get('admin'))
+
     return render(req, template, data)
 
 

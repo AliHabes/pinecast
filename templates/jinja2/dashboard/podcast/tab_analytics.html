@@ -23,7 +23,7 @@
       data-chart-type="line"></div>
   </div>
 
-  {% if minimum_plan(podcast.owner, PLANS.PLAN_STARTER) %}
+  {% if minimum_plan(podcast.owner, PLANS.PLAN_STARTER) or is_admin %}
     <div class="row">
       <div class="card card-block chart-placeholder"
         data-type="podcast-listen-platform-breakdown"
