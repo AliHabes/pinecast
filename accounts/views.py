@@ -164,7 +164,7 @@ Someone requested a change to your email address on Pinecast. This email is
 to verify that you own the email address provided.
 '''),
         reverse('user_settings_change_email_finalize') + '?user=%s&email=%s' % (
-            urlencode(req.user.id), urlencode(req.POST.get('new_email'))),
+            urlencode(str(req.user.id)), urlencode(req.POST.get('new_email'))),
         req.POST.get('new_email')
     )
     return redirect(reverse('user_settings') + '?success=em')
