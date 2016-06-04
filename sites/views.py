@@ -125,21 +125,23 @@ def sitemap(req, podcast_slug):
             <loc>{url}</loc>
             <changefreq>weekly</changefreq>
         </url>
-        '''.format(url='%s?page=%d' % (reverse('site_home', podcast_slug=pod.slug), i + 1))
+        '''.format(url='%s?page=%d' % (
+            _subdomain_reverse('site_home', podcast_slug=pod.slug),
+            i + 1))
 
     output += '''
     <url><loc>{url}</loc></url>
-    '''.format(url=reverse('site_blog', podcast_slug=pod.slug))
+    '''.format(url=_subdomain_reverse('site_blog', podcast_slug=pod.slug))
 
     for episode in pod.podcastepisode_set.all():
         output += '''
         <url><loc>{url}</loc></url>
-        '''.format(url=reverse('site_episode', podcast_slug=pod.slug, episode_id=str(episode.id)))
+        '''.format(url=_subdomain_reverse('site_episode', podcast_slug=pod.slug, episode_id=str(episode.id)))
 
     for post in site.siteblogpost_set.all():
         output += '''
         <url><loc>{url}</loc></url>
-        '''.format(url=reverse('site_post', podcast_slug=pod.slug, post_slug=post.slug))
+        '''.format(url=_subdomain_reverse('site_post', podcast_slug=pod.slug, post_slug=post.slug))
 
 
     output += '</urlset>'
