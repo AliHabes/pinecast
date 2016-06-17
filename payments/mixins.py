@@ -11,13 +11,13 @@ class StripeCustomerMixin(object):
         return None
 
     def create_stripe_customer(self, token):
-        if self.stripe_customer_id:
-            self.get_stripe_customer().delete()
-
         customer = stripe.Customer.create(
             source=token,
             email=self.get_email(),
             description=self.get_stripe_description())
+
+        if self.stripe_customer_id:
+            self.get_stripe_customer().delete()
 
         self.stripe_customer_id = customer.id
         self.save()

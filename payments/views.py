@@ -118,7 +118,12 @@ def set_payment_method(req):
         customer.source = req.POST.get('token')
         customer.save()
     else:
-        us.create_stripe_customer(req.POST.get('token'))
+        try:
+            us.create_stripe_customer(req.POST.get('token'))
+        except stripe.error.CardError:
+            return {'error': ugettext('Card was rejected by the bank')}
+        except Exception:
+            return {'error': ugettext('The card could not be processed')}
 
     return {'success': True, 'id': us.stripe_customer_id}
 
