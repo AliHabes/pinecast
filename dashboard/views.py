@@ -193,6 +193,12 @@ def new_podcast(req):
     if not req.POST:
         return _pmrender(req, 'dashboard/podcast/page_new.html', ctx)
 
+    # Basic validation
+    if (not req.POST.get('slug') or
+        not req.POST.get('name')):
+        ctx.update(default=req.POST, error=True)
+        return _pmrender(req, 'dashboard/podcast/page_new.html', ctx)
+
     try:
         pod = Podcast(
             slug=req.POST.get('slug'),
