@@ -477,7 +477,7 @@ var PodcastImporter = React.createClass({
                 'p',
                 {style: {padding: '0 10px'}},
                 interpolate(
-                    ngettext(
+                    ngettextf(
                         'There is %d episode in this podcast.',
                         'There are %d episodes in this podcast.',
                         data.items.length
@@ -512,7 +512,7 @@ var PodcastImporter = React.createClass({
             data.items.length > 10 ? React.createElement(
                 'p',
                 {style: {'font-style': 'italic', 'padding-left': '10px'}},
-                interpolate(ngettext('%d item not shown', '%d items not shown', data.items.length - 10), [data.items.length - 10])
+                interpolate(ngettextf('%d item not shown', '%d items not shown', data.items.length - 10), [data.items.length - 10])
             ) : null,
             !this.state.podcastData.__ignored_items ? null : React.createElement(
                 'div',
@@ -634,5 +634,10 @@ Array.prototype.slice.call(placeholders).forEach(function(placeholder) {
         placeholder
     );
 });
+
+function ngettextf(singular, plural, count) {
+    var value = ngettext(singular, plural, count);
+    return value.replace(/%d/g, count);
+}
 
 }());
