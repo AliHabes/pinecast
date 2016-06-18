@@ -5,6 +5,13 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 
+has_bitfield = True
+try:
+    import bitfield.models
+except ImportError:
+    has_bitfield = False
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -16,4 +23,4 @@ class Migration(migrations.Migration):
             model_name='podcastepisode',
             name='description_flair',
         ),
-    ]
+    ] if has_bitfield else []
