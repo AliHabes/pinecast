@@ -4,7 +4,6 @@ import uuid
 
 import gfm
 import requests
-from bitfield import BitField
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist

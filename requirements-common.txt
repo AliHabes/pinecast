@@ -2,7 +2,6 @@ bleach==1.4.1
 boto3==1.2.2
 defusedxml==0.4.1
 Django==1.9
-django-bitfield==1.8.0
 gevent==1.1b1
 gfm==0.0.3
 greenlet==0.4.7
