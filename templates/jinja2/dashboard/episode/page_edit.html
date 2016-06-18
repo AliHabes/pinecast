@@ -43,7 +43,7 @@
         name="publish"
         required
         value="{{ default.get('publish', (episode.publish + tz_delta).strftime('%Y-%m-%dT%H:%M')) }}">
-      <button class="publish-now btn-neutral">{{ _('Now') }}</button>
+      <button class="publish-now btn-neutral" type="button">{{ _('Now') }}</button>
     </label>
 
     <label>

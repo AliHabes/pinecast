@@ -103,6 +103,10 @@ var Uploader = React.createClass({
         };
     },
 
+    componentWillReceiveProps: function(newProps) {
+        this.setState({uploaded: !!newProps.defURL});
+    },
+
     render: function() {
         return React.createElement(
             'div',
@@ -166,6 +170,7 @@ var Uploader = React.createClass({
                     {
                         className: 'btn-danger uploader-btn',
                         onClick: this.clearFile,
+                        type: 'button',
                     },
                     gettext('Clear File')
                 ),

@@ -19,10 +19,15 @@
     line-height: 1.2em;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .info-card span {
     color: #999;
     font-size: 13px;
+  }
+  .info-card b span {
+    color: #aaa;
+    font-weight: normal;
   }
   .main-body {
     background: #fff;
@@ -90,7 +95,12 @@
 <body>
 <div class="main-body">
   <div class="info-card">
-    <b>{{ episode.title }}</b>
+    <b>
+      {{ episode.title }}
+      {% if episode.subtitle %}
+        &nbsp;<span>{{ episode.subtitle }}</span>
+      {% endif %}
+    </b>
     <span>
       {% trans author=episode.podcast.author_name %}by {{ author }}{% endtrans %}
       &bull;
