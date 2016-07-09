@@ -515,7 +515,7 @@ var PodcastImporter = React.createClass({
                 'div',
                 {className: 'warning'},
                 ngettextf(
-                    'Warning! We found %d item in your feed that did not have an <enclosure /> tag. There was no audio attached to these items, so we cannot import them.',
+                    'Warning! We found %d item in your feed that did not have an <enclosure /> tag. There was no audio attached to this item, so we cannot import it.',
                     'Warning! We found %d items in your feed that did not have an <enclosure /> tag. There was no audio attached to these items, so we cannot import them.',
                     this.state.podcastData.__ignored_items
                 )

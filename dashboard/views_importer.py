@@ -111,17 +111,17 @@ def start_import(req):
         for item in parsed_items:
             i = PodcastEpisode(
                 podcast=p,
-                title=item['title'],
-                subtitle=item['subtitle'],
-                publish=datetime.datetime.fromtimestamp(time.mktime(item['publish'])),
-                description=item['description'],
-                duration=int(item['duration']),
-                audio_url=item['audio_url'],
-                audio_size=int(item['audio_size']),
-                audio_type=item['audio_type'],
-                image_url=item['image_url'] or show_image_url,
-                copyright=item['copyright'],
-                license=item['license'],
+                title=item.get('title', '')[:1023],
+                subtitle=item.get('subtitle', '')[:1023],
+                publish=datetime.datetime.fromtimestamp(time.mktime(item.get('publish', ''))),
+                description=item.get('description', ''),
+                duration=int(item.get('duration', '0')),
+                audio_url=item.get('audio_url', '')[:512],
+                audio_size=int(item.get('audio_size', '0')),
+                audio_type=item.get('audio_type', 'audio/mp3')[:64],
+                image_url=(item.get('image_url', '') or show_image_url)[:512],
+                copyright=item.get('copyright', '')[:1023],
+                license=item.get('license', '')[:1023],
                 awaiting_import=True)
             i.save()
             created_items.append(i)
