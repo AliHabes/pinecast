@@ -150,7 +150,7 @@ def start_import(req):
                 i.delete()
             except Exception:
                 pass
-        return {'error': ugettext('There was a problem saving the podcast items: %u') % unicode(e)}
+        return {'error': ugettext('There was a problem saving the podcast items: %s') % unicode(e)}
 
     for ir in asset_requests:
         ir.save()
