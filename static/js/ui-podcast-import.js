@@ -476,13 +476,10 @@ var PodcastImporter = React.createClass({
             React.createElement(
                 'p',
                 {style: {padding: '0 10px'}},
-                interpolate(
-                    ngettextf(
-                        'There is %d episode in this podcast.',
-                        'There are %d episodes in this podcast.',
-                        data.items.length
-                    ),
-                    [data.items.length]
+                ngettextf(
+                    'There is %d episode in this podcast.',
+                    'There are %d episodes in this podcast.',
+                    data.items.length
                 )
             ),
 
@@ -512,14 +509,15 @@ var PodcastImporter = React.createClass({
             data.items.length > 10 ? React.createElement(
                 'p',
                 {style: {'font-style': 'italic', 'padding-left': '10px'}},
-                interpolate(ngettextf('%d item not shown', '%d items not shown', data.items.length - 10), [data.items.length - 10])
+                ngettextf('%d item not shown', '%d items not shown', data.items.length - 10)
             ) : null,
             !this.state.podcastData.__ignored_items ? null : React.createElement(
                 'div',
                 {className: 'warning'},
-                interpolate(
-                    gettext('Warning! We found %d items in your feed that did not have an <enclosure /> tag. There was no audio attached to these items, so we cannot import them.'),
-                    [this.state.podcastData.__ignored_items]
+                ngettextf(
+                    'Warning! We found %d item in your feed that did not have an <enclosure /> tag. There was no audio attached to these items, so we cannot import them.',
+                    'Warning! We found %d items in your feed that did not have an <enclosure /> tag. There was no audio attached to these items, so we cannot import them.',
+                    this.state.podcastData.__ignored_items
                 )
             )
 
