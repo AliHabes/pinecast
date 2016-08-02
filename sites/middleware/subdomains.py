@@ -12,7 +12,7 @@ SUBDOMAIN_HOSTS = ['.pinecast.co', '.pinecast.dev']
 class SubdomainMiddleware(object):
 
     def process_request(self, req):
-        scheme = "http" if not req.is_secure() else "https"
+        scheme = 'http' if not req.is_secure() else 'https'
         path = req.get_full_path()
         domain = req.META.get('HTTP_HOST') or req.META.get('SERVER_NAME')
 
@@ -27,7 +27,7 @@ class SubdomainMiddleware(object):
             return None
 
         try:
-            pod = Podcast.objects.get(slug=pieces[0])
+            pod = Podcast.objects.get(slug__iexact=pieces[0])
             site = Site.objects.get(podcast=pod)
         except (Site.DoesNotExist, Podcast.DoesNotExist):
             return None
@@ -35,4 +35,4 @@ class SubdomainMiddleware(object):
         path_to_resolve = path if '?' not in path else path[:path.index('?')]
         func, args, kwargs = resolve(path_to_resolve, urls_internal)
         req.META['site_hostname'] = True
-        return func(req, podcast_slug=pieces[0], *args, **kwargs)
+        return func(req, podcast_slug=pod.slug, *args, **kwargs)
