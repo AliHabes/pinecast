@@ -84,7 +84,7 @@ def start_import(req):
             language=req.POST.get('language'),
             copyright=req.POST.get('copyright'),
             subtitle=req.POST.get('subtitle'),
-            author_name=req.POST.get('author_name'),
+            author_name=req.POST.get('author_name', 'Anonymous'),
             is_explicit=req.POST.get('is_explicit', 'false') == 'true',
 
             # This is just temporary for the feed, just so it's usable in the interim

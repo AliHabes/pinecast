@@ -43,7 +43,7 @@ class Podcast(models.Model):
 
     language = models.CharField(max_length=16, default='en-US')
     copyright = models.CharField(max_length=1024, blank=True)
-    author_name = models.CharField(max_length=1024, blank=True)
+    author_name = models.CharField(max_length=1024, default='Anonymous')
 
     owner = models.ForeignKey(User)
 
