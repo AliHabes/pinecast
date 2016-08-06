@@ -93,7 +93,10 @@ def set_tip_payment_method(req):
         customer.source = req.POST.get('token')
         customer.save()
     else:
-        tip_user.create_stripe_customer(req.POST.get('token'))
+        try:
+            tip_user.create_stripe_customer(req.POST.get('token'))
+        except stripe.error.CardError:
+            return {'error': 'bad card'}
 
     return {'success': True, 'id': tip_user.stripe_customer_id}
 
