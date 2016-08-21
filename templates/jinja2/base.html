@@ -15,5 +15,6 @@
   {% block content %}{% endblock %}
   <script src="{{ url('django.views.i18n.javascript_catalog') }}"></script>
   {% block after_content %}{% endblock %}
+  {% include 'ga.html' %}
 </body>
 </html>
