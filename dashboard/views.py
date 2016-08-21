@@ -133,16 +133,6 @@ def podcast_dashboard(req, podcast_slug):
 
 
 @login_required
-def podcast_geochart(req, podcast_slug):
-    pod = get_podcast(req, podcast_slug)
-    owner_uset = UserSettings.get_from_user(pod.owner)
-    if not payment_plans.minimum(owner_uset.plan, payment_plans.FEATURE_MIN_GEOANALYTICS):
-        return _pmrender(req, 'dashboard/podcast/page_geochart_upgrade.html', {'podcast': pod})
-
-    return _pmrender(req, 'dashboard/podcast/page_geochart.html', {'podcast': pod})
-
-
-@login_required
 def episode_geochart(req, podcast_slug, episode_id):
     pod = get_podcast(req, podcast_slug)
     owner_uset = UserSettings.get_from_user(pod.owner)
@@ -151,35 +141,6 @@ def episode_geochart(req, podcast_slug, episode_id):
         return _pmrender(req, 'dashboard/episode/page_geochart_upgrade.html', {'podcast': pod, 'episode': ep})
 
     return _pmrender(req, 'dashboard/episode/page_geochart.html', {'podcast': pod, 'episode': ep})
-
-
-@login_required
-def podcast_top_episodes(req, podcast_slug):
-    pod = get_podcast(req, podcast_slug)
-    owner_uset = UserSettings.get_from_user(pod.owner)
-    if not payment_plans.minimum(owner_uset.plan, payment_plans.FEATURE_MIN_COMMENT_BOX):
-        return _pmrender(req, 'dashboard/podcast/page_top_episodes_upgrade.html', {'podcast': pod})
-
-    with analytics_query.AsyncContext() as async_ctx:
-        top_ep_data_query = analytics_query.get_top_episodes(unicode(pod.id), async_ctx)
-    top_ep_data = top_ep_data_query()
-
-    ep_ids = [x['episode'] for x in top_ep_data]
-    episodes = PodcastEpisode.objects.filter(id__in=ep_ids)
-    mapped = {unicode(ep.id): ep for ep in episodes}
-
-    # This step is necessary to filter out deleted episodes
-    top_ep_data = [x for x in top_ep_data if x['episode'] in mapped]
-
-    # Sort the top episode data descending
-    top_ep_data = reversed(sorted(top_ep_data, key=lambda x: x['podcast']))
-
-    data = {
-        'podcast': pod,
-        'episodes': mapped,
-        'top_ep_data': top_ep_data,
-    }
-    return _pmrender(req, 'dashboard/podcast/page_top_episodes.html', data)
 
 
 @login_required

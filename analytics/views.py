@@ -11,7 +11,7 @@ from formatter import Format
 from . import query
 from accounts.models import Network, UserSettings
 from dashboard.views import get_podcast
-from pinecast.helpers import json_response
+from pinecast.helpers import json_response, reverse
 from podcasts.models import Podcast, PodcastEpisode
 
 
@@ -165,3 +165,31 @@ def network_listen_history(req):
         labels={str(p.id): p.name for p in pods},
         labeled_by='podcast',
         extra_data={str(p.id): {'slug': p.slug} for p in pods})
+
+@login_required
+@restrict(plans.PLAN_PRO)
+def podcast_top_episodes(req, pod):
+    with query.AsyncContext() as async_ctx:
+        top_ep_data_query = query.get_top_episodes(unicode(pod.id), async_ctx)
+    top_ep_data = top_ep_data_query()
+
+    ep_ids = [x['episode'] for x in top_ep_data]
+    episodes = PodcastEpisode.objects.filter(id__in=ep_ids)
+    mapped = {unicode(ep.id): ep for ep in episodes}
+
+    # This step is necessary to filter out deleted episodes, since deleted episodes
+    # are not removed from the analytics data.
+    top_ep_data = [x for x in top_ep_data if x['episode'] in mapped]
+
+    # Sort the top episode data descending
+    return [[ugettext('Episode'), ugettext('Count')]] + [
+        [
+            {
+                'href': reverse('podcast_episode', podcast_slug=pod.slug, episode_id=mapped[x['episode']].id),
+                'title': mapped[x['episode']].title,
+            },
+            x['podcast'], # The count
+        ] for
+        x in
+        reversed(sorted(top_ep_data, key=lambda x: x['podcast']))
+    ]

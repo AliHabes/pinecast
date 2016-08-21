@@ -333,7 +333,7 @@ ul .empty-state i {
 
 .stats-panel {
     display: flex;
-    padding: 0px 20px 30px;
+    padding: 0px 20px 20px 0;
 }
 .stats-panel:last-child {
     padding-bottom: 0;
@@ -792,13 +792,15 @@ menu.tabs a.selected {
 
 
 table {
+    line-height: 3em;
+    width: 100%;
+}
+table.card {
     background: #fff;
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
     border-radius: 2px;
-    line-height: 3em;
     margin: 10px 0;
     padding: 0 10px;
-    width: 100%;
 }
 
 table thead {

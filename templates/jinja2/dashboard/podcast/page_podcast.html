@@ -33,7 +33,6 @@
 <nav class="subnav">
   <ul class="bottom-tabs tabs dynamic">
     <li class="selected"><a data-tab=".tab-overview" href="">{{ _('Overview') }}</a></li>
-    <li><a data-tab=".tab-analytics" href="">{{ _('Analytics') }}</a></li>
     <li><a data-tab=".tab-tips" href="">{{ _('Tips') }}</a></li>
     <li><a data-tab=".tab-feedback" href="">{{ _('Feedback') }}</a></li>
     <li>
@@ -95,11 +94,12 @@
       </div>
 
       {% if analytics.total_listens > -1 %}
-        <div class="chart-placeholder"
-          data-type="podcast-listen-history"
+        <div class="analytics-dash"
           data-podcast="{{ podcast.slug }}"
-          data-title="{{ _('Listen history') }}"
-          data-chart-type="line"></div>
+          data-is-podcast-owner="{{ 'true' if user == podcast.owner else 'false' }}"
+          data-is-starter="{{ 'true' if minimum_plan(podcast.owner, PLANS.PLAN_STARTER) or is_admin else 'false' }}"
+          data-is-pro="{{ 'true' if minimum_plan(podcast.owner, PLANS.PLAN_PRO) or is_admin else 'false' }}"
+          data-upgrade-url="{{ url('upgrade') }}"></div>
       {% endif %}
 
     </div>
@@ -155,10 +155,6 @@
 
 </div>
 
-<div class="tab-analytics" style="overflow: hidden; height: 0">
-  {% include 'dashboard/podcast/tab_analytics.html' %}
-</div>
-
 <div class="tab-tips" style="overflow: hidden; height: 0">
   {% include 'dashboard/podcast/tab_tips.html' %}
 </div>
@@ -174,6 +170,6 @@
 {% endblock %}
 
 {% block after_content %}
-<script src="/static/js/ui-chart.js"></script>
+<script src="/static/js/ui-ad.js"></script>
 <script src="/static/js/tabs.js"></script>
 {% endblock %}

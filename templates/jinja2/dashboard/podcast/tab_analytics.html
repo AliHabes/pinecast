@@ -1,45 +1,20 @@
 {% if not episodes %}
   <div class="episode-empty-state empty-state">
-    {{ _('Analytics will become available when you\'ve uploaded your first episode') }}
+    {{ _("Analytics will become available when you've uploaded your first episode") }}
   </div>
 {% else %}
   <menu class="toolbar">
-    <li><a class="btn" href="{{ url('podcast_geo', podcast_slug=podcast.slug) }}">{{ _('Geo') }}</a></li>
     <li><a class="btn" href="{{ url('top_episodes', podcast_slug=podcast.slug) }}">{{ _('Top Episodes') }}</a></li>
   </menu>
-  <div class="row">
-    <div class="card card-block chart-placeholder"
-      data-type="podcast-listen-breakdown"
-      data-podcast="{{ podcast.slug }}"
-      data-title="{{ _('Listens by Source') }}"
-      data-chart-type="pie"></div>
 
-    <div class="card card-block chunkier chart-placeholder"
-      data-type="podcast-subscriber-history"
-      data-podcast="{{ podcast.slug }}"
-      data-title="{{ _('Subscriber History') }}"
-      data-hide-granularity="true"
-      data-timeframes="day,month,sixmonth"
-      data-chart-type="line"></div>
-  </div>
+  <div class="analytics-dash"
+    data-podcast="{{ podcast.slug }}"
+    data-is-podcast-owner="{{ user == podcast.owner }}"
+    data-is-starter="{{ 'true' if minimum_plan(podcast.owner, PLANS.PLAN_STARTER) or is_admin else 'false' }}"
+    data-is-pro="{{ 'true' if minimum_plan(podcast.owner, PLANS.PLAN_PRO) or is_admin else 'false' }}"
+    data-upgrade-url="{{ url('upgrade') }}"></div>
 
-  {% if minimum_plan(podcast.owner, PLANS.PLAN_STARTER) or is_admin %}
-    <div class="row">
-      <div class="card card-block chart-placeholder"
-        data-type="podcast-listen-platform-breakdown"
-        data-podcast="{{ podcast.slug }}"
-        data-extra="breakdown_type=browser"
-        data-title="{{ _('Listens by Browser') }}"
-        data-chart-type="pie"></div>
-
-      <div class="card card-block chart-placeholder"
-        data-type="podcast-listen-platform-breakdown"
-        data-podcast="{{ podcast.slug }}"
-        data-extra="breakdown_type=os"
-        data-title="{{ _('Listens by OS') }}"
-        data-chart-type="pie"></div>
-    </div>
-  {% else %}
+  {% if not minimum_plan(podcast.owner, PLANS.PLAN_STARTER) and not is_admin %}
     <div class="upgrade-empty-state empty-state">
       {{ _('More analytics&mdash;including breakdowns by browser, device, and OS&mdash;are available when you upgrade to a Starter plan or better.')|safe }}
     </div>
