@@ -22,6 +22,7 @@ DELTAS = {
 USER_TIMEFRAMES = {
     'day': 'today',
     'yesterday': 'yesterday', # Should not be exposed in UI
+    'week': {'previous': {'hours': 7 * 24}},
     'month': {'previous': {'hours': 30 * 24}},
     'sixmonth': {'previous': {'hours': 6 * 30 * 24}},
     'year': {'previous': {'hours': 12 * 30 * 24}},
@@ -87,7 +88,7 @@ class Format(object):
         if self.group_by:
             q['groupBy'] = self.group_by
         if self.timeframe:
-            tf = USER_TIMEFRAMES[self.req.GET.get('timeframe', self.timeframe)]
+            tf = USER_TIMEFRAMES.get(self.req.GET.get('timeframe', self.timeframe))
             if tf:
                 q['timeframe'] = tf
         if self.interval_val:
