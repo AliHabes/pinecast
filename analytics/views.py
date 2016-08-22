@@ -15,6 +15,13 @@ from pinecast.helpers import json_response, reverse
 from podcasts.models import Podcast, PodcastEpisode
 
 
+ACCEPTABLE_TIMEFRAMES = {
+    'month': {'previous': {'hours': 30 * 24}},
+    'week': {'previous': {'hours': 7 * 24}},
+    'day': {'previous': {'hours': 24}},
+}
+
+
 def restrict(minimum_plan):
     def wrapped(view):
         @wraps(view)
@@ -31,7 +38,7 @@ def restrict(minimum_plan):
                 return HttpResponseForbidden()
 
             resp = view(req, pod, *args[1:], **kwargs)
-            if not isinstance(resp, (dict, list, bool, str, unicode, int, float)):
+            if not isinstance(resp, (dict, list, bool, str, unicode, int, float)) and resp is not None:
                 # Handle HttpResponse/HttpResponseBadRequest/etc
                 return resp
             return JsonResponse(resp, safe=False)
@@ -166,11 +173,17 @@ def network_listen_history(req):
         labeled_by='podcast',
         extra_data={str(p.id): {'slug': p.slug} for p in pods})
 
+
 @login_required
 @restrict(plans.PLAN_PRO)
 def podcast_top_episodes(req, pod):
+    timeframe = req.GET.get('timeframe', None)
+    if not timeframe or timeframe not in ACCEPTABLE_TIMEFRAMES:
+        return None
+
     with query.AsyncContext() as async_ctx:
-        top_ep_data_query = query.get_top_episodes(unicode(pod.id), async_ctx)
+        top_ep_data_query = query.get_top_episodes(
+            unicode(pod.id), async_ctx, ACCEPTABLE_TIMEFRAMES[timeframe])
     top_ep_data = top_ep_data_query()
 
     ep_ids = [x['episode'] for x in top_ep_data]

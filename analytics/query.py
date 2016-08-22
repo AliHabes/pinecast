@@ -134,11 +134,12 @@ def total_subscribers(podcast, async):
     return async.add(data, get_listens)
 
 
-def get_top_episodes(podcast_id, async):
+def get_top_episodes(podcast_id, async, timeframe=None):
     data = query_async(
         'listen',
         {'select': {'podcast': 'count'},
          'groupBy': 'episode',
+         'timeframe': timeframe,
          'filter': {'podcast': {'eq': podcast_id}}})
 
     return async.add(data, lambda d: d['results'] if 'results' in d else [])
