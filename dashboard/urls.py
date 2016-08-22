@@ -14,7 +14,6 @@ urlpatterns = [
     url(r'^podcast/(?P<podcast_slug>[\w-]+)/episode/(?P<episode_id>[\w-]+)$', views.podcast_episode, name='podcast_episode'),
     url(r'^podcast/(?P<podcast_slug>[\w-]+)/episode/(?P<episode_id>[\w-]+)/delete$', views.delete_podcast_episode, name='delete_podcast_episode'),
     url(r'^podcast/(?P<podcast_slug>[\w-]+)/episode/(?P<episode_id>[\w-]+)/edit$', views.edit_podcast_episode, name='edit_podcast_episode'),
-    url(r'^podcast/(?P<podcast_slug>[\w-]+)/episode/(?P<episode_id>[\w-]+)/geo$', views.episode_geochart, name='episode_geo'),
 
     url(r'^network/new$', views_network.new_network, name='new_network'),
     url(r'^network/(?P<network_id>[\w-]+)$', views_network.network_dashboard, name='network_dashboard'),

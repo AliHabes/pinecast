@@ -166,24 +166,15 @@
 </div>
 
 <div class="tab-analytics" style="overflow: hidden; height: 0">
-  <menu class="toolbar">
-    <li><a class="btn" href="{{ url('episode_geo', podcast_slug=podcast.slug, episode_id=str(episode.id)) }}">{{ _('Geo') }}</a></li>
-  </menu>
   {% if analytics.total_listens %}
-    <div class="card-block card chart-placeholder"
-      data-type="episode-listen-history"
-      data-podcast="{{ podcast.slug }}"
-      data-episode="{{ str(episode.id) }}"
-      data-title="{{ _('Listen history over one month') }}"
-      data-chart-type="line"></div>
-
-    <div class="card-block card">
-      <div class="chart-placeholder"
-        data-type="episode-listen-breakdown"
-        data-podcast="{{ podcast.slug }}"
+    <div class="card card-block">
+      <div class="analytics-dash"
         data-episode="{{ str(episode.id) }}"
-        data-title="{{ _('Listens by Source') }}"
-        data-chart-type="pie"></div>
+        data-podcast="{{ podcast.slug }}"
+        data-is-podcast-owner="{{ 'true' if user == podcast.owner else 'false' }}"
+        data-is-starter="{{ 'true' if minimum_plan(podcast.owner, PLANS.PLAN_STARTER) or is_admin else 'false' }}"
+        data-is-pro="{{ 'true' if minimum_plan(podcast.owner, PLANS.PLAN_PRO) or is_admin else 'false' }}"
+        data-upgrade-url="{{ url('upgrade') }}"></div>
     </div>
   {% else %}
     <div class="episode-empty-state empty-state">
@@ -233,6 +224,6 @@
 {% endblock %}
 
 {% block after_content %}
-<script src="/static/js/ui-chart.js"></script>
+<script src="/static/js/ui-ad.js"></script>
 <script src="/static/js/tabs.js"></script>
 {% endblock %}
