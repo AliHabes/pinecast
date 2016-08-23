@@ -232,10 +232,3 @@ except ImportError:
 
 if not DEBUG:
     MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('rollbar.contrib.django.middleware.RollbarNotifierMiddleware', )
-    LOGGING['loggers']['django']['handlers'] = ['rollbar', 'console']
-    LOGGING['handlers']['rollbar'] = {
-        'filters': ['require_debug_false'],
-        'access_token': ROLLBAR['access_token'],
-        'environment': 'development' if DEBUG else 'production',
-        'class': 'rollbar.logger.RollbarHandler'
-    }
