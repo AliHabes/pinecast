@@ -16,6 +16,7 @@ from podcasts.models import Podcast, PodcastEpisode
 
 
 ACCEPTABLE_TIMEFRAMES = {
+    'all': None,
     'month': {'previous': {'hours': 30 * 24}},
     'week': {'previous': {'hours': 7 * 24}},
     'day': {'previous': {'hours': 24}},
@@ -204,5 +205,5 @@ def podcast_top_episodes(req, pod):
             x['podcast'], # The count
         ] for
         x in
-        reversed(sorted(top_ep_data, key=lambda x: x['podcast']))
+        list(reversed(sorted(top_ep_data, key=lambda x: x['podcast'])))[:25]
     ]
