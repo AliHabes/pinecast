@@ -161,6 +161,7 @@ def new_podcast(req):
             copyright=req.POST.get('copyright'),
             author_name=req.POST.get('author_name'),
             owner=req.user)
+        pod.clean()
         pod.save()
         # TODO: The following line can throw an exception and create a
         # duplicate podcast if something has gone really wrong
@@ -193,6 +194,7 @@ def edit_podcast(req, podcast_slug):
         pod.author_name = req.POST.get('author_name')
         pod.cover_image = signer.unsign(req.POST.get('image-url'))
         pod.set_category_list(req.POST.get('categories'))
+        pod.full_clean()
         pod.save()
     except Exception as e:
         ctx.update(default=req.POST, error=True)

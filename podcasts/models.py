@@ -7,6 +7,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import URLValidator
 from django.db import models
 from django.utils.translation import ugettext, ugettext_lazy
 
@@ -39,7 +40,7 @@ class Podcast(models.Model):
     cover_image = models.URLField(max_length=500)
     description = models.TextField(blank=True)
     is_explicit = models.BooleanField(default=False)
-    homepage = models.URLField(max_length=500, blank=True)
+    homepage = models.URLField(max_length=500, blank=True, validators=[URLValidator()])
 
     language = models.CharField(max_length=16, default='en-US')
     copyright = models.CharField(max_length=1024, blank=True)

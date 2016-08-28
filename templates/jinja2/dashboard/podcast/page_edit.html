@@ -87,7 +87,7 @@
       <div class="col">
         <label>
           <span>{{ _('Homepage') }}</span>
-          <input type="url" name="homepage" placeholder="https://my-great-podcast.biz" required value="{{ default.get('homepage', podcast.homepage) }}">
+          <input type="url" name="homepage" placeholder="https://my-great-podcast.biz" required value="{{ default.get('homepage', podcast.homepage) }}" pattern="https?://.+">
         </label>
 
         <label>
