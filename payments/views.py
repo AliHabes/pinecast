@@ -82,14 +82,16 @@ def upgrade_set_plan(req):
         existing_sub.plan = plan_stripe_id
         try:
             existing_sub.save()
-        except Exception:
+        except Exception as e:
+            rollbar.report_message(str(e), 'error')
             return redirect('upgrade')
     else:
         try:
             sub = customer.subscriptions.create(plan=plan_stripe_id)
         except stripe.error.CardError:
             return redirect(reverse('upgrade') + '?error=card')
-        except Exception:
+        except Exception as e:
+            rollbar.report_message(str(e), 'error')
             return redirect('upgrade')
 
     us.plan = new_plan_val
