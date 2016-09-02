@@ -55,7 +55,7 @@ def log(req):
 
     ts_formats = ['[%d/%b/%Y:%H:%M:%S %z]',
                   '[%d/%b/%Y:%H:%M:%S +0000]',
-                  '[%d/%m/%Y:%H:%M:%S +0000]'] # For cdn
+                  '[%d/%m/%Y:%H:%M:%S +0000]']  # For cdn
 
     listens_to_log = []
 

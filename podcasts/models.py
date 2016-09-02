@@ -167,7 +167,7 @@ class Podcast(models.Model):
         last_eligible_payout_date = self.last_eligible_payout_date()
         last_tip = (self.tip_events
                         .filter(occurred_at__gt=last_eligible_payout_date -
-                                    datetime.timedelta(days=7))
+                                datetime.timedelta(days=7))
                         .order_by('-occurred_at')
                         .first())
 

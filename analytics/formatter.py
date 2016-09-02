@@ -21,7 +21,7 @@ DELTAS = {
 
 USER_TIMEFRAMES = {
     'day': 'today',
-    'yesterday': 'yesterday', # Should not be exposed in UI
+    'yesterday': 'yesterday',  # Should not be exposed in UI
     'week': {'previous': {'hours': 7 * 24}},
     'month': {'previous': {'hours': 30 * 24}},
     'sixmonth': {'previous': {'hours': 6 * 30 * 24}},

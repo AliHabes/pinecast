@@ -25,10 +25,9 @@ class Command(BaseCommand):
         key_regexp = re.compile(r'\.s3\.amazonaws\.com/(.+)', re.I)
 
         cutoff = datetime.datetime.now() - datetime.timedelta(days=30)
-        for ep in PodcastEpisode.objects.filter(
-            created__lt=cutoff,
-            publish__lt=cutoff,
-            awaiting_import=False):
+        for ep in PodcastEpisode.objects.filter(created__lt=cutoff,
+                                                publish__lt=cutoff,
+                                                awaiting_import=False):
 
             bucket_match = bucket_regexp.search(ep.audio_url)
             if not bucket_match:

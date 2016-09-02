@@ -60,9 +60,10 @@ class Command(BaseCommand):
                 self.stdout.write('     Still in use by Podcast')
                 continue
 
-            if PodcastEpisode.objects.filter(
-                Q(audio_url=canon_url) | Q(image_url=canon_url) |
-                Q(audio_url=https_canon_url) | Q(image_url=https_canon_url)).count():
+            if PodcastEpisode.objects.filter(Q(audio_url=canon_url) |
+                                             Q(image_url=canon_url) |
+                                             Q(audio_url=https_canon_url) |
+                                             Q(image_url=https_canon_url)).count():
                 self.stdout.write('     Still in use by PodcastEpisode')
                 continue
 

@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.utils.translation import ugettext, ugettext_lazy
 from django.views.decorators.http import require_POST
 
@@ -9,7 +9,7 @@ import accounts.payment_plans as plans
 import pinecast.email
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
-from pinecast.helpers import reverse
+from pinecast.helpers import get_object_or_404, reverse
 from podcasts.models import Podcast
 from views import _pmrender, signer
 
@@ -72,7 +72,7 @@ def network_add_show(req, network_id):
             pod.networks.add(net)
             pod.save()
         return redirect('network_dashboard', network_id=net.id)
-            
+
     return _pmrender(req, 'dashboard/network/page_add_show.html', {'network': net})
 
 
@@ -107,7 +107,7 @@ network, and will be able to add your own podcasts to the network.
 @restrict_minimum_plan(plans.PLAN_STARTER)
 def network_edit(req, network_id):
     net = get_object_or_404(Network, deactivated=False, id=network_id, members__in=[req.user])
-    
+
     if not req.POST:
         return _pmrender(req, 'dashboard/network/page_edit.html', {'network': net})
 
@@ -128,7 +128,7 @@ def network_edit(req, network_id):
 @login_required
 def network_deactivate(req, network_id):
     net = get_object_or_404(Network, deactivated=False, id=network_id, owner=req.user)
-    
+
     if not req.POST:
         return _pmrender(req, 'dashboard/network/page_deactivate.html', {'network': net})
 
@@ -145,7 +145,7 @@ def network_deactivate(req, network_id):
 def network_remove_podcast(req, network_id, podcast_slug):
     net = get_object_or_404(Network, deactivated=False, id=network_id, members__in=[req.user])
     pod = get_object_or_404(Podcast, slug=podcast_slug, networks__in=[net])
-    
+
     # We don't need to confirm if the user is the owner.
     if pod.owner == req.user:
         pod.networks.remove(net)
@@ -174,7 +174,7 @@ def network_remove_member(req, network_id, member_id):
 
     if not net.members.filter(username=user.username).count():
         raise Http404()
-    
+
     # We don't need to confirm if the user is the owner.
     if net.owner == user:
         return redirect('network_dashboard', network_id=net.id)

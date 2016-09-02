@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.utils.translation import ugettext
 
 import accounts.payment_plans as plans
@@ -9,7 +9,7 @@ from .models import Feedback
 from accounts.models import UserSettings
 from dashboard.views import _pmrender
 from pinecast.email import send_notification_email
-from pinecast.helpers import reverse, validate_recaptcha
+from pinecast.helpers import get_object_or_404, reverse, validate_recaptcha
 from podcasts.models import Podcast, PodcastEpisode
 
 
@@ -47,8 +47,8 @@ def podcast_comment_box(req, podcast_slug):
             ugettext('[Pinecast] You got some feedback!'),
             'Go check the Feedback page of your podcast, %s, to see what was written.\n\n'
             'https://pinecast.com%s' %
-                (pod.name,
-                 reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#tab-feedback')
+            (pod.name,
+             reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#tab-feedback')
         )
     except Exception:
         return _pmrender(req, 'feedback/comment_podcast.html',
@@ -93,12 +93,12 @@ def ep_comment_box(req, podcast_slug, episode_id):
             ugettext('[Pinecast] You got some feedback!'),
             'Go check the Feedback page of %s--an episode on %s--to see what was written.\n\n'
             'https://pinecast.com%s' %
-                (ep.title,
-                 pod.name,
-                 reverse('podcast_episode',
-                         podcast_slug=podcast_slug,
-                         episode_id=str(ep.id)) +
-                    '#tab-feedback')
+            (ep.title,
+             pod.name,
+             reverse('podcast_episode',
+                     podcast_slug=podcast_slug,
+                     episode_id=str(ep.id)) +
+             '#tab-feedback')
         )
     except Exception:
         return _pmrender(req, 'feedback/comment_episode.html',

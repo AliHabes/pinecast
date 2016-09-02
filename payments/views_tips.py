@@ -1,7 +1,7 @@
 from urllib import quote
 
 import rollbar
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.utils.translation import ugettext
 from django.views.decorators.http import require_POST
 
@@ -13,7 +13,7 @@ from dashboard.views import _pmrender
 from pinecast.email import (send_anon_confirmation_email as send_email,
                             send_notification_email,
                             validate_confirmation)
-from pinecast.helpers import json_response, reverse
+from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import Podcast
 
 
@@ -43,9 +43,9 @@ def no_session(req, ctx):
                 ugettext(
                     'Thanks for verifying your email! Click the link below '
                     'to choose your level of support for %s.' %
-                        ctx['podcast'].name),
+                    ctx['podcast'].name),
                 reverse('tip_jar', podcast_slug=ctx['podcast'].slug) +
-                    '?email=%s' % quote(email))
+                '?email=%s' % quote(email))
 
     if has_user:
         return _pmrender(req, 'payments/tip_jar/check_email.html', ctx)
@@ -158,14 +158,13 @@ def send_tip(req):
         None,
         'Thanks for leaving a tip!',
         'Your tip was processed: %s received $%d. Thanks for supporting your '
-            'favorite content creators!' % (
-                pod.name, float(amount) / 100),
+        'favorite content creators!' % (pod.name, float(amount) / 100),
         email=tip_user.email_address)
     send_notification_email(
         pod.owner,
         'Your podcast was tipped!',
         '%s received was tipped $%d by %s. You should send them an email '
-            'thanking them for their generosity.' % (
-                pod.name, float(amount) / 100, tip_user.email_address))
+        'thanking them for their generosity.' % (
+            pod.name, float(amount) / 100, tip_user.email_address))
 
     return {'success': True}

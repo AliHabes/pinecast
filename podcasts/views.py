@@ -5,13 +5,14 @@ from xml.sax.saxutils import escape, quoteattr
 
 from django.conf import settings
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 
 import accounts.payment_plans as plans
 import analytics.analyze as analyze
 import analytics.log as analytics_log
 from .models import Podcast, PodcastEpisode
 from accounts.models import UserSettings
+from pinecast.helpers import get_object_or_404
 
 
 PREMIUM_S3_PREFIX = 'https://%s.s3.amazonaws.com/' % settings.S3_PREMIUM_BUCKET
@@ -64,20 +65,20 @@ def feed(req, podcast_slug):
 
         items.append('\n'.join([
             '<item>',
-                '<title>%s</title>' % escape(ep.title),
-                '<description><![CDATA[%s]]></description>' % md_desc,
-                '<link>%s</link>' % escape(ep_url),
-                '<guid isPermaLink="false">https://pinecast.com/guid/%s</guid>' % escape(str(ep.id)),
-                '<pubDate>%s</pubDate>' % formatdate(time.mktime(ep.publish.timetuple())),
-                explicit_tag,
-                '<itunes:author>%s</itunes:author>' % escape(pod.author_name),
-                '<itunes:subtitle>%s</itunes:subtitle>' % escape(ep.subtitle),
-                '<itunes:image href=%s />' % quoteattr(_asset(ep.image_url)),
-                '<itunes:duration>%s</itunes:duration>' % escape(ep.formatted_duration()),
-                '<enclosure url=%s length=%s type=%s />' % (
-                    quoteattr(ep_url), quoteattr(str(ep.audio_size)), quoteattr(ep.audio_type)),
-                ('<dc:copyright>%s</dc:copyright>' % escape(ep.copyright)) if ep.copyright else '',
-                ('<dc:rights>%s</dc:rights>' % escape(ep.license)) if ep.license else '',
+            '<title>%s</title>' % escape(ep.title),
+            '<description><![CDATA[%s]]></description>' % md_desc,
+            '<link>%s</link>' % escape(ep_url),
+            '<guid isPermaLink="false">https://pinecast.com/guid/%s</guid>' % escape(str(ep.id)),
+            '<pubDate>%s</pubDate>' % formatdate(time.mktime(ep.publish.timetuple())),
+            explicit_tag,
+            '<itunes:author>%s</itunes:author>' % escape(pod.author_name),
+            '<itunes:subtitle>%s</itunes:subtitle>' % escape(ep.subtitle),
+            '<itunes:image href=%s />' % quoteattr(_asset(ep.image_url)),
+            '<itunes:duration>%s</itunes:duration>' % escape(ep.formatted_duration()),
+            '<enclosure url=%s length=%s type=%s />' % (
+                quoteattr(ep_url), quoteattr(str(ep.audio_size)), quoteattr(ep.audio_type)),
+            ('<dc:copyright>%s</dc:copyright>' % escape(ep.copyright)) if ep.copyright else '',
+            ('<dc:rights>%s</dc:rights>' % escape(ep.license)) if ep.license else '',
             '</item>',
         ]))
 
@@ -105,22 +106,22 @@ def feed(req, podcast_slug):
         '     xmlns:dc="http://purl.org/dc/elements/1.1/"',
         '     version="2.0">',
         '<channel>',
-            '<title>%s</title>' % escape(pod.name),
-            '<link>%s</link>' % escape(pod.homepage),
-            '<language>%s</language>' % escape(pod.language),
-            '<copyright>%s</copyright>' % escape(pod.copyright),
-            '<generator>Pinecast (https://pinecast.com)</generator>',
-            ('<itunes:subtitle>%s</itunes:subtitle>' % escape(pod.subtitle)) if pod.subtitle else '',
-            '<itunes:author>%s</itunes:author>' % escape(pod.author_name),
-            '<description><![CDATA[%s]]></description>' % pod.description,
-            '<itunes:owner>',
-                '<itunes:name>%s</itunes:name>' % escape(pod.author_name),
-                '<itunes:email>%s</itunes:email>' % escape(pod.owner.email),
-            '</itunes:owner>',
-            '<itunes:explicit>%s</itunes:explicit>' % ('yes' if pod.is_explicit else 'no'),
-            '<itunes:image href=%s />' % quoteattr(_asset(pod.cover_image)),
-            '\n'.join(render_cat(category_map)),
-            '\n'.join(items),
+        '<title>%s</title>' % escape(pod.name),
+        '<link>%s</link>' % escape(pod.homepage),
+        '<language>%s</language>' % escape(pod.language),
+        '<copyright>%s</copyright>' % escape(pod.copyright),
+        '<generator>Pinecast (https://pinecast.com)</generator>',
+        ('<itunes:subtitle>%s</itunes:subtitle>' % escape(pod.subtitle)) if pod.subtitle else '',
+        '<itunes:author>%s</itunes:author>' % escape(pod.author_name),
+        '<description><![CDATA[%s]]></description>' % pod.description,
+        '<itunes:owner>',
+        '<itunes:name>%s</itunes:name>' % escape(pod.author_name),
+        '<itunes:email>%s</itunes:email>' % escape(pod.owner.email),
+        '</itunes:owner>',
+        '<itunes:explicit>%s</itunes:explicit>' % ('yes' if pod.is_explicit else 'no'),
+        '<itunes:image href=%s />' % quoteattr(_asset(pod.cover_image)),
+        '\n'.join(render_cat(category_map)),
+        '\n'.join(items),
         '</channel>',
         '</rss>',
     ]

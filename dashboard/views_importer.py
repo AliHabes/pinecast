@@ -8,7 +8,6 @@ from defusedxml.minidom import parseString as parseXMLString
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest
-from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -20,7 +19,7 @@ from .models import AssetImportRequest
 from .views import _pmrender
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import UserSettings
-from pinecast.helpers import json_response
+from pinecast.helpers import get_object_or_404, json_response
 from podcasts.models import Podcast, PodcastEpisode
 
 

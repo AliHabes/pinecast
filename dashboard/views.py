@@ -12,7 +12,7 @@ import itsdangerous
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.utils.translation import ugettext
 from django.views.decorators.http import require_GET
 
@@ -21,7 +21,7 @@ import analytics.query as analytics_query
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
 from feedback.models import Feedback, EpisodeFeedbackPrompt
-from pinecast.helpers import json_response, reverse
+from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import (CATEGORIES, Podcast, PodcastCategory,
                              PodcastEpisode)
 from sites.models import Site
@@ -247,7 +247,7 @@ def podcast_new_ep(req, podcast_slug):
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
 
     try:
-        naive_publish = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M') # 2015-07-09T12:00
+        naive_publish = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M')  # 2015-07-09T12:00
         adjusted_publish = naive_publish - tz_delta
 
         ep = PodcastEpisode(
@@ -294,7 +294,7 @@ def edit_podcast_episode(req, podcast_slug, episode_id):
         return _pmrender(req, 'dashboard/episode/page_edit.html', ctx)
 
     try:
-        naive_publish = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M') # 2015-07-09T12:00
+        naive_publish = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M')  # 2015-07-09T12:00
         adjusted_publish = naive_publish - UserSettings.get_from_user(req.user).get_tz_delta()
 
         ep.title = req.POST.get('title')

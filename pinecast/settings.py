@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
+import mimetypes
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -34,7 +36,6 @@ else:
     ALLOWED_HOSTS.append('host.podmaster.io')
 
 
-import mimetypes
 mimetypes.add_type("image/svg+xml", ".svg", True)
 
 # Application definition

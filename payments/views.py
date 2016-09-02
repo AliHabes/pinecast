@@ -1,6 +1,6 @@
 import iso8601
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.utils.translation import ugettext
 from django.views.decorators.http import require_POST
 
@@ -10,7 +10,7 @@ from .stripe_lib import stripe
 from accounts.models import UserSettings
 from dashboard.views import _pmrender
 from pinecast.email import CONFIRMATION_PARAM, send_notification_email
-from pinecast.helpers import json_response, reverse
+from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import Podcast
 
 
@@ -98,12 +98,12 @@ def upgrade_set_plan(req):
     send_notification_email(
         req.user,
         ugettext('Your account has been %s') %
-            (ugettext('upgraded') if was_upgrade else ugettext('downgraded')),
+        (ugettext('upgraded') if was_upgrade else ugettext('downgraded')),
         ugettext('''Your Pinecast account has been updated successfully.
 Your account is now marked as "%s".
 
 Please contact Pinecast support if you have any questions.''') %
-            payment_plans.PLANS_MAP[new_plan_val])
+        payment_plans.PLANS_MAP[new_plan_val])
 
     return redirect('upgrade')
 

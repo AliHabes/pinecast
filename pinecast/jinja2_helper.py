@@ -99,7 +99,7 @@ def pretty_date(time=None):
             if second_diff < 60:
                 return ungettext('{n} second from now', '{n} seconds from now', second_diff).format(n=second_diff)
             if second_diff < 120:
-                return  ugettext('in a minute')
+                return ugettext('in a minute')
             if second_diff < 3600:
                 return ungettext('{n} minute from now', '{n} minutes from now', second_diff / 60).format(n=second_diff / 60)
             if second_diff < 7200:
@@ -123,7 +123,7 @@ def pretty_date(time=None):
         if second_diff < 60:
             return ungettext('{n} second ago', '{n} seconds ago', second_diff).format(n=second_diff)
         if second_diff < 120:
-            return  ugettext('a minute ago')
+            return ugettext('a minute ago')
         if second_diff < 3600:
             return ungettext('{n} minute ago', '{n} minutes ago', second_diff / 60).format(n=second_diff / 60)
         if second_diff < 7200:

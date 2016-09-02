@@ -3,7 +3,7 @@ from functools import wraps
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.utils.translation import ugettext, ugettext_lazy
 
 import accounts.payment_plans as plans
@@ -11,7 +11,7 @@ from formatter import Format
 from . import query
 from accounts.models import Network, UserSettings
 from dashboard.views import get_podcast
-from pinecast.helpers import json_response, reverse
+from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import Podcast, PodcastEpisode
 
 
@@ -202,7 +202,7 @@ def podcast_top_episodes(req, pod):
                 'href': reverse('podcast_episode', podcast_slug=pod.slug, episode_id=mapped[x['episode']].id),
                 'title': mapped[x['episode']].title,
             },
-            x['podcast'], # The count
+            x['podcast'],  # The count
         ] for
         x in
         list(reversed(sorted(top_ep_data, key=lambda x: x['podcast'])))[:25]

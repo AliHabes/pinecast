@@ -7,7 +7,8 @@ import pytz
 import requests
 from django.conf import settings
 from django.core.urlresolvers import reverse as reverse_django
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404 as dj_get_object_or_404
 
 
 def json_response(*args, **jr_kwargs):
@@ -84,3 +85,10 @@ def validate_recaptcha(response, ip):
 def round_now():
     now = datetime.datetime.now()
     return now - datetime.timedelta(microseconds=now.microsecond)
+
+
+def get_object_or_404(*args, **kwargs):
+    try:
+        return dj_get_object_or_404(*args, **kwargs)
+    except ValueError:
+        raise Http404()

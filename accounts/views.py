@@ -6,14 +6,14 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.utils.translation import ugettext
 from django.views.decorators.http import require_POST
 
 from .models import UserSettings
 from dashboard.views import _pmrender
 from pinecast.email import get_expired_page, get_signed_url, request_must_be_confirmed, send_confirmation_email, send_notification_email
-from pinecast.helpers import reverse, tz_offset
+from pinecast.helpers import get_object_or_404, reverse, tz_offset
 from pinecast.signatures import signer
 
 

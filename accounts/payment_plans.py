@@ -59,7 +59,7 @@ STRIPE_PLANS = {
 }
 
 
-_MB = 1024 * 1024;
+_MB = 1024 * 1024
 MAX_FILE_SIZE = {
     PLAN_DEMO: 48 * _MB,
     PLAN_STARTER: 64 * _MB,

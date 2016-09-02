@@ -76,7 +76,8 @@ class Command(BaseCommand):
         self.stdout.write('Finished analysis')
         self.stdout.write('%s logs need to be reprocessed' % len(to_reprocess))
 
-        if not to_reprocess: return
+        if not to_reprocess:
+            return
 
         if options['run']:
             lambda_client = session.client('lambda')

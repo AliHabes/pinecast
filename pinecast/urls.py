@@ -13,7 +13,8 @@ from accounts.urls import urlpatterns as account_urlpatterns
 from podcasts.urls import urlpatterns as podcast_urlpatterns
 
 
-logout_view = lambda r: logout(r) or redirect('home')
+def logout_view(r):
+    return logout(r) or redirect('home')
 
 js_info_dict = {
     'packages': ('podcasts', 'dashboard'),
@@ -39,4 +40,3 @@ urlpatterns = (
         url(r'^favicon\.ico$', lambda *_: redirect('/static/img/favicon.png')),
     ]
 )
-
