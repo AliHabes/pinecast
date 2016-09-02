@@ -1,4 +1,5 @@
 import iso8601
+import rollbar
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.utils.translation import ugettext
@@ -114,16 +115,17 @@ Please contact Pinecast support if you have any questions.''') %
 def set_payment_method(req):
     us = UserSettings.get_from_user(req.user)
     customer = us.get_stripe_customer()
-    if customer:
-        customer.source = req.POST.get('token')
-        customer.save()
-    else:
-        try:
+    try:
+        if customer:
+            customer.source = req.POST.get('token')
+            customer.save()
+        else:
             us.create_stripe_customer(req.POST.get('token'))
-        except stripe.error.CardError:
-            return {'error': ugettext('Card was rejected by the bank')}
-        except Exception:
-            return {'error': ugettext('The card could not be processed')}
+    except stripe.error.CardError as e:
+        return {'error': ugettext('Card was rejected by the bank. %s') % str(e)}
+    except Exception as e:
+        rollbar.report_message(str(e), 'error')
+        return {'error': ugettext('The card could not be processed')}
 
     return {'success': True, 'id': us.stripe_customer_id}
 
