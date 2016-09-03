@@ -132,37 +132,49 @@
 </div>
 
 <div class="tab-feedback">
-  <div class="card-block card">
-    <strong>{{ _('Comment Box') }}</strong>
-    <p>{{ _('Your listeners can leave questions, comments, and other feedback about this episode at this URL.') }}</p>
-    <input type="url"
-      title="{{ _('Comment Box') }}"
-      readonly
-      value="https://pinecast.com{{ url('ep_comment_box', kwargs={'podcast_slug': podcast.slug, 'episode_id': str(episode.id)}) }}">
-  </div>
-  <div class="card-block card">
-    {% for f in feedback %}
-      <div class="card-item">
-        <a class="comment-from" href="mailto:{{ f.sender }}">
-          <img src="{{ gravatar(f.sender) }}" class="comment-from-gravatar" title="{{ f.sender }}" alt="">
-        </a>
-        <p>
-          {{ f.message }}
-          <br>
-          <abbr class="feedback-date" title="{{ (f.created + tz_delta).strftime('%x') }}">
-            {{ f.created|pretty_date }}
-          </abbr>
-        </p>
-        <menu class="toolbar">
-          <a href="{{ url('delete_comment', kwargs={'podcast_slug': podcast.slug, 'comment_id': str(f.id)}) }}">{{ _('Delete') }}</a>
-        </menu>
-      </div>
-    {% else %}
-      <div class="episode-empty-state empty-state">
-        {{ _('Nobody has submitted feedback about the episode yet.') }}
-      </div>
-    {% endfor %}
-  </div>
+  {% if minimum_plan(podcast.owner, PLANS.PLAN_PRO) %}
+    <div class="card-block card">
+      <strong>{{ _('Comment Box') }}</strong>
+      <p>{{ _('Your listeners can leave questions, comments, and other feedback about this episode at this URL.') }}</p>
+      <input type="url"
+        title="{{ _('Comment Box') }}"
+        readonly
+        value="https://pinecast.com{{ url('ep_comment_box', kwargs={'podcast_slug': podcast.slug, 'episode_id': str(episode.id)}) }}">
+    </div>
+    <div class="card-block card">
+      {% for f in feedback %}
+        <div class="card-item">
+          <a class="comment-from" href="mailto:{{ f.sender }}">
+            <img src="{{ gravatar(f.sender) }}" class="comment-from-gravatar" title="{{ f.sender }}" alt="">
+          </a>
+          <p>
+            {{ f.message }}
+            <br>
+            <abbr class="feedback-date" title="{{ (f.created + tz_delta).strftime('%x') }}">
+              {{ f.created|pretty_date }}
+            </abbr>
+          </p>
+          <menu class="toolbar">
+            <a href="{{ url('delete_comment', kwargs={'podcast_slug': podcast.slug, 'comment_id': str(f.id)}) }}">{{ _('Delete') }}</a>
+          </menu>
+        </div>
+      {% else %}
+        <div class="episode-empty-state empty-state">
+          {{ _('Nobody has submitted feedback about the episode yet.') }}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="upgrade-empty-state empty-state">
+      {% if user == podcast.owner %}
+        {{ _('Feedback is available to users with a Pro plan.') }}
+        <br>
+        <a class="btn" href="{{ url('upgrade') }}">{{ _('Upgrade Now') }}</a>
+      {% else %}
+        {{ _('The feedback feature is available to podcasts owned by Pro users.') }}
+      {% endif %}
+    </div>
+  {% endif %}
 </div>
 
 <div class="tab-analytics" style="overflow: hidden; height: 0">
