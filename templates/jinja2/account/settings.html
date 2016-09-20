@@ -13,7 +13,10 @@
 
     <dl class="user-detail-list">
       <dt>{{ _('Email') }}</dt>
-      <dd>{{ user.email }}</dd>
+      <dd>
+        {{ user.email }}
+        <a href="#as-section-email">{{ _('(change)') }}</a>
+      </dd>
 
       <dt>{{ _('Account Created') }}</dt>
       <dd><abbr title="{{ user.date_joined }}">{{ user.date_joined|pretty_date }}</abbr></dd>
