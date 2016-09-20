@@ -83,7 +83,7 @@
 
   <form action="{{ url('user_settings_change_password') }}" method="post">
 
-    <p>{{ _('Passwords must be at least eight characters') }}</p>
+    <p>{{ _('Passwords must be at least eight characters.') }}</p>
 
     <label>
       <span>{{ _('Old Password') }}</span>
@@ -96,7 +96,7 @@
     </label>
 
     <label>
-      <span>{{ _('Confirm') }}</span>
+      <span>{{ _('Confirm Password') }}</span>
       <input required type="password" name="confirm_password">
     </label>
 
@@ -115,8 +115,8 @@
 
     <p>
       {% trans %}
-        To change your email, enter your new email address. We will send you a
-        confirmation message containing a link that will finalize the process.
+        To change your email on file, enter your new email address. Then, check
+        your inbox for an email with a link to finalize the switch.
       {% endtrans %}
     </p>
 
