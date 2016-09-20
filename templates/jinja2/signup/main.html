@@ -8,7 +8,7 @@
       <strong>{{ _('Error') }}</strong> {{ error }}
     </div>
   {% else %}
-    <p>{{ _('Sign up for an account, on us.') }}</p>
+    <p>{{ _('Sign up for an account. No strings attached.') }}</p>
   {% endif %}
 
   <label>
@@ -18,7 +18,7 @@
   </label>
 
   <label>
-    <span>{{ _('Choose A Password') }}</span>
+    <span>{{ _('Choose a Password') }}</span>
     <input type="password" name="password" required minlength="8">
   </label>
 
@@ -27,7 +27,7 @@
   <button type="submit">{{ _('Create Account') }}</button>
 
   <footer>
-    {{ _('Already a member?')}} <a href="{{ url('login') }}">{{ _('Sign In') }}</a>
+    {{ _('Already a member?')}} <a href="{{ url('login') }}">{{ _('Sign in.') }}</a>
   </footer>
 
   <input type="hidden" name="timezone">
