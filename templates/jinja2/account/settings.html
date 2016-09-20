@@ -5,7 +5,7 @@
   <h1>{{ _('Account Settings') }}</h1>
 </header>
 
-<div class="card card-block">
+<div class="card card-block" id="as-section-profile">
   <strong>{{ _('Account') }}</strong>
 
   <div class="user-detail">
@@ -56,7 +56,7 @@
   </div>
 {% endif %}
 
-<div class="card card-block">
+<div class="card card-block" id="as-section-timezone">
   <strong>{{ _('Timezone') }}</strong>
 
   <form action="{{ url('user_settings_save_tz') }}" method="post">
@@ -78,7 +78,7 @@
   </form>
 </div>
 
-<div class="card card-block">
+<div class="card card-block" id="as-section-pw">
   <strong>{{ _('Change Password') }}</strong>
 
   <form action="{{ url('user_settings_change_password') }}" method="post">
@@ -108,7 +108,7 @@
   </form>
 </div>
 
-<div class="card card-block">
+<div class="card card-block" id="as-section-email">
   <strong>{{ _('Change Email') }}</strong>
 
   <form action="{{ url('user_settings_change_email') }}" method="post">
@@ -156,7 +156,7 @@
   </p>
 </div>
 
-<div class="card card-block">
+<div class="card card-block" id="as-section-cc">
   <strong>{{ _('Credit Card') }}</strong>
 
   {% if user_settings.has_payment_method() %}
