@@ -27,18 +27,12 @@ body {
 
 
 .main-container {
-    padding-top: 60px;
+    padding-top: 15vh;
 }
 
 main {
-    padding-top: 100px;
+    padding: 0;
     text-align: center;
-}
-
-@media (max-width: 500px) {
-    main {
-        padding: 0;
-    }
 }
 
 main hgroup {
