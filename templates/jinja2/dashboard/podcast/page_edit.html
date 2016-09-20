@@ -41,22 +41,6 @@
     </label>
 
     <label>
-      <span>{{ _('Slug') }}</span>
-      <input type="text"
-        name="slug"
-        placeholder="{{ _('my-great-podcast') }}"
-        required
-        maxlength="64"
-        pattern="[\w-]+"
-        class="slug-field"
-        value="{{ default.get('slug', podcast.slug) }}">
-      <div class="url-availability"></div>
-      <div class="warning slug-warning">
-        {{ _('WARNING! Changing your slug will change your RSS feed URL. You will lose all of your subscribers.') }}
-      </div>
-    </label>
-
-    <label>
       <span>{{ _('Subtitle') }}</span>
       <input type="text"
         name="subtitle"
@@ -160,47 +144,7 @@
 <script src="/static/js/ui-uploader.js"></script>
 <script src="/static/js/disable-forms.js"></script>
 <script>
-
 window.PODCAST_CATEGORIES = {{ PODCAST_CATEGORIES|safe }};
-
-(function() {
-  var slugField = document.querySelector('.slug-field');
-  var urlAvail = document.querySelector('.url-availability');
-
-  var slugDebounce;
-  var slugXHR;
-
-  slugField.addEventListener('input', function() {
-    if (slugDebounce) clearTimeout(slugDebounce);
-    if (slugXHR) slugXHR.abort();
-    if (!slugField.validity.valid || slugField.value === slugField.defaultValue) {
-      urlAvail.textContent = urlAvail.innerText = '';
-      urlAvail.className = 'url-availability';
-      return;
-    }
-    slugDebounce = setTimeout(validateSlug, 500);
-  });
-
-  function validateSlug() {
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-      slugXHR = null;
-      var parsed = JSON.parse(xhr.responseText);
-      if (parsed.valid) {
-        urlAvail.textContent = urlAvail.innerText = '{% trans slug=("' + slugField.value + '"|safe) %}"{{ slug }}" is available!{% endtrans %}';
-        urlAvail.className = 'url-availability is-available';
-      } else {
-        urlAvail.textContent = urlAvail.innerText = '{% trans slug=("' + slugField.value + '"|safe) %}"{{ slug }}" is unavailable{% endtrans %}';
-        urlAvail.className = 'url-availability is-unavailable';
-      }
-    };
-    xhr.open('get', '/dashboard/services/slug_available?slug=' + encodeURIComponent(slugField.value), true);
-    xhr.send();
-    slugXHR = xhr;
-  }
-
-}());
-
 </script>
 {# Must come after the PODCAST_CATEGORIES declaration above #}
 <script src="/static/js/ui-categories.js"></script>

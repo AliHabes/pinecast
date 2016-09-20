@@ -183,7 +183,6 @@ def edit_podcast(req, podcast_slug):
         return _pmrender(req, 'dashboard/podcast/page_edit.html', ctx)
 
     try:
-        pod.slug = req.POST.get('slug')
         pod.name = req.POST.get('name')
         pod.subtitle = req.POST.get('subtitle')
         pod.description = req.POST.get('description')
