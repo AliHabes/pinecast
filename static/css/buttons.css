@@ -8,11 +8,13 @@ button, .btn {
     border-radius: 3px;
     box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
     color: #fff;
+    cursor: pointer;
     display: block;
     font-size: 13px;
     margin: 20px 0;
     padding: 9px 30px;
     position: relative;
+    text-decoration: none;
     text-transform: uppercase;
     transition: box-shadow 0.3s, top 0.1s;
     top: 0;
@@ -21,6 +23,7 @@ button, .btn {
 button:hover, .btn:hover,
 button:focus, .btn:focus {
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
 }
 
 button:active, .btn:active {
