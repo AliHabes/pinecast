@@ -48,13 +48,11 @@ def importer_lookup(req):
     try:
         encoded = data.encode('utf-8')
     except Exception as e:
-        print e
         return {'error': 'invalid encoding'}
 
     try:
         parsed = parseXMLString(encoded)
     except Exception as e:
-        print e
         return {'error': 'invalid xml'}
 
     return importer_lib.get_details(req, parsed)

@@ -322,7 +322,6 @@ def edit_podcast_episode(req, podcast_slug, episode_id):
             prompt.save()
 
     except Exception as e:
-        print e
         ctx['default'] = req.POST
         ctx['error'] = True
         return  _pmrender(req, 'dashboard/episode/page_edit.html', ctx)

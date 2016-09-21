@@ -19,7 +19,6 @@ def _send_mail(to, subject, body, email_format='Text'):
                       aws_secret_access_key=settings.SES_SECRET_KEY,
                       region_name='us-east-1')
     conn = session.client('ses')
-    print 'Sending email to %s' % to
     conn.send_email(
         Source=settings.SUPPORT_EMAIL,
         Destination={'ToAddresses': [to]},

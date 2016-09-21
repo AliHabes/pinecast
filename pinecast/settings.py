@@ -71,6 +71,7 @@ MIDDLEWARE_CLASSES = (
 
     'sites.middleware.subdomains.SubdomainMiddleware',
     'pinecast.middleware.hnredirect.HostnameRedirect',
+    'pinecast.middleware.tsredirect.TrailingSlashRedirect',
 )
 
 ROOT_URLCONF = 'pinecast.urls'
@@ -100,6 +101,8 @@ TEMPLATES = [
         },
     },
 ]
+
+SILENCED_SYSTEM_CHECKS = ['urls.W002']
 
 WSGI_APPLICATION = 'pinecast.wsgi.application'
 

@@ -33,7 +33,6 @@ def new_network(req):
         net.members.add(req.user)
         net.save()
     except Exception as e:
-        print e
         return _pmrender(req,
                          'dashboard/network/page_new.html',
                          {'error': ugettext('Error while saving network details'),
@@ -116,7 +115,6 @@ def network_edit(req, network_id):
         net.image_url = signer.unsign(req.POST.get('image-url')) if req.POST.get('image-url') else None
         net.save()
     except Exception as e:
-        print e
         return _pmrender(req,
                          'dashboard/network/page_edit.html',
                          {'network': net, 'error': ugettext('Error while saving network details'),

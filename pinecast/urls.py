@@ -24,12 +24,11 @@ urlpatterns = (
     account_urlpatterns +
     podcast_urlpatterns +
     [
-        url(r'^accounts/login/$', lambda *_: redirect('home')),
         url(r'^admin/', include(admin.site.urls)),
         url(r'^analytics/', include(analytics.urls)),
-        url(r'^dashboard/', include(dashboard.urls)),
+        url(r'^dashboard', include(dashboard.urls)),
         url(r'^feedback/', include(feedback.urls)),
-        url(r'^logout$', logout_view, name='logout'),
+        url(r'^logout', logout_view, name='logout'),
         url(r'^payments/', include(payments.urls)),
 
         url(r'^services/deploy_complete$', views.deploy_complete),

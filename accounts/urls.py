@@ -17,5 +17,5 @@ urlpatterns = [
     url(r'^accounts/settings/change_email$', views.user_settings_page_changeemail, name='user_settings_change_email'),
     url(r'^accounts/settings/change_email/finalize$', views.user_settings_page_changeemail_finalize, name='user_settings_change_email_finalize'),
 
-    url(r'^signup/$', views_signup.signup, name='signup'),
+    url(r'^signup$', views_signup.signup, name='signup'),
 ]

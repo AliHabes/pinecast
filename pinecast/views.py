@@ -17,7 +17,7 @@ from podcasts.models import Podcast, PodcastEpisode
 @require_POST
 def deploy_complete(req):
 
-    commit = '<https://github.com/AlmostBetterNetwork/pinecast/commit/%s|%s>' % (
+    commit = '<https://github.com/pinecast/pinecast/commit/%s|%s>' % (
         req.POST.get('head'), req.POST.get('head'))
 
     payload = {

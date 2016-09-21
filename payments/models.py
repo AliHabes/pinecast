@@ -36,12 +36,10 @@ class TipEvent(models.Model):
 
     def payout_date(self):
         date = self.occurred_at.date()
-        print date
 
         # This payout date is the last one that the last tip missed the cutoff
         # for.
         following_payout = date + datetime.timedelta(days=(5 - date.isoweekday()) % 7)
-        print following_payout
 
         return following_payout + datetime.timedelta(days=7)
 

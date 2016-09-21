@@ -17,8 +17,6 @@ def push_batch(bus, payloads):
         )
         count += 1
 
-    print 'Dispatched %d events to SNS' % count
-
 
 def prep_payloads(payloads):
     for p in payloads:

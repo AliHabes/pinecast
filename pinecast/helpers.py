@@ -76,9 +76,6 @@ def validate_recaptcha(response, ip):
     except Exception:
         return False
 
-    if parsed.get('error-codes'):
-        print parsed.get('error-codes')
-
     return parsed['success']
 
 

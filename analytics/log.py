@@ -31,14 +31,13 @@ def _post(url, payload):
         rollbar.report_message('Analytics POST timeout: %s' % url, 'error')
         return
 
+    # 409 is a duplicate ID error, which is expected
     if posted.status_code != 200 and posted.status_code != 409:
         rollbar.report_message(
             'Got non-200 status code submitting logs: %s %s' % (
                 posted.status_code,
                 posted.text),
             'error')
-        # 409 is a duplicate ID error, which is expected
-        print posted.status_code, posted.text
 
 def _get_country(ip, req=None):
     if req and req.META.get('HTTP_CF_IPCOUNTRY'):

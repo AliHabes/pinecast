@@ -50,7 +50,6 @@ def new_site(req, podcast_slug):
         )
         site.save()
     except Exception as e:
-        print e
         data.update(error=True, default=req.POST)
         return _pmrender(req, 'dashboard/sites/page_new.html', data)
     else:
@@ -83,7 +82,6 @@ def edit_site(req, podcast_slug):
         site.stitcher_url = req.POST.get('stitcher_url')
         site.save()
     except Exception as e:
-        print e
         data.update(error=True, default=req.POST)
         return _pmrender(req, 'dashboard/sites/page_edit.html', data)
     else:
@@ -159,7 +157,6 @@ def add_blog_post(req, podcast_slug):
         )
         post.save()
     except Exception as e:
-        print e
         data.update(error=True, default=req.POST)
         return _pmrender(req, 'dashboard/sites/blog/page_new.html', data)
     else:
@@ -193,7 +190,6 @@ def edit_blog_post(req, podcast_slug, post_slug):
         post.publish = adjusted_publish
         post.save()
     except Exception as e:
-        print e
         data.update(error=True, default=req.POST)
         return _pmrender(req, 'dashboard/sites/blog/page_edit.html', data)
     else:
