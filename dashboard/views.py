@@ -11,6 +11,7 @@ import uuid
 import itsdangerous
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.utils.translation import ugettext
@@ -127,7 +128,11 @@ def podcast_dashboard(req, podcast_slug):
 
     owner_uset = UserSettings.get_from_user(pod.owner)
     if payment_plans.minimum(owner_uset.plan, payment_plans.FEATURE_MIN_COMMENT_BOX):
-        data['feedback'] = Feedback.objects.filter(podcast=pod, episode=None).order_by('-created')
+        all_feedback = Feedback.objects.filter(podcast=pod)
+        data['feedback_all'] = all_feedback
+        data['feedback'] = all_feedback.filter(episode=None).order_by('-created')
+        data['feedback_episodes'] = all_feedback.exclude(episode=None).annotate(
+            Count('episode', distinct=True))
 
     return _pmrender(req, 'dashboard/podcast/page_podcast.html', data)
 

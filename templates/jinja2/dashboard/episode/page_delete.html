@@ -1,4 +1,7 @@
 {% extends 'dashboard/base.html' %}
+
+{% block title %}{{ episode.title }}{% endblock %}
+
 {% block dashboard_body %}
 
 <header>
@@ -13,7 +16,7 @@
     <p>
       {% trans title=episode.title %}Are you absolutely sure you wish to delete "{{ title }}"? This is permanent.{% endtrans %}
     </p>
-    
+
     <menu class="toolbar">
       <li><button type="submit" class="btn-danger">{{ _('I\'m sure' )}}</button></li>
       <li><a class="btn btn-neutral" href="{{ url('podcast_episode', kwargs={'podcast_slug': podcast.slug, 'episode_id': str(episode.id)})}}">{{ _('Never mind') }}</a></li>

@@ -86,8 +86,8 @@
         <div class="segment">
           <span>{{ _('Feedback') }}</span>
           <em>
-            {% if feedback %}
-              {{ feedback.count() }}
+            {% if feedback_all %}
+              {{ feedback_all.count() }}
             {% else %}
               0
             {% endif %}
