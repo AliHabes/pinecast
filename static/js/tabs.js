@@ -19,7 +19,9 @@ function buildTabs(tab) {
             hide(document.querySelector(tab.getAttribute('data-tab')));
         });
         a.parentNode.className = 'selected';
-        show(document.querySelector(a.getAttribute('data-tab')));
+        var tab = a.getAttribute('data-tab');
+        show(document.querySelector(tab));
+        window.history.replaceState(null, null, '#' + tab.substr(5));
     }
 
     tab.addEventListener('click', function(e) {
@@ -32,7 +34,10 @@ function buildTabs(tab) {
 
     var selected = null;
     if (window.location.hash) {
-        selected = tab.querySelector('a[data-tab=".' + window.location.hash.substr(1) + '"]')
+        selected = (
+            tab.querySelector('a[data-tab=".tab-' + window.location.hash.substr(1) + '"]') ||
+            tab.querySelector('a[data-tab=".' + window.location.hash.substr(1) + '"]')
+        );
     }
     if (!selected) {
         selected = tab.querySelector('li a[data-tab]');
