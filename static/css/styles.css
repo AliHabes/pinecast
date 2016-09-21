@@ -1191,25 +1191,33 @@ li.user-card span.name {
 }
 .upgrade-progress:before,
 .upgrade-progress:after {
+    align-items: center;
     background: #eee;
     border-radius: 10px;
-    content: "";
-    display: block;
-    height: 10px;
+    display: flex;
+    font-size: 10px;
+    height: 18px;
+    justify-content: center;
     position: absolute;
-    top: -4px;
-    width: 10px;
+    text-align: center;
+    top: -8px;
+    width: 18px;
 }
 .upgrade-progress:before {
     background: #5395D3;
+    color: #fff;
+    content: "1";
     left: -10px;
 }
 .upgrade-progress:after {
+    color: #aaa;
+    content: "2";
     right: -10px;
 }
 .upgrade-progress[data-progress="2"],
 .upgrade-progress[data-progress="2"]:after {
     background: #5395D3;
+    color: #fff;
 }
 
 .plans {
