@@ -35,7 +35,6 @@
 <nav class="subnav">
   <ul class="bottom-tabs tabs dynamic">
     <li class="selected"><a data-tab=".tab-overview" href="">{{ _('Overview') }}</a></li>
-    <li><a data-tab=".tab-analytics" href="">{{ _('Analytics') }}</a></li>
     <li><a data-tab=".tab-feedback" href="">{{ _('Feedback') }}</a></li>
     <li><a data-tab=".tab-audio" href="">{{ _('Audio') }}</a></li>
   </ul>
@@ -72,6 +71,20 @@
         </em>
       </div>
     </div>
+
+    {% if analytics.total_listens %}
+      <div class="analytics-dash"
+        data-episode="{{ str(episode.id) }}"
+        data-podcast="{{ podcast.slug }}"
+        data-is-podcast-owner="{{ 'true' if user == podcast.owner else 'false' }}"
+        data-is-starter="{{ 'true' if minimum_plan(podcast.owner, PLANS.PLAN_STARTER) or is_admin else 'false' }}"
+        data-is-pro="{{ 'true' if minimum_plan(podcast.owner, PLANS.PLAN_PRO) or is_admin else 'false' }}"
+        data-upgrade-url="{{ url('upgrade') }}"></div>
+    {% else %}
+      <div class="episode-empty-state empty-state">
+        {% trans %}Analytics will become available when you've received your first listen{% endtrans %}
+      </div>
+    {% endif %}
   </div>
 
   <section class="row">
@@ -173,24 +186,6 @@
       {% else %}
         {{ _('The feedback feature is available to podcasts owned by Pro users.') }}
       {% endif %}
-    </div>
-  {% endif %}
-</div>
-
-<div class="tab-analytics" style="overflow: hidden; height: 0">
-  {% if analytics.total_listens %}
-    <div class="card card-block">
-      <div class="analytics-dash"
-        data-episode="{{ str(episode.id) }}"
-        data-podcast="{{ podcast.slug }}"
-        data-is-podcast-owner="{{ 'true' if user == podcast.owner else 'false' }}"
-        data-is-starter="{{ 'true' if minimum_plan(podcast.owner, PLANS.PLAN_STARTER) or is_admin else 'false' }}"
-        data-is-pro="{{ 'true' if minimum_plan(podcast.owner, PLANS.PLAN_PRO) or is_admin else 'false' }}"
-        data-upgrade-url="{{ url('upgrade') }}"></div>
-    </div>
-  {% else %}
-    <div class="episode-empty-state empty-state">
-      {% trans %}Analytics will become available when you've received your first listen{% endtrans %}
     </div>
   {% endif %}
 </div>
