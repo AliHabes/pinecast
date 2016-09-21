@@ -1,4 +1,7 @@
 {% extends 'dashboard/base.html' %}
+
+{% block title %}{{ podcast.name }}{% endblock %}
+
 {% block dashboard_body %}
 
 <header>
@@ -26,7 +29,7 @@
         required
         title="{% trans slug=podcast.slug %}Type '{{ slug }}' here in order to confirm deletion{% endtrans %}">
     </label>
-    
+
     <menu class="toolbar">
       <li><button type="submit" class="btn-danger">{{ _('Delete') }}</button></li>
     </menu>
