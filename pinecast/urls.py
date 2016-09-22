@@ -24,6 +24,7 @@ urlpatterns = (
     account_urlpatterns +
     podcast_urlpatterns +
     [
+        url(r'^accounts/login/$', lambda r, *_: redirect('/login?next=%s' % r.GET.get('next'))),
         url(r'^admin/', include(admin.site.urls)),
         url(r'^analytics/', include(analytics.urls)),
         url(r'^dashboard', include(dashboard.urls)),
