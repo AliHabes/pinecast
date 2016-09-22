@@ -2,6 +2,7 @@ import hashlib
 import uuid
 
 import itsdangerous
+import rollbar
 from boto3.session import Session
 from django.conf import settings
 from django.http import HttpResponseBadRequest
@@ -15,12 +16,14 @@ CONFIRMATION_PARAM = '__ctx'
 
 
 def _send_mail(to, subject, body, email_format='Text'):
+    if settings.DEBUG:
+        print to, subject, body
     session = Session(aws_access_key_id=settings.SES_ACCESS_ID,
                       aws_secret_access_key=settings.SES_SECRET_KEY,
                       region_name='us-east-1')
     conn = session.client('ses')
-    conn.send_email(
-        Source=settings.SUPPORT_EMAIL,
+    resp = conn.send_email(
+        Source=settings.SENDER_EMAIL,
         Destination={'ToAddresses': [to]},
         Message={
             'Subject': {
@@ -35,6 +38,11 @@ def _send_mail(to, subject, body, email_format='Text'):
         ReplyToAddresses=[settings.SUPPORT_EMAIL],
         ReturnPath=settings.ADMINS[0][1]
     )
+
+    if settings.DEBUG:
+        print resp
+    if not resp.get('MessageId'):
+        rollbar.report_message('Got bad response from SES: %s' % repr(resp), 'error')
 
 
 def send_confirmation_email(user, subject, description, url, email=None):

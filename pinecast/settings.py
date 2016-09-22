@@ -216,6 +216,7 @@ EMAIL_CONFIRMATION_MAX_AGE = 3600 * 24 * 2  # Two days
 
 SUPPORT_URL = 'https://pinecast.zendesk.com'
 SUPPORT_EMAIL = 'support@pinecast.zendesk.com'
+SENDER_EMAIL = 'Matt@pinecast.com'
 
 ROLLBAR = {
     'access_token': os.environ.get('ROLLBAR_ACCESS_TOKEN'),
