@@ -20,7 +20,7 @@ In a production environment, the following dependencies are also required:
 
 ### Production
 
-Pushing to Heroku as-is should work. [The wiki](https://github.com/AlmostBetterNetwork/pinecast/wiki/Configuration) contains information on environment variables that should be set in order to make the installation functional.
+Pushing to Heroku as-is should work. [The wiki](https://github.com/Pinecast/pinecast/wiki/Configuration) contains information on environment variables that should be set in order to make the installation functional.
 
 
 ### Local Development
@@ -35,7 +35,7 @@ pip install -r requirements-dev.txt
 
 This will set up a virtual environment and install all Python dependencies necessary for development.
 
-If you intend to deploy LicenseForge to production (which will require a database server), you will need to install the prod requirements instead:
+If you intend to deploy Pinecast to production (which will require a database server), you will need to install the prod requirements instead:
 
 ```bash
 # Run this `pip` command instead of the one above:
