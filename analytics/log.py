@@ -23,7 +23,7 @@ def _post(url, payload):
     try:
         posted = requests.post(
             url,
-            timeout=5,
+            timeout=7.5,
             data=payload,
             headers={'X-Project-Id': settings.GETCONNECT_IO_PID,
                      'X-Api-Key': settings.GETCONNECT_IO_PUSH_KEY})
