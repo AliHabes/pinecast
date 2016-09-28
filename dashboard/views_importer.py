@@ -101,7 +101,7 @@ def start_import(req):
                 p.delete()
             except Exception:
                 pass
-        return {'error': ugettext('There was a problem saving the podcast: %u') % unicode(e)}
+        return {'error': ugettext('There was a problem saving the podcast: %s') % unicode(e)}
 
     created_items = []
     try:
