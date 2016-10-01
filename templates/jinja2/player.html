@@ -136,9 +136,10 @@
   function setUpAudio() {
     if (audio) return;
     audio = new Audio('/listen/{{ str(episode.id) }}?embed=true');
+    var origMarkup = button.innerHTML;
     audio.addEventListener('pause', function() {
       button.className = 'play-button paused';
-      button.innerHTML = '&#9654;';
+      button.innerHTML = origMarkup;
     });
     audio.addEventListener('playing', function() {
       button.className = 'play-button playing';
