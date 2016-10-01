@@ -54,11 +54,9 @@
     -moz-appearance: none;
     -ms-appearance: none;
     -webkit-appearance: none;
-    background: #eee;
-    border: 1px solid #aaa;
-    border-radius: 40px;
+    background: transparent;
+    border: 0;
     bottom: 0;
-    color: #aaa;
     height: 40px;
     left: 10px;
     margin: auto;
@@ -67,13 +65,12 @@
     top: 0;
     width: 40px;
   }
-  .play-button:hover {
-    background: #fff;
-    color: #999;
+  .play-button:hover #pbb {
+    fill: #ddd;
   }
-  .play-button:active {
-    background: #fff;
-    color: #333;
+  .play-button:active #pbb {
+    fill: #aaa;
+    outline: none;
   }
   .download-button {
     position: absolute;
@@ -109,7 +106,18 @@
       {{ episode.audio_size|filesizeformat }}
     </span>
   </div>
-  <button class="play-button">&#9654;</button>
+  <button class="play-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256">
+      <defs>
+        <clipPath id="a">
+          <path d="M26 40.62h16V19.38H26v21.24z"/>
+        </clipPath>
+      </defs>
+      <path d="M256 128c0 70.692-57.308 128-128 128C57.308 256 0 198.692 0 128 0 57.308 57.308 0 128 0c70.692 0 128 57.308 128 128" fill="#d5d5d5" id="pbb" />
+      <path d="M206.63 115.35L85.845 203.112l37.93 52.782c1.407.045 2.81.106 4.226.106 54.737 0 101.427-34.367 119.725-82.694L206.63 115.35z" fill-opacity=".08" fill-rule="evenodd"/>
+      <path d="M99.535 210.813c-2.74 0-5.48-.707-7.944-2.13-4.916-2.835-7.943-8.086-7.943-13.758V57.992c0-5.68 3.027-10.924 7.944-13.76 4.918-2.844 10.972-2.844 15.89 0l95.33 68.463c4.916 2.836 7.943 8.087 7.943 13.76 0 5.68-3.027 10.923-7.944 13.76l-95.33 68.47c-2.463 1.42-5.204 2.128-7.945 2.128" fill="#fff"/>
+    </svg>
+  </button>
   {% if minimum_plan(episode.podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
     <a class="feedback-button" href="{{ url('ep_comment_box', podcast_slug=episode.podcast.slug, episode_id=str(episode.id)) }}" title="{{ _('Leave a Comment') }}" target="_blank">
       <img src="/static/img/bubble.svg" alt="{{ _('Leave a Comment') }}" height="20" width="20">
