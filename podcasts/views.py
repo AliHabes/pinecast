@@ -108,6 +108,7 @@ def feed(req, podcast_slug):
         '<channel>',
         '<title>%s</title>' % escape(pod.name),
         '<link>%s</link>' % escape(pod.homepage),
+        '<atom:link href="https://pinecast.com/feed/%s" rel="self" type="application/rss+xml" />' % escape(pod.slug),
         '<language>%s</language>' % escape(pod.language),
         '<copyright>%s</copyright>' % escape(pod.copyright),
         '<generator>Pinecast (https://pinecast.com)</generator>',
