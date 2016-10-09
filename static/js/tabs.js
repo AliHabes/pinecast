@@ -1,30 +1,32 @@
 (function() {
 
 function hide(elem) {
-    elem.style.overflow = 'hidden';
-    elem.style.height = '0';
+    elem.style.display = 'none';
 }
 function show(elem) {
-    elem.style.overflow = 'auto';
-    elem.style.height = 'auto';
+    elem.style.display = 'block';
 }
 
-function buildTabs(tab) {
-    var allTabs = Array.prototype.slice.call(tab.querySelectorAll('li a[data-tab]'));
+function buildTabs(tabBar) {
+    const allTabs = Array.prototype.slice.call(tabBar.querySelectorAll('li a[data-tab]'));
 
-    function select(a) {
+    function select(a, initial) {
         allTabs.forEach(function(tab) {
             if (tab === a) return;
             tab.parentNode.className = '';
             hide(document.querySelector(tab.getAttribute('data-tab')));
         });
         a.parentNode.className = 'selected';
-        var tab = a.getAttribute('data-tab');
-        show(document.querySelector(tab));
-        window.history.replaceState(null, null, '#' + tab.substr(5));
+        const tabName = a.getAttribute('data-tab');
+        const tab = document.querySelector(tabName);
+        show(tab);
+        if (tabBar.getAttribute('data-no-history') !== null || initial) {
+            return;
+        }
+        window.history.replaceState(null, null, '#' + tabName.substr(5));
     }
 
-    tab.addEventListener('click', function(e) {
+    tabBar.addEventListener('click', function(e) {
         if (!e.target.getAttribute('data-tab')) return;
         e.preventDefault();
         if (e.target.nodeName !== 'A') return;
@@ -32,22 +34,20 @@ function buildTabs(tab) {
         select(e.target);
     });
 
-    var selected = null;
+    let selected = null;
     if (window.location.hash) {
         selected = (
-            tab.querySelector('a[data-tab=".tab-' + window.location.hash.substr(1) + '"]') ||
-            tab.querySelector('a[data-tab=".' + window.location.hash.substr(1) + '"]')
+            tabBar.querySelector('a[data-tab=".tab-' + window.location.hash.substr(1) + '"]') ||
+            tabBar.querySelector('a[data-tab=".' + window.location.hash.substr(1) + '"]')
         );
     }
     if (!selected) {
-        selected = tab.querySelector('li a[data-tab]');
+        selected = tabBar.querySelector('li a[data-tab]');
     }
-    select(selected);
+    select(selected, true);
 }
 
-var tabs = document.querySelectorAll('.tabs.dynamic');
-Array.prototype.slice.call(tabs).forEach(function(tab) {
-    buildTabs(tab);
-});
+const tabs = document.querySelectorAll('.tabs.dynamic');
+Array.prototype.slice.call(tabs).forEach(buildTabs);
 
 }());

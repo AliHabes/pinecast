@@ -474,6 +474,310 @@ menu.tabs a.selected {
 }
 
 
+.tabs-inline ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    list-style: none;
+    margin-bottom: 1em;
+    padding: 30px 15px 0 0;
+}
+.tabs-inline a {
+    border-bottom: 2px solid #000;
+    color: #444;
+    display: inline-block;
+    font-weight: 600;
+    margin: 0 0 18px 0;
+    padding: 0 35px 7px 0;
+    transition: border-bottom 0.15s;
+}
+.tabs-inline a:focus {
+    color: #000;
+    text-decoration: none;
+}
+.tabs-inline .selected a {
+    border-bottom: 4px solid #000;
+}
+
+.form-block {
+    color: #444;
+    font-size: 14px;
+    line-height: 2em;
+    max-width: 600px;
+    padding-bottom: 100px;
+    position: relative;
+}
+.form-block > strong,
+.form-block form > strong {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 1em;
+}
+.form-block a {
+    background: linear-gradient(#F8F9FA, #F8F9FA) no-repeat,
+        linear-gradient(#F8F9FA, #F8F9FA) no-repeat,
+        linear-gradient(#32719C, #32719C) repeat-x;
+    background-position: 0 87%, 100% 92%, 0 92%;
+    background-size: 0.05em 1px, 0.05em 1px, 1px 1px;
+    color: #32719C;
+    display: inline;
+    font-weight: 600;
+    line-height: 1.5em;
+    position: relative;
+    text-shadow: .03em 0 #F8F9FA,
+        -0.03em 0 #F8F9FA,
+        0 0.03em #F8F9FA,
+        0 -0.03em #F8F9FA,
+        0.06em 0 #F8F9FA,
+        -0.06em 0 #F8F9FA,
+        0.09em 0 #F8F9FA,
+        -0.09em 0 #F8F9FA;
+    z-index: 2;
+}
+.form-block small a {
+    display: inline-block;
+    height: 1.4em;
+}
+.form-block a:hover {
+    text-decoration: none;
+}
+.form-block .panel {
+    border: 2px solid #444;
+    display: flex;
+    margin-bottom: 1em;
+    max-width: 600px;
+    padding: 1em 1em 0;
+}
+.form-block .panel .segment-fill,
+.form-block .panel .segment-divide,
+.form-block .panel .segment-shrink {
+    margin-bottom: 1em;
+}
+.form-block .panel .segment-fill:not(:last-child),
+.form-block .panel .segment-divide:not(:last-child),
+.form-block .panel .segment-shrink:not(:last-child) {
+    margin-right: 1em;
+}
+.form-block .panel .segment-fill {flex: 2 0;}
+.form-block .panel .segment-divide {flex: 1 1;}
+.form-block .panel .segment-shrink {flex: 0 1;}
+
+@media (max-width: 700px) {
+    .form-block .panel {
+        flex-wrap: wrap;
+    }
+    .form-block .panel .segment-fill,
+    .form-block .panel .segment-divide,
+    .form-block .panel .segment-shrink {
+        white-space: nowrap;
+    }
+}
+
+.form-block .btn,
+.form-block .bank-form-update-account-btn {
+    background: rgba(255,255,255,0.8);
+    border: 2px solid #444;
+    border-radius: 0;
+    color: #444;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    height: 3em;
+    margin: 0;
+    padding: 0 1.5em;
+}
+.form-block .btn.btn--tiny {
+    line-height: 2em;
+    height: auto;
+    padding: 0 9px;
+}
+.form-block .btn.btn--go {
+    padding-right: 20px;
+}
+.form-block .btn.btn--go:after {
+    border: 0 solid #444;
+    border-right-width: 3px;
+    border-top-width: 3px;
+    bottom: 0;
+    content: "";
+    display: block;
+    height: 7px;
+    margin: auto;
+    right: 8px;
+    transition: right 0.2s;
+    top: 0;
+    position: absolute;
+    transform: rotate(45deg);
+    width: 7px;
+}
+.form-block .btn.btn--go:hover:after {
+    right: 6px;
+}
+
+.form-block hr {
+    background: #000;
+    border: 0;
+    display: block;
+    height: 2px;
+    margin: 2em 0 3em;
+    max-width: 600px;
+}
+.form-block form + hr,
+.form-block .panel + hr {
+    margin-top: 3em;
+}
+
+.form-block form {
+    max-width: 600px;
+    position: relative;
+}
+.form-block aside {
+    border: 2px solid #000;
+    left: calc(100% + 2em);
+    padding: 1em 1.5em;
+    position: absolute;
+    width: 300px;
+}
+.form-block aside strong {
+    line-height: 1em;
+}
+.form-block aside p {
+    line-height: 1.5em;
+}
+.form-block aside :last-child {
+    margin-bottom: 0;
+}
+
+.form-block aside.aside--secure {
+    border-color: #05a;
+    color: #36a;
+}
+.form-block aside.aside--secure a {
+    background-image: linear-gradient(#F8F9FA, #F8F9FA) no-repeat,
+        linear-gradient(#F8F9FA, #F8F9FA) no-repeat,
+        linear-gradient(#148, #148) repeat-x;
+    color: #148;
+}
+
+@media (max-width: 1000px) {
+    .form-block aside {
+        margin-bottom: 1em;
+        position: static;
+        width: 100%;
+    }
+}
+
+.form-block .inline-form {
+    display: flex;
+    max-width: 600px;
+    padding-bottom: 1em;
+}
+.form-block .inline-form label {
+    display: flex;
+    flex: 1 1;
+    line-height: 3em;
+    margin-right: 1em;
+    padding: 0;
+}
+.form-block .inline-form label > * {
+    flex: 1 1;
+}
+.form-block .inline-form label strong {
+    flex: 0 0 30%;
+    margin: 0;
+}
+.form-block .inline-form label strong + input,
+.form-block .inline-form label strong + select {
+    flex: 1 1;
+}
+.form-block .inline-form menu.toolbar {
+    flex: 0 0 0%;
+    margin: 0;
+    padding: 0;
+}
+.form-block .inline-form menu.toolbar .btn {
+    height: 3em;
+    padding: 0 1em;
+}
+
+.form-block .select {
+    background: rgba(255,255,255,0.8);
+    border: 2px solid #000;
+    height: 3em;
+    padding: 0;
+    position: relative;
+}
+.form-block .select select {
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    display: block;
+    height: calc(3em - 7px);
+    line-height: calc(3em - 7px);
+    margin: 0;
+    padding: 0 20px;
+    width: 100%;
+}
+.form-block .select:after {
+    border: 0 solid #000;
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+    bottom: 0;
+    content: "";
+    display: block;
+    height: 7px;
+    margin: auto;
+    position: absolute;
+    right: 10px;
+    top: 0;
+    transform: rotate(45deg);
+    width: 7px;
+}
+
+.form-block form:not(.inline-form) p + label {
+    margin-top: 1em;
+}
+.form-block form:not(.inline-form) label {
+    display: flex;
+    line-height: 3em;
+    margin-bottom: 1em;
+    max-width: 600px;
+    padding: 0;
+}
+.form-block form:not(.inline-form) label span {
+    color: #444;
+    flex: 0 0 30%;
+    font-size: 14px;
+    font-weight: 600;
+    padding-right: 1em;
+    text-align: right;
+}
+.form-block form:not(.inline-form) label input {
+    background: rgba(255,255,255,0.8);
+    border: 2px solid #000;
+    border-radius: 0;
+    flex: 1 1 0%;
+    margin: 0;
+}
+
+.form-block menu.toolbar {
+    margin: 2em 0;
+    padding: 0;
+}
+
+
+/* form-block overrides for bank form */
+
+.form-block .bank-info-form .bank-form {
+    max-width: 100% !important;
+}
+.form-block .bank-info-form .bank-form label {
+    flex-basis: 100% !important;
+}
+
 
 .progress {
     background: #ecf0f1;
@@ -610,22 +914,22 @@ menu.tabs a.selected {
     margin-right: 15px;
 }
 
-.dashboard ul {
+.dashboard .card-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     padding: 0;
 }
-.dashboard ul li {
+.dashboard .card-list li {
     flex: 0 0 calc(50% - 7.5px);
     margin-bottom: 15px;
 }
 
 @media (max-width: 900px) {
-    .dashboard ul {
+    .dashboard .card-list {
         flex-direction: column;
     }
-    .dashboard ul li {
+    .dashboard .card-list li {
         flex: 0 0 auto;
     }
 }
@@ -833,30 +1137,33 @@ table th {
     text-align: center;
 }
 
+p {
+    margin: 1em 0;
+}
+
 
 dl {
-    line-height: 35px;
+    display: flex;
+    flex-wrap: wrap;
+    line-height: 3em;
     margin: 0;
 }
 dl dt {
     display: inline-block;
-    font-weight: bold;
+    flex: 0 0 30%;
+    font-weight: 600;
     margin: 0;
-    vertical-align: top;
-    width: 15%;
 }
 dl dd {
     display: inline-block;
+    flex: 1 0 70%;
     margin: 0;
-    width: 84%;
 }
 
-@media (max-width: 1280px) {
-    dl dt {
-        width: 30%;
-    }
+@media (max-width: 700px) {
+    dl dt,
     dl dd {
-        width: 70%;
+        flex: 0 0 100%;
     }
 }
 
@@ -1020,14 +1327,14 @@ li.user-card span.name {
     padding: 5px;
 }
 
-.user-detail {
-    padding-left: 60px;
-}
-
-.user-detail > img {
+.avatar {
     border-radius: 60px;
-    float: left;
-    margin: 5px 0 0 -60px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+    display: block;
+    flex: 0 0 60px;
+    height: 60px;
+    margin: 0 1em 1em 0;
+    width: 60px;
 }
 
 [data-still-importing] {
@@ -1286,63 +1593,6 @@ li.user-card span.name {
 }
 .plan-free p {
     text-align: justify;
-}
-
-
-.bank-form-update-account-btn {
-    -ms-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border: 1px solid #aaa;
-    border-left: 0;
-    border-right: 0;
-    border-radius: 0;
-    background: 0;
-    color: #444;
-    margin: 20px auto;
-    padding: 30px 50px;
-    text-transform: none;
-}
-.bank-form-update-account-btn .arrowicon {
-    display: inline-block;
-    height: 1em;
-    margin: 0 0 0 20px;
-    position: relative;
-    transform: scale(1, 1);
-    transition: transform 0.2s;
-    width: 0;
-}
-.bank-form-update-account-btn .arrowicon:before {
-    background: #444;
-    content: "";
-    display: block;
-    height: 2px;
-    left: -2px;
-    position: absolute;
-    bottom: 3px;
-    transform: rotate(-40deg);
-    width: 10px;
-}
-.bank-form-update-account-btn .arrowicon:after {
-    background: #444;
-    content: "";
-    display: block;
-    height: 2px;
-    position: absolute;
-    bottom: 3px;
-    right: -2px;
-    transform: rotate(40deg);
-    width: 10px;
-}
-
-.bank-form-update-account-btn:hover {
-    box-shadow: none;
-}
-.bank-form-update-account-btn:hover .arrowicon {
-    transform: scale(1.1, 1.1);
-}
-.bank-form-update-account-btn:active {
-    top: 0;
 }
 
 .bank-form div:last-child {

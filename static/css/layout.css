@@ -95,7 +95,7 @@ nav.tabs > ul li a {
     border-bottom: 4px solid rgba(255, 255, 255, 0.7);
 }
 nav.tabs > ul li.selected {
-    font-weight: bold;
+    font-weight: 600;
     border-bottom: 4px solid #52D1C7;
 }
 

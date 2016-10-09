@@ -18,6 +18,9 @@
     <li>
       <a href="" data-tab=".tab-networks">{{ _('Networks') }}</a>
     </li>
+    <li>
+      <a href="" data-tab=".tab-settings">{{ _('Settings') }}</a>
+    </li>
   </ul>
 </nav>
 {% endblock %}
@@ -40,7 +43,7 @@
       {{ _('Move Podcast to Pinecast') }}
     </a>
   </div>
-  <ul>
+  <ul class="card-list">
   {% for p in podcasts %}
     <li class="card"
       {% if p.is_still_importing() %}data-still-importing="{{ _('Import in progress...') }}"{% endif %}>
@@ -69,8 +72,8 @@
   {% endfor %}
   </ul>
 </div>
-<div class="tab-networks dashboard">
-  <div class="{{ 'tab-buttons' if podcasts else 'buttons-empty-state' }}">
+<div class="tab-networks dashboard" style="display: none">
+  <div class="{{ 'tab-buttons' if networks.count() else 'buttons-empty-state' }}">
     {% if not networks.count() %}
       <p>{{ _("Start collaborating with your peers on network of podcasts. Create your first network in seconds.") }}</p>
     {% endif %}
@@ -79,7 +82,7 @@
     </a>
   </div>
   {% if networks %}
-    <ul>
+    <ul class="card-list">
       {% for n in networks %}
         <li class="card">
           <a href="{{ url('network_dashboard', network_id=str(n.id)) }}">
@@ -104,10 +107,15 @@
     </ul>
   {% endif %}
 </div>
+<div class="tab-settings dashboard">
+  {% include 'dashboard/dashboard_settings.html' %}
+</div>
 
 {% endblock %}
 
 {% block after_content %}
 <link rel="prefetch" href="/static/js/ui-ad.js">
 <script src="/static/js/tabs.js"></script>
+<script src="https://js.stripe.com/v2/"></script>
+<script src="/static/js/ui-bank.js"></script>
 {% endblock %}

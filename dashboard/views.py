@@ -93,7 +93,11 @@ def get_podcast(req, slug):  # TODO: move to the Podcast model
 
 @login_required
 def dashboard(req):
-    return _pmrender(req, 'dashboard/dashboard.html')
+    ctx = {
+        'success': req.GET.get('success'),
+        'error': req.GET.get('error'),
+    }
+    return _pmrender(req, 'dashboard/dashboard.html', ctx)
 
 
 MILESTONES = [1, 100, 250, 500, 1000, 2000, 5000, 7500, 10000, 15000, 20000,

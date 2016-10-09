@@ -54,11 +54,10 @@
     <a href="{{ SUPPORT_URL }}" class="support-link">
       {{ _('Help') }}
     </a>
-    <a class="user-card menu-trigger" href="{{ url('user_settings') }}">
+    <a class="user-card menu-trigger" href="{{ url('dashboard') }}#settings">
       <img src="{{ gravatar(user.email) }}" alt="">
     </a>
     <menu class="hide-on-mobile">
-      <li><a href="{{ url('user_settings') }}">{{ _('Settings') }}</a></li>
       <li><a href="{{ url('logout') }}">{{ _('Sign Out') }}</a></li>
     </menu>
   </div>

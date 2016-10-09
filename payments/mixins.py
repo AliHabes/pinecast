@@ -35,12 +35,13 @@ class StripeCustomerMixin(object):
 
         source = customer.sources.data[0]
         return {
-            'name': source.name,
-            'lastFour': source.last4,
+            'brand': source.brand,
             'expiration': {
                 'month': source.exp_month,
                 'year': source.exp_year,
             },
+            'lastFour': source.last4,
+            'name': source.name,
         }
 
     def has_payment_method(self):
@@ -115,8 +116,9 @@ class StripeManagedAccountMixin(object):
 
         bank_account = account.external_accounts.data[0]
         return {
-            'name': bank_account.account_holder_name,
             'bank_name': bank_account.bank_name,
+            'country': bank_account.country,
+            'name': bank_account.account_holder_name,
         }
 
     def has_connected_account(self):

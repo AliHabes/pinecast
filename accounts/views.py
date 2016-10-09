@@ -136,26 +136,18 @@ def forgot_password_finish(req):
 
 
 @login_required
-def user_settings_page(req):
-    ctx = {
-        'success': req.GET.get('success'),
-        'error': req.GET.get('error'),
-    }
-    return _pmrender(req, 'account/settings.html', ctx)
-
-@login_required
 @require_POST
 def user_settings_page_savetz(req):
     us = UserSettings.get_from_user(req.user)
     us.tz_offset = tz_offset(req.POST.get('timezone'))
     us.save()
-    return redirect(reverse('user_settings') + '?success=tz')
+    return redirect(reverse('dashboard') + '?success=tz#settings')
 
 @login_required
 @require_POST
 def user_settings_page_changeemail(req):
     if User.objects.filter(email=req.POST.get('new_email')).count():
-        return redirect(reverse('user_settings') + '?error=eae')
+        return redirect(reverse('dashboard') + '?error=eae#settings')
     send_confirmation_email(
         req.user,
         ugettext('[Pinecast] Email change confirmation'),
@@ -167,17 +159,17 @@ to verify that you own the email address provided.
             urlencode(str(req.user.id)), urlencode(req.POST.get('new_email'))),
         req.POST.get('new_email')
     )
-    return redirect(reverse('user_settings') + '?success=em')
+    return redirect(reverse('dashboard') + '?success=em#settings')
 
 @login_required
 @require_POST
 def user_settings_page_changepassword(req):
     if req.POST.get('new_password') != req.POST.get('confirm_password'):
-        return redirect(reverse('user_settings') + '?error=pwc')
+        return redirect(reverse('dashboard') + '?error=pwc#settings')
     if not req.user.check_password(req.POST.get('old_password')):
-        return redirect(reverse('user_settings') + '?error=pwo')
+        return redirect(reverse('dashboard') + '?error=pwo#settings')
     if len(req.POST.get('new_password')) < 8:
-        return redirect(reverse('user_settings') + '?error=pwl')
+        return redirect(reverse('dashboard') + '?error=pwl#settings')
 
     req.user.set_password(req.POST.get('new_password'))
     req.user.save()
@@ -199,4 +191,4 @@ def user_settings_page_changeemail_finalize(req):
     user = get_object_or_404(User, id=req.GET.get('user'))
     user.email = req.GET.get('email')
     user.save()
-    return redirect(reverse('user_settings') + '?success=emf')
+    return redirect(reverse('dashboard') + '?success=emf#settings')

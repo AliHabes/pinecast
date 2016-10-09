@@ -131,6 +131,25 @@ def set_payment_method(req):
 
     return {'success': True, 'id': us.stripe_customer_id}
 
+@require_POST
+@login_required
+def set_payment_method_redir(req):
+    us = UserSettings.get_from_user(req.user)
+    customer = us.get_stripe_customer()
+    try:
+        if customer:
+            customer.source = req.POST.get('token')
+            customer.save()
+        else:
+            us.create_stripe_customer(req.POST.get('token'))
+    except stripe.error.CardError as e:
+        return redirect(reverse('dashboard') + '?error=crej#settings')
+    except Exception as e:
+        rollbar.report_message(str(e), 'error')
+        return redirect(reverse('dashboard') + '?error=cerr#settings')
+
+    return redirect(reverse('dashboard') + '?success=csuc#settings')
+
 
 @require_POST
 @login_required
