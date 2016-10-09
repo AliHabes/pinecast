@@ -1,0 +1,31 @@
+{% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_BLOG) %}
+  <div class="tabs-inline tabs dynamic" data-hash-pos="1">
+    <ul>
+      <li class="selected">
+        <a href="" data-tab=".tab-options">{{ _('Options') }}</a>
+      </li>
+      <li>
+        <a href="" data-tab=".tab-blog">{{ _('Blog') }}</a>
+      </li>
+    </ul>
+  </div>
+{% endif %}
+
+<div class="tab-options">
+  {% include "dashboard/podcast/tab_site_options.html" %}
+  {% if not minimum_plan(podcast.owner, PLANS.FEATURE_MIN_BLOG) %}
+    <div class="card card-block">
+      <strong>{{ _('Engage your audience with a blog') }}</strong>
+      <p>
+        {% trans upgrade_url=url('upgrade') %}
+          Upgrade to the <a href="{{ upgrade_url }}">Pro Plan</a> to add a blog to your podcast's custom website!
+        {% endtrans %}
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_BLOG) %}
+  <div class="tab-blog form-block" style="display: none">
+    {% include "dashboard/podcast/tab_site_blog.html" %}
+  </div>
+{% endif %}

@@ -1,19 +1,6 @@
 {% extends 'dashboard/base.html' %}
 {% block dashboard_body %}
 
-<header>
-  {{ breadcrumb(_('Manage Blog'), url('site_manage_blog', podcast_slug=site.podcast.slug)) }}
-
-  <menu class="toolbar toolbar-right">
-    <form action="{{ url('site_remove_blog_post', podcast_slug=site.podcast.slug) }}" method="post">
-      <button class="btn btn-danger">{{ _('Delete') }}</button>
-      <input type="hidden" name="slug" value="{{ post.slug }}">
-      <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    </form>
-  </menu>
-  <h1>{{ post.title }}</h1>
-</header>
-
 {% if error %}
   <div class="error">
     {{ _('Please make sure you fill out each field correctly.') }}

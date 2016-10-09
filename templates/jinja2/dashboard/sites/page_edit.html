@@ -4,15 +4,6 @@
 
 {% block dashboard_body %}
 
-<header>
-  {{ breadcrumb(_('Site Options'), url('site_options', podcast_slug=site.podcast.slug)) }}
-  <h1>{{ _('Edit Site') }}</h1>
-
-  <menu class="toolbar toolbar-right">
-    <li><a class="btn btn-danger" href="{{ url('delete_site', podcast_slug=site.podcast.slug) }}">{{ _('Delete Site') }}</a></li>
-  </menu>
-</header>
-
 {% if error %}
 <div class="error">
   {{ _('Please check that all fields are filled out correctly.') }}

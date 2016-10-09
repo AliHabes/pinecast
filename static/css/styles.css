@@ -74,7 +74,7 @@ ol, ul, dl {
 .card > .card-btn:first-child + strong,
 .card .chart-title {
     display: block;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     margin-bottom: 20px;
     overflow: hidden;
@@ -487,9 +487,9 @@ menu.tabs a.selected {
     color: #444;
     display: inline-block;
     font-weight: 600;
-    margin: 0 0 18px 0;
+    margin: 0 0 20px 0;
     padding: 0 35px 7px 0;
-    transition: border-bottom 0.15s;
+    transition: border-bottom 0.15s, color 0.15s, margin-bottom 0.15s;
 }
 .tabs-inline a:focus {
     color: #000;
@@ -497,6 +497,11 @@ menu.tabs a.selected {
 }
 .tabs-inline .selected a {
     border-bottom: 4px solid #000;
+    margin-bottom: 18px;
+}
+.tabs-inline .tab--danger.selected a {
+    border-bottom-color: #b00;
+    color: #b00;
 }
 
 .form-block {
@@ -544,10 +549,12 @@ menu.tabs a.selected {
 .form-block .panel {
     border: 2px solid #444;
     display: flex;
+    flex-wrap: wrap;
     margin-bottom: 1em;
     max-width: 600px;
     padding: 1em 1em 0;
 }
+.form-block .panel .segment-full,
 .form-block .panel .segment-fill,
 .form-block .panel .segment-divide,
 .form-block .panel .segment-shrink {
@@ -558,6 +565,7 @@ menu.tabs a.selected {
 .form-block .panel .segment-shrink:not(:last-child) {
     margin-right: 1em;
 }
+.form-block .panel .segment-full {flex: 0 0 100%;}
 .form-block .panel .segment-fill {flex: 2 0;}
 .form-block .panel .segment-divide {flex: 1 1;}
 .form-block .panel .segment-shrink {flex: 0 1;}
@@ -569,6 +577,7 @@ menu.tabs a.selected {
     .form-block .panel .segment-fill,
     .form-block .panel .segment-divide,
     .form-block .panel .segment-shrink {
+        flex: 0 0 100%;
         white-space: nowrap;
     }
 }
@@ -584,12 +593,23 @@ menu.tabs a.selected {
     font-weight: 600;
     height: 3em;
     margin: 0;
+    opacity: 1;
     padding: 0 1.5em;
+    text-align: center;
+    transition: opacity 0.2s;
+}
+.form-block .btn:disabled {
+    opacity: 0.1;
+    pointer-events: none;
 }
 .form-block .btn.btn--tiny {
     line-height: 2em;
     height: auto;
     padding: 0 9px;
+}
+.form-block .btn.btn--danger {
+    border-color: #b00;
+    color: #b00;
 }
 .form-block .btn.btn--go {
     padding-right: 20px;
@@ -619,7 +639,7 @@ menu.tabs a.selected {
     border: 0;
     display: block;
     height: 2px;
-    margin: 2em 0 3em;
+    margin: 2em 0 2em;
     max-width: 600px;
 }
 .form-block form + hr,
@@ -630,6 +650,9 @@ menu.tabs a.selected {
 .form-block form {
     max-width: 600px;
     position: relative;
+}
+.form-block form:first-child {
+    padding-top: 40px;
 }
 .form-block aside {
     border: 2px solid #000;
@@ -700,6 +723,15 @@ menu.tabs a.selected {
     padding: 0 1em;
 }
 
+@media (max-width: 600px) {
+    .form-block .inline-form {
+        align-items: flex-end;
+    }
+    .form-block .inline-form label {
+        flex-direction: column;
+    }
+}
+
 .form-block .select {
     background: rgba(255,255,255,0.8);
     border: 2px solid #000;
@@ -746,8 +778,9 @@ menu.tabs a.selected {
     margin-bottom: 1em;
     max-width: 600px;
     padding: 0;
+    position: relative;
 }
-.form-block form:not(.inline-form) label span {
+.form-block form:not(.inline-form) label > span {
     color: #444;
     flex: 0 0 30%;
     font-size: 14px;
@@ -755,7 +788,11 @@ menu.tabs a.selected {
     padding-right: 1em;
     text-align: right;
 }
-.form-block form:not(.inline-form) label input {
+.form-block .panel:not(.inline-form) label > span {
+    text-align: left;
+}
+.form-block form:not(.inline-form) label input,
+.form-block form:not(.inline-form) label textarea {
     background: rgba(255,255,255,0.8);
     border: 2px solid #000;
     border-radius: 0;
@@ -763,19 +800,91 @@ menu.tabs a.selected {
     margin: 0;
 }
 
+@media (max-width: 600px) {
+    .form-block form:not(.inline-form) label + label {
+        margin-top: -1em;
+    }
+    .form-block form:not(.inline-form) label.checkbox input {
+        margin-left: 0;
+    }
+    .form-block form:not(.inline-form) label.checkbox input:checked + span:before {
+        left: 2px;
+    }
+    .form-block form:not(.inline-form) label:not(.checkbox) {
+        flex-direction: column;
+    }
+    .form-block form:not(.inline-form) label:not(.checkbox) > span:first-child {
+        text-align: left;
+        white-space: nowrap;
+    }
+}
+
 .form-block menu.toolbar {
     margin: 2em 0;
     padding: 0;
 }
-
-
-/* form-block overrides for bank form */
-
-.form-block .bank-info-form .bank-form {
-    max-width: 100% !important;
+.form-block .panel menu.toolbar {
+    margin-top: 0;
 }
-.form-block .bank-info-form .bank-form label {
-    flex-basis: 100% !important;
+
+.form-block samp {
+    background: #FEF6D6;
+    border: 1px solid #E2D49C;
+    border-radius: 3px;
+    color: #652;
+    font-family: inherit;
+    font-weight: 500px;
+    padding: 0 4px;
+}
+
+.form-block form label input[type=checkbox] {
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -webkit-appearance: none;
+    align-self: center;
+    background: rgba(255,255,255,0.8);
+    display: block;
+    flex: 0 0 1.5em;
+    height: 1.5em;
+    margin-left: 30%;
+    width: 1.5em;
+}
+.form-block form label input[type=checkbox] + span {
+    flex: 1 1;
+    margin-left: 10px;
+    text-align: left;
+}
+.form-block form label input[type=checkbox]:checked + span:before {
+    bottom: 0;
+    content: "✔";
+    display: block;
+    font-size: 12px;
+    height: 18px;
+    left: calc(30% + 2px);
+    line-height: 1.5em;
+    margin: auto;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    width: 13px;
+}
+
+.form-block .empty-state {
+    padding: 2em;
+    text-align: center;
+}
+
+.form-block table {
+    border-collapse: collapse;
+}
+.form-block table thead tr > th,
+.form-block table thead tr:last-child > th {
+    border-bottom: 2px solid #000;
+    font-weight: 600;
+}
+.form-block table tbody tr td,
+.form-block table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid #444;
 }
 
 
@@ -822,18 +931,18 @@ menu.tabs a.selected {
 
 .upload-dd-label {
     background-color: #fff;
-    border: 2px dashed #bdc3c7;
-    border-radius: 4px;
+    border: 2px solid #333;
+    justify-content: center;
+    position: relative;
     text-align: center;
     transform: scale(1);
     transition: background-color 0.2s, transform 0.2s, border-color 0.2s;
 }
 .upload-dd-label:not(.is-dragging):hover {
-    border-color: #009688;
+    border-color: #444;
 }
 .upload-dd-label.is-dragging {
-    background-color: #B2DFDB;
-    border-color: #00796B;
+    border-color: #000;
     transform: scale(1.1);
 }
 .upload-dd-label i:before {
@@ -852,8 +961,10 @@ menu.tabs a.selected {
     text-decoration: none;
 }
 .upload-dd-label input {
+    flex: 0 0 0px !important;
     height: 0;
     visibility: hidden;
+    width: 0;
 }
 
 .uploader-btn {
@@ -862,12 +973,22 @@ menu.tabs a.selected {
     top: 8px;
 }
 
+.uploader {
+    background-color: #fff;
+    border: 2px solid #333;
+    margin-bottom: 2em;
+    padding: 30px;
+    position: relative;
+    text-align: left;
+}
+
 
 .uploaded-file-card b {
     display: block;
-    font-size: 1.5em;
+    font-weight: 600;
 }
 .uploaded-file-card dl {
+    line-height: 2em;
     margin: 15px 0;
 }
 .uploaded-file-card dt {
@@ -1015,12 +1136,9 @@ menu.tabs a.selected {
 }
 .markdown-editor > div.CodeMirror,
 .markdown-editor > div.markdown-editor-preview {
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    top: 0;
-}
-.markdown-editor > .cm-s-base16-light.CodeMirror {
     background: #fff;
+    border: 2px solid #000;
+    top: 0;
 }
 .markdown-editor > a.markdown-editor-preview-toggle {
     background-image: url(/static/img/preview.svg);
@@ -1138,7 +1256,7 @@ table th {
 }
 
 p {
-    margin: 1em 0;
+    margin: 0 0 1em;
 }
 
 
@@ -1158,6 +1276,8 @@ dl dd {
     display: inline-block;
     flex: 1 0 70%;
     margin: 0;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 }
 
 @media (max-width: 700px) {
@@ -1172,22 +1292,67 @@ abbr {
 }
 
 .category-picker {
-    display: flex;
-    margin: 0 -10px;
+    flex: 1 1;
+    max-height: 300px;
+    overflow-y: scroll;
+    padding-bottom: 10px;
 }
-.category-picker > div {
-    flex: 1 1 50%;
-    height: 200px;
+.category-picker .category {
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    display: block;
+    font-size: 14px;
+    line-height: 3em;
+    margin: 0;
+    padding: 0 5px 0 35px;
+    position: relative;
+    text-align: left;
+    text-transform: none;
+    width: 100%;
+}
+.category-picker .category:not(:last-child) {
+    border-bottom: 1px solid #000;
+}
+.category-picker .category:last-child {
+    border-bottom: 0;
+}
+.category-picker .category:before {
+    border: 2px solid #000;
+    bottom: 0;
+    content: "";
+    cursor: pointer;
+    display: block;
+    height: 1.5em;
+    left: 5px;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    width: 1.5em;
+}
+.category-picker .category.is-selected:after {
+    bottom: 0;
+    color: #36a;
+    content: "✔";
+    display: block;
+    height: 1.5em;
+    left: 5px;
     line-height: 1.5em;
-    margin: 0 10px;
-    overflow: auto;
-    padding: 15px;
+    margin: auto;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    width: 1.5em;
 }
-.category-picker b {
-    display: block;
+.category-picker .category:active {
+    top: 0;
 }
-.category-picker a {
-    display: block;
+.category-picker .category:focus {
+    outline: none;
+}
+.category-picker .category:focus:before {
+    border-color: #36a;
 }
 
 .pinecast-embed {
@@ -1367,25 +1532,20 @@ li.user-card span.name {
 }
 
 
-.flex-row {
-    display: flex;
-}
-.flex-row > .col {
-    flex: 1 1;
-}
-
-
-.site-links {
-    list-style: none;
-    padding: 0;
-}
-.site-links .site-link {
-    border-top: 1px solid #B6B6B6;
-    padding: 10px;
+.site-link {
     position: relative;
 }
-.site-links .site-link:last-child {
-    border-bottom: 1px solid #B6B6B6;
+.site-link p {
+    margin: 0;
+}
+.site-link menu.toolbar {
+    margin: 0;
+}
+.site-link menu.toolbar form {
+    padding: 0;
+}
+.site-link + hr {
+    margin: 1em 0;
 }
 
 
@@ -1597,4 +1757,18 @@ li.user-card span.name {
 
 .bank-form div:last-child {
     flex: 1 1;
+}
+
+
+.flex-row {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+}
+.flex-row > .col {
+    flex: 1 1;
+}
+.flex-column {
+    display: flex;
+    flex-direction: column;
 }

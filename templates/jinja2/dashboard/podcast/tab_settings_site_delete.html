@@ -1,0 +1,24 @@
+<strong>{{ _('Delete Podcast Site') }}</strong>
+
+<p>
+  {% trans site_url='http://%s.pinecast.co' % podcast.slug %}
+    Deleting the podcast\'s site will remove the website at <samp>{{ site_url }}</samp>. This operation is permanent, though a new site can be create from scratch later.
+  {% endtrans %}
+</p>
+
+<p>{{ _('If you\'re sure you wish to do this, enter the slug of the podcast in the box below.') }}</p>
+<form action="{{ url('delete_site', podcast_slug=site.podcast.slug) }}" method="post">
+
+  <label class="col">
+    <span>{{ _('Podcast Slug') }}</span>
+    <input class="confirm-delete"
+      data-confirming=".delete-confirm-button-site"
+      type="text" maxlength="512" placeholder="{{ site.podcast.slug }}" name="slug" required pattern="{{ site.podcast.slug }}">
+  </label>
+
+  <menu class="toolbar">
+    <button class="btn btn--danger delete-confirm-button-site" disabled type="submit">{{ _('Delete Site') }}</button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>

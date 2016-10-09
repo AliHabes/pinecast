@@ -1,0 +1,32 @@
+<strong>{{ _('Delete %s') % podcast.name }}</strong>
+
+<p>
+  {% trans name=podcast.name %}
+    Are you absolutely sure you wish to delete "{{ name }}"? This is permanent and cannot be undone.
+  {% endtrans %}
+</p>
+
+<p>{{ _('To confirm, type this show\'s slug into the box below.') }}</p>
+
+<form action="{{ url('delete_podcast', podcast_slug=podcast.slug) }}" method="post">
+
+  <label>
+    <span>{{ _('Podcast Slug') }}</span>
+    <input class="confirm-delete"
+      data-confirming=".delete-confirm-button"
+      name="slug"
+      pattern="{{ podcast.slug }}"
+      placeholder="{{ podcast.slug }}"
+      required
+      title="{% trans slug=podcast.slug %}Type '{{ slug }}' here in order to confirm deletion{% endtrans %}"
+      type="text">
+  </label>
+
+  <menu class="toolbar">
+    <button disabled type="submit" class="btn btn--danger delete-confirm-button">
+      {{ _('Delete Podcast') }}
+    </button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>

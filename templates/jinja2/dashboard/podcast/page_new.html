@@ -80,7 +80,15 @@
 
         <label>
           <span>{{ _('Language') }}</span>
-          <input type="text" name="language" placeholder="en-US" required maxlength="16" value="{{ default.get('language', 'en-US')}}">
+          <div class="select">
+            {% set deflang = default.get('language', 'en-US') %}
+            <select name="language">
+              {% for raw_locale in sorted(LOCALES.keys()) %}
+                {% set locale = raw_locale.replace('_', '-') %}
+                <option value="{{ locale }}" {{ 'selected' if deflang == locale else '' }}>{{ LOCALES[raw_locale] }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </label>
 
       </div>

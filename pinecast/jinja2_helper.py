@@ -29,6 +29,7 @@ def environment(**options):
         'static': staticfiles_storage.url,
         'dir': dir,
         'len': len,
+        'sorted': sorted,
         'str': str,
         'url': helpers.reverse,
         'gravatar': gravatar,

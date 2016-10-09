@@ -1,4 +1,6 @@
 (function() {
+const tabs = Array.from(document.querySelectorAll('.tabs.dynamic'));
+tabs.forEach(buildTabs);
 
 function hide(elem) {
     elem.style.display = 'none';
@@ -13,17 +15,20 @@ function buildTabs(tabBar) {
     function select(a, initial) {
         allTabs.forEach(function(tab) {
             if (tab === a) return;
-            tab.parentNode.className = '';
+            tab.parentNode.className = tab.parentNode.className.replace(/\s?selected/g, '');
             hide(document.querySelector(tab.getAttribute('data-tab')));
         });
-        a.parentNode.className = 'selected';
+        a.parentNode.className += ' selected';
         const tabName = a.getAttribute('data-tab');
         const tab = document.querySelector(tabName);
         show(tab);
         if (tabBar.getAttribute('data-no-history') !== null || initial) {
             return;
         }
-        window.history.replaceState(null, null, '#' + tabName.substr(5));
+        const hash = window.location.hash.substr(1).split(',');
+        const hashPos = parseInt(tabBar.getAttribute('data-hash-pos') || 0, 10);
+        hash[hashPos] = tabName.substr(5);
+        window.history.replaceState(null, null, '#' + hash.slice(0, hashPos + 1).join(','));
     }
 
     tabBar.addEventListener('click', function(e) {
@@ -36,9 +41,10 @@ function buildTabs(tabBar) {
 
     let selected = null;
     if (window.location.hash) {
+        const hash = window.location.hash.substr(1).split(',')[tabBar.getAttribute('data-hash-pos') || 0];
         selected = (
-            tabBar.querySelector('a[data-tab=".tab-' + window.location.hash.substr(1) + '"]') ||
-            tabBar.querySelector('a[data-tab=".' + window.location.hash.substr(1) + '"]')
+            tabBar.querySelector('a[data-tab=".tab-' + hash + '"]') ||
+            tabBar.querySelector('a[data-tab=".' + hash + '"]')
         );
     }
     if (!selected) {
@@ -46,8 +52,5 @@ function buildTabs(tabBar) {
     }
     select(selected, true);
 }
-
-const tabs = document.querySelectorAll('.tabs.dynamic');
-Array.prototype.slice.call(tabs).forEach(buildTabs);
 
 }());

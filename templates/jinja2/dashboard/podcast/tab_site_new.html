@@ -1,0 +1,83 @@
+<form action="{{ url('new_site', podcast_slug=podcast.slug) }}" method="post">
+  <strong>{{ _('Create a Site') }}</strong>
+
+  <p>
+    {% trans site_url='http://%s.pinecast.co' % podcast.slug %}
+      By creating a site, you'll have a presence at <samp>{{ site_url }}</samp>.
+      Engage your users and complete your podcast's brand.
+    {% endtrans %}
+  </p>
+
+  <label>
+    <span>{{ _('Theme') }}</span>
+    <div class="select">
+      <select name="theme">
+        {% for theme, name in SITE_THEMES %}
+          <option value="{{ theme }}"{{ ' selected' if default.get('theme') == theme else '' }}>{{ name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </label>
+
+  <label>
+    <span>{{ _('Google Analytics ID') }}</span>
+    <input type="text"
+      name="analytics_id"
+      placeholder="UA-123456"
+      maxlength="32"
+      pattern="[\w-]+"
+      value="{{ default.get('analytics_id') }}">
+  </label>
+
+  <label>
+    <span>{{ _('iTunes URL') }}</span>
+    <input type="url"
+      name="itunes_url"
+      placeholder="https://itunes.apple.com/la/podcast/almost-better-than-dragons/id981540916?mt=2"
+      value="{{ default.get('itunes_url') }}">
+  </label>
+
+  <label>
+    <span>{{ _('Stitcher Radio URL') }}</span>
+    <input type="url"
+      name="stitcher_url"
+      placeholder="http://www.stitcher.com/podcast/this-american-life"
+      value="{{ default.get('stitcher_url') }}">
+  </label>
+
+  <hr>
+
+  <strong>{{ _('Cover Art') }}</strong>
+  <p>{{ _('Cover art should be landscape (wider than it is tall) and be at least 1000px wide and 600px tall.') }}</p>
+  <div class="upload-placeholder"
+    data-optional="true"
+    data-no-itunes-size-check="true"
+    data-default-url="{{ default.get('cover-url', '') }}"
+    data-default-name="{{ default.get('cover-url-name') }}"
+    data-default-size="{{ default.get('cover-url-size') }}"
+    data-default-type="{{ default.get('cover-url-type') }}"
+    data-accept="image/*"
+    data-name="cover-url"
+    data-type="image"
+    data-podcast="$site"></div>
+
+  <strong>{{ _('Logo') }}</strong>
+  <p>{{ _('We recommend uploading an image that\'s about 256x256px in size, but any size or SVG will be fine.') }}</p>
+  <div class="upload-placeholder"
+    data-optional="true"
+    data-no-itunes-size-check="true"
+    data-default-url="{{ default.get('logo-url', '') }}"
+    data-default-name="{{ default.get('logo-url-name') }}"
+    data-default-size="{{ default.get('logo-url-size') }}"
+    data-default-type="{{ default.get('logo-url-type') }}"
+    data-accept="image/*"
+    data-name="logo-url"
+    data-type="image"
+    data-podcast="$site"></div>
+
+  <menu class="toolbar">
+    <button class="btn" type="submit">{{ _('Create Site') }}</button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>

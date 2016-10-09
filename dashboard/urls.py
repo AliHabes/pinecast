@@ -25,12 +25,10 @@ urlpatterns = [
     url(r'^/network/(?P<network_id>[\w-]+)/remove_member/(?P<member_id>[\w]+)$', views_network.network_remove_member, name='network_remove_member'),
 
     url(r'^/sites/new/(?P<podcast_slug>[\w-]+)$', views_sites.new_site, name='new_site'),
-    url(r'^/sites/options/(?P<podcast_slug>[\w-]+)$', views_sites.site_options, name='site_options'),
     url(r'^/sites/options/(?P<podcast_slug>[\w-]+)/edit$', views_sites.edit_site, name='edit_site'),
     url(r'^/sites/options/(?P<podcast_slug>[\w-]+)/add_link$', views_sites.add_link, name='site_add_link'),
     url(r'^/sites/options/(?P<podcast_slug>[\w-]+)/remove_link$', views_sites.remove_link, name='site_remove_link'),
     url(r'^/sites/options/(?P<podcast_slug>[\w-]+)/delete_site$', views_sites.delete_site, name='delete_site'),
-    url(r'^/sites/options/(?P<podcast_slug>[\w-]+)/blog$', views_sites.manage_blog, name='site_manage_blog'),
     url(r'^/sites/options/(?P<podcast_slug>[\w-]+)/blog/add$', views_sites.add_blog_post, name='site_add_blog_post'),
     url(r'^/sites/options/(?P<podcast_slug>[\w-]+)/blog/edit/(?P<post_slug>[\w-]+)$', views_sites.edit_blog_post, name='site_blog_post'),
     url(r'^/sites/options/(?P<podcast_slug>[\w-]+)/blog/remove$', views_sites.remove_blog_post, name='site_remove_blog_post'),

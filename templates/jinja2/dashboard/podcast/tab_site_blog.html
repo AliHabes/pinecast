@@ -1,0 +1,64 @@
+<div style="margin-bottom: 1em">
+  <button class="btn write-post-btn" type="button">{{ _('Write New Post') }}</button>
+</div>
+
+<form class="panel write-post-panel" action="{{ url('site_add_blog_post', podcast_slug=site.podcast.slug) }}" method="post" style="display: none">
+  <label class="segment-full">
+    <span>{{ _('Title') }}</span>
+    <input type="text" required name="title" maxlength="512">
+  </label>
+  <label class="segment-full">
+    <span>{{ _('Slug') }}</span>
+    <input type="text" name="slug" required pattern="[\w-]+">
+  </label>
+  <label class="segment-full">
+    <span>{{ _('Publish On') }}</span>
+    <input type="datetime-local" name="publish" required>
+  </label>
+  <label class="segment-full markdwon-editor-small">
+    <span>{{ _('Body') }}</span>
+    <textarea name="body"></textarea>
+  </label>
+
+  <menu class="toolbar">
+    <button class="btn" type="submit">{{ _('Add Post') }}</button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>
+
+<script>
+  document.querySelector('.write-post-btn').addEventListener('click', function(e) {
+    e.target.style.display = 'none';
+    document.querySelector('.write-post-panel').style.display = 'block';
+  });
+</script>
+
+{% set blog_posts = site.siteblogpost_set.all().order_by('-publish') %}
+
+{% if blog_posts %}
+  <table>
+    <thead>
+      <tr>
+        <th class="primary">{{ _('Post Title') }}</th>
+        <th>{{ _('Slug') }}</th>
+        <th>{{ _('Published') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in blog_posts %}
+        <tr>
+          <td class="primary">
+            <a href="{{ url('site_blog_post', podcast_slug=site.podcast.slug, post_slug=p.slug) }}">{{ p.title }}</a>
+          </td>
+          <td>{{ p.slug }}</td>
+          <td>{{ p.publish|pretty_date }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <div class="empty-state">
+    {{ _('You haven\'t written any blog posts yet.') }}
+  </div>
+{% endif %}

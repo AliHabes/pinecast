@@ -1,0 +1,119 @@
+<strong>{{ _('Basic Podcast Details') }}</strong>
+
+<form action="?" method="post">
+
+  <label>
+    <span>{{ _('Name') }}</span>
+    <input type="text"
+      name="name"
+      placeholder="{{ _('My Great Podcast') }}"
+      required
+      maxlength="256"
+      value="{{ default.get('name', podcast.name) }}">
+  </label>
+
+  <label>
+    <span>{{ _('Subtitle') }}</span>
+    <input type="text"
+      name="subtitle"
+      maxlength="512"
+      value="{{ default.get('subtitle', podcast.subtitle) }}">
+  </label>
+
+  <aside>
+    <p>
+      {{ _('"Explicit" means "has explicit language or adult content". This is a signal to podcast directories like iTunes.') }}
+    </p>
+  </aside>
+
+  <label class="checkbox">
+    <input type="checkbox" name="is_explicit" value="true" {{ 'checked' if default.get('is_explicit', 'true' if podcast.is_explicit else 'false') == 'true' }}>
+    <span>{{ _('Podcast contains explicit material') }}</span>
+  </label>
+
+  <label>
+    <span>{{ _('Description') }}</span>
+    {#
+    There's a self XSS here. You could enter </ textarea > or something
+    similar, and it'll parse as valid HTML probably. It's not great, but it's
+    an acceptable risk.
+    #}
+    <textarea name="description">{{ default.get('description', podcast.description)|replace('</textarea>', '')|safe }}</textarea>
+  </label>
+
+  <hr>
+
+  <label>
+    <span>{{ _('Homepage') }}</span>
+    <input type="url" name="homepage" placeholder="https://my-great-podcast.biz" required value="{{ default.get('homepage', podcast.homepage) }}" pattern="https?://.+">
+  </label>
+
+  <label>
+    <span>{{ _('Language') }}</span>
+    <div class="select">
+      {% set deflang = default.get('language', podcast.language) %}
+      <select name="language">
+        {% for raw_locale in sorted(LOCALES.keys()) %}
+          {% set locale = raw_locale.replace('_', '-') %}
+          <option value="{{ locale }}" {{ 'selected' if deflang == locale else '' }}>{{ LOCALES[raw_locale] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </label>
+
+  <label>
+    <span>{{ _('Copyright') }}</span>
+    <input type="text"
+      name="copyright"
+      maxlength="1024"
+      placeholder="{{ _('Copyright 2015 Foo Bar Inc.') }}"
+      required
+      value="{{ default.get('copyright', podcast.copyright) }}">
+  </label>
+
+  <label>
+    <span>{{ _('Author') }}</span>
+    <input type="text"
+      name="author_name"
+      maxlength="1024"
+      placeholder="Anonymous"
+      required
+      value="{{ default.get('author_name', podcast.author_name) }}">
+  </label>
+
+
+  <hr>
+
+  <strong>{{ _('Cover Art') }}</strong>
+
+  <aside>
+    <strong>{{ _('Cover Art Guidelines') }}</strong>
+    <p>{{ _('Your image should be a JPG or PNG. It should be square, at least 1400x1400 pixels, and a maximum of 3000x3000 pixels.') }}</p>
+    <p>{{ _('Images may be up to 2MB.') }}</p>
+  </aside>
+
+  <p>{{ _('Your cover art is the image that listeners will see when searching for your podcast, and on their device while listening.') }}</p>
+
+  <div class="upload-placeholder"
+    data-default-url="{{ sign(default.get('image-url', podcast.cover_image)) }}"
+    data-default-size="{{ default.get('image-url-size') }}"
+    data-default-name="{{ default.get('image-url-name') }}"
+    data-default-type="{{ default.get('image-url-type', 'image/jpeg') }}"
+    data-accept="image/*"
+    data-name="image-url"
+    data-type="image"
+    data-podcast="$none"></div>
+
+  <hr>
+
+  <strong>{{ _('Categories') }}</strong>
+  <div class="category-placeholder panel"
+    data-name="categories"
+    data-default-cats="{{ podcast.get_category_list() }}"></div>
+
+  <menu class="toolbar">
+    <button class="btn" type="submit">{{ _('Save') }}</button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>

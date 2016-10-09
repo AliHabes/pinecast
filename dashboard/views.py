@@ -15,10 +15,11 @@ from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.utils.translation import ugettext
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 
 import accounts.payment_plans as payment_plans
 import analytics.query as analytics_query
+import pinecast.constants as constants
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
 from feedback.models import Feedback, EpisodeFeedbackPrompt
@@ -128,7 +129,18 @@ def podcast_dashboard(req, podcast_slug):
         'previous_milestone': [x for x in MILESTONES if x <= listens][-1] if listens else 0,
         'hit_first_milestone': listens > MILESTONES[1],  # The first "real" milestone
         'is_still_importing': pod.is_still_importing(),
+
+        'site': None,
+
+        'LOCALES': constants.locales,
+        'PODCAST_CATEGORIES': json.dumps(list(CATEGORIES)),
+        'SITE_THEMES': Site.SITE_THEMES,
     }
+
+    try:
+        data['site'] = pod.site
+    except Site.DoesNotExist:
+        pass
 
     owner_uset = UserSettings.get_from_user(pod.owner)
     if payment_plans.minimum(owner_uset.plan, payment_plans.FEATURE_MIN_COMMENT_BOX):
@@ -146,7 +158,10 @@ def new_podcast(req):
     if payment_plans.has_reached_podcast_limit(uset):
         return _pmrender(req, 'dashboard/podcast/page_new_upgrade.html')
 
-    ctx = {'PODCAST_CATEGORIES': json.dumps(list(CATEGORIES))}
+    ctx = {
+        'LOCALES': constants.locales,
+        'PODCAST_CATEGORIES': json.dumps(list(CATEGORIES)),
+    }
 
     if not req.POST:
         return _pmrender(req, 'dashboard/podcast/page_new.html', ctx)
@@ -181,15 +196,13 @@ def new_podcast(req):
     return redirect('podcast_dashboard', podcast_slug=pod.slug)
 
 
+@require_POST
 @login_required
 def edit_podcast(req, podcast_slug):
     pod = get_podcast(req, podcast_slug)
 
     ctx = {'podcast': pod,
            'PODCAST_CATEGORIES': json.dumps(list(CATEGORIES))}
-
-    if not req.POST:
-        return _pmrender(req, 'dashboard/podcast/page_edit.html', ctx)
 
     try:
         pod.name = req.POST.get('name')
@@ -205,21 +218,15 @@ def edit_podcast(req, podcast_slug):
         pod.full_clean()
         pod.save()
     except Exception as e:
-        ctx.update(default=req.POST, error=True)
-        return _pmrender(req, 'dashboard/podcast/page_edit.html', ctx)
+        return redirect(reverse('podcast_dashboard', podcast_slug=pod.slug) + '?error=serr#settings')
     return redirect('podcast_dashboard', podcast_slug=pod.slug)
 
 
+@require_POST
 @login_required
 def delete_podcast(req, podcast_slug):
     # This doesn't use `get_podcast` because only the owner may delete the podcast
     pod = get_object_or_404(Podcast, slug=podcast_slug, owner=req.user)
-    if not req.POST:
-        return _pmrender(req, 'dashboard/podcast/page_delete.html', {'podcast': pod})
-
-    if req.POST.get('slug') != pod.slug:
-        return redirect('dashboard')
-
     pod.delete()
     return redirect('dashboard')
 

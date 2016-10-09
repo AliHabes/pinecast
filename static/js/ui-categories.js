@@ -1,13 +1,27 @@
 (function() {
 
-var allCats = window.PODCAST_CATEGORIES;
+var allCats = window.PODCAST_CATEGORIES.sort(function(a, b) {
+    return a.localeCompare(b);
+});
 
 var CategoryComponent = React.createClass({
 
     getInitialState: function() {
         var hasDef = !!this.props.defCats;
+        var selectedCats = hasDef ? this.props.defCats.split(',') : [];
         return {
-            selectedCats: hasDef ? this.props.defCats.split(',') : [],
+            selectedCats: selectedCats,
+            cats: allCats.sort(function(a, b) {
+                var leftSelected = selectedCats.indexOf(a) > -1;
+                var rightSelected = selectedCats.indexOf(a) > -1;
+                if (leftSelected && !rightSelected) {
+                    return -1;
+                }
+                if (!leftSelected && rightSelected) {
+                    return 1;
+                }
+                return a.localeCompare(b);
+            })
         };
     },
 
@@ -17,8 +31,7 @@ var CategoryComponent = React.createClass({
             {
                 className: 'category-picker',
             },
-            this.getUnselected(),
-            this.getSelected(),
+            this.getItems(),
             React.createElement(
                 'input',
                 {
@@ -30,44 +43,20 @@ var CategoryComponent = React.createClass({
         );
     },
 
-    getUnselected: function() {
-        var unselected = allCats.filter(function(c) {
-            return this.state.selectedCats.indexOf(c) === -1;
-        }, this).sort();
-        return React.createElement(
-            'div',
-            {className: 'category-picker-unselected'},
-            React.createElement('b', {}, this.props.transUnsel),
-            unselected.map(function(u) {
-                return React.createElement(
-                    'a',
-                    {
-                        className: 'category',
-                        onClick: this.doSelect.bind(this, u),
-                        href: '#',
-                    },
-                    u
-                );
-            }, this)
-        );
-    },
-    getSelected: function() {
-        return React.createElement(
-            'div',
-            {className: 'category-picker-selected'},
-            React.createElement('b', {}, this.props.transSel),
-            this.state.selectedCats.map(function(s) {
-                return React.createElement(
-                    'a',
-                    {
-                        className: 'category',
-                        onClick: this.doUnselect.bind(this, s),
-                        href: '#',
-                    },
-                    s
-                );
-            }, this)
-        );
+    getItems: function() {
+       return allCats.map(function(s) {
+            var isSelected = this.state.selectedCats.indexOf(s) > -1;
+            return React.createElement(
+                'button',
+                {
+                    className: 'category' + (isSelected ? ' is-selected' : ''),
+                    key: s,
+                    onClick: isSelected ? this.doUnselect.bind(this, s) : this.doSelect.bind(this, s),
+                    type: 'button',
+                },
+                s
+            );
+        }, this);
     },
 
     doSelect: function(cat, e) {
@@ -92,9 +81,6 @@ Array.prototype.slice.call(fields).forEach(function(field) {
         React.createElement(CategoryComponent, {
             name: field.getAttribute('data-name'),
             defCats: field.getAttribute('data-default-cats'),
-
-            transUnsel: field.getAttribute('data-trans-unselcats'),
-            transSel: field.getAttribute('data-trans-selcats'),
         }),
         field
     );

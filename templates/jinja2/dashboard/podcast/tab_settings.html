@@ -1,0 +1,38 @@
+{% if podcast.owner == user %}
+  <div class="tabs-inline tabs dynamic" data-hash-pos="1">
+    <ul>
+      <li class="selected">
+        <a href="" data-tab=".tab-details">{{ _('Details') }}</a>
+      </li>
+      {% if site and minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITES) %}
+        <li>
+          <a href="" data-tab=".tab-site-options">{{ _('Site') }}</a>
+        </li>
+        <li class="tab--danger">
+          <a href="" data-tab=".tab-site-delete">{{ _('Delete Site') }}</a>
+        </li>
+      {% endif %}
+      <li class="tab--danger">
+        <a href="" data-tab=".tab-delete">{{ _('Delete Podcast') }}</a>
+      </li>
+    </ul>
+  </div>
+{% endif %}
+
+
+<div class="tab-details form-block">
+  {% include "dashboard/podcast/tab_settings_edit.html" %}
+</div>
+
+{% if site %}
+  <div class="tab-site-options form-block" style="display: none">
+    {% include "dashboard/podcast/tab_settings_site_edit.html" %}
+  </div>
+  <div class="tab-site-delete form-block" style="display: none">
+    {% include "dashboard/podcast/tab_settings_site_delete.html" %}
+  </div>
+{% endif %}
+
+<div class="tab-delete form-block" style="display: none">
+  {% include "dashboard/podcast/tab_settings_delete.html" %}
+</div>

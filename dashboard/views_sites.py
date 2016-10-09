@@ -21,6 +21,7 @@ def get_site(req, podcast_slug):
         raise Http404()
     return pod.site
 
+@require_POST
 @login_required
 def new_site(req, podcast_slug):
     pod = get_podcast(req, podcast_slug)
@@ -29,14 +30,6 @@ def new_site(req, podcast_slug):
         UserSettings.get_from_user(pod.owner).plan,
         payment_plans.FEATURE_MIN_SITES):
         raise Http404()
-
-    data = {
-        'podcast': pod,
-        'themes': Site.SITE_THEMES,
-    }
-
-    if not req.POST:
-        return _pmrender(req, 'dashboard/sites/page_new.html', data)
 
     try:
         site = Site(
@@ -50,29 +43,14 @@ def new_site(req, podcast_slug):
         )
         site.save()
     except Exception as e:
-        data.update(error=True, default=req.POST)
-        return _pmrender(req, 'dashboard/sites/page_new.html', data)
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?error=true#site')
     else:
-        return redirect('site_options', podcast_slug=podcast_slug)
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site')
 
-
-@login_required
-def site_options(req, podcast_slug):
-    site = get_site(req, podcast_slug)
-    return _pmrender(req, 'dashboard/sites/page_site.html', {'site': site, 'error': req.GET.get('error')})
-
+@require_POST
 @login_required
 def edit_site(req, podcast_slug):
     site = get_site(req, podcast_slug)
-
-    data = {
-        'site': site,
-        'themes': Site.SITE_THEMES,
-    }
-
-    if not req.POST:
-        return _pmrender(req, 'dashboard/sites/page_edit.html', data)
-
     try:
         site.theme = req.POST.get('theme')
         site.cover_image_url = signer.unsign(req.POST.get('cover-url')) if req.POST.get('cover-url') else None
@@ -82,30 +60,23 @@ def edit_site(req, podcast_slug):
         site.stitcher_url = req.POST.get('stitcher_url')
         site.save()
     except Exception as e:
-        data.update(error=True, default=req.POST)
-        return _pmrender(req, 'dashboard/sites/page_edit.html', data)
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?error=true#settings,site-options')
     else:
-        return redirect('site_options', podcast_slug=podcast_slug)
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#settings,site-options')
 
+@require_POST
 @login_required
 def delete_site(req, podcast_slug):
-    site = get_site(req, podcast_slug)
-
-    data = {'site': site}
-
-    if not req.POST:
-        return _pmrender(req, 'dashboard/sites/page_delete.html', data)
-    elif req.POST.get('slug') != podcast_slug:
-        return redirect('site_options', podcast_slug=podcast_slug)
-
-    site.delete()
-    return redirect(
-        reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#tab-site'
-    )
+    try:
+        site = get_site(req, podcast_slug)
+        site.delete()
+    except Exception:
+        pass
+    return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site')
 
 
-@login_required
 @require_POST
+@login_required
 def add_link(req, podcast_slug):
     site = get_site(req, podcast_slug)
 
@@ -115,22 +86,24 @@ def add_link(req, podcast_slug):
             raise Exception('Invalid scheme')
 
         SiteLink(site=site, title=req.POST.get('title'), url=url).save()
-        return redirect('site_options', podcast_slug=podcast_slug)
     except Exception as e:
-        return redirect(reverse('site_options', podcast_slug=podcast_slug) + '?error=link')
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?error=slink#settings,site-options')
+    else:
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#settings,site-options')
 
-@login_required
 @require_POST
+@login_required
 def remove_link(req, podcast_slug):
     site = get_site(req, podcast_slug)
     try:
-        link = SiteLink.objects.get(id=req.POST.get('id'))
+        link = SiteLink.objects.get(id=req.POST.get('id'), site=site)
         link.delete()
     except Exception:
         pass
-    return redirect('site_options', podcast_slug=podcast_slug)
+    return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#settings,site-options')
 
 
+@require_POST
 @login_required
 def add_blog_post(req, podcast_slug):
     site = get_site(req, podcast_slug)
@@ -139,11 +112,6 @@ def add_blog_post(req, podcast_slug):
         UserSettings.get_from_user(site.podcast.owner).plan,
         payment_plans.FEATURE_MIN_BLOG):
         raise Http404()
-
-    data = {'site': site}
-
-    if not req.POST:
-        return _pmrender(req, 'dashboard/sites/blog/page_new.html', data)
 
     try:
         naive_publish = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M') # 2015-07-09T12:00
@@ -157,22 +125,9 @@ def add_blog_post(req, podcast_slug):
         )
         post.save()
     except Exception as e:
-        data.update(error=True, default=req.POST)
-        return _pmrender(req, 'dashboard/sites/blog/page_new.html', data)
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?error=sblog#site,blog')
     else:
-        return redirect('site_manage_blog', podcast_slug=podcast_slug)
-
-@login_required
-def manage_blog(req, podcast_slug):
-    site = get_site(req, podcast_slug)
-
-    if not payment_plans.minimum(
-        UserSettings.get_from_user(site.podcast.owner).plan,
-        payment_plans.FEATURE_MIN_BLOG):
-        raise Http404()
-
-    return _pmrender(req, 'dashboard/sites/blog/page_manage.html',
-                     {'site': site, 'posts': site.siteblogpost_set.all().order_by('-publish')})
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site,blog')
 
 @login_required
 def edit_blog_post(req, podcast_slug, post_slug):

@@ -108,6 +108,51 @@ var Uploader = React.createClass({
     },
 
     render: function() {
+        if (!this.state.uploading && !this.state.uploaded) {
+            return React.createElement(
+                'label',
+                {
+                    className: 'upload-dd-label' + (this.state.dragging ? ' is-dragging' : ''),
+                    onDragEnter: function(e) {
+                        // e.preventDefault();
+                        this.setState({
+                            dragging: this.state.dragging + 1,
+                        });
+                    }.bind(this),
+                    onDragOver: function(e) {
+                        e.preventDefault();
+                    }.bind(this),
+                    onDragLeave: function() {
+                        this.setState({
+                            dragging: this.state.dragging - 1,
+                        });
+                    }.bind(this),
+                    onDrop: function(e) {
+                        e.preventDefault();
+                        this.setNewFile(e.dataTransfer.files[0]);
+                    }.bind(this),
+                },
+                React.createElement('i', {
+                    'data-text-choose': gettext('Choose a file to upload'),
+                    'data-text-drop': gettext('or drop a file to upload'),
+                }),
+                this.getError(),
+                React.createElement(
+                    'input',
+                    {
+                        type: 'file',
+                        accept: this.props.accept,
+                        onChange: function(e) {
+                            var fileObj = this.refs.filePicker.files[0];
+                            this.setNewFile(fileObj);
+                        }.bind(this),
+                        ref: 'filePicker',
+                        required: this.props.optional ? null : 'required',
+                    }
+                )
+            );
+        }
+
         return React.createElement(
             'div',
             {
@@ -168,7 +213,7 @@ var Uploader = React.createClass({
                 React.createElement(
                     'button',
                     {
-                        className: 'btn-danger uploader-btn',
+                        className: 'btn btn--danger btn--tiny uploader-btn',
                         onClick: this.clearFile,
                         type: 'button',
                     },
@@ -210,48 +255,7 @@ var Uploader = React.createClass({
             );
         }
 
-        return React.createElement(
-            'label',
-            {
-                className: 'upload-dd-label' + (this.state.dragging ? ' is-dragging' : ''),
-                onDragEnter: function(e) {
-                    // e.preventDefault();
-                    this.setState({
-                        dragging: this.state.dragging + 1,
-                    });
-                }.bind(this),
-                onDragOver: function(e) {
-                    e.preventDefault();
-                }.bind(this),
-                onDragLeave: function() {
-                    this.setState({
-                        dragging: this.state.dragging - 1,
-                    });
-                }.bind(this),
-                onDrop: function(e) {
-                    e.preventDefault();
-                    this.setNewFile(e.dataTransfer.files[0]);
-                }.bind(this),
-            },
-            React.createElement('i', {
-                'data-text-choose': gettext('Choose a file to upload'),
-                'data-text-drop': gettext('or drop a file to upload'),
-            }),
-            this.getError(),
-            React.createElement(
-                'input',
-                {
-                    type: 'file',
-                    accept: this.props.accept,
-                    onChange: function(e) {
-                        var fileObj = this.refs.filePicker.files[0];
-                        this.setNewFile(fileObj);
-                    }.bind(this),
-                    ref: 'filePicker',
-                    required: this.props.optional ? null : 'required',
-                }
-            )
-        );
+        return null;
     },
 
     renderPreview: function() {
@@ -266,10 +270,10 @@ var Uploader = React.createClass({
                     backgroundPosition: 'center center',
                     backgroundSize: 'cover',
                     border: '1px solid #ccc',
-                    borderRadius: '4px',
                     height: '150px',
                     maxWidth: '350px',
-                    width: '40%',
+                    minWidth: '250px',
+                    width: '100%',
                 }
             }
         );

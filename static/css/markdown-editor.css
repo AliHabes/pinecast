@@ -55,7 +55,7 @@
 .markdown-editor a:focus{ outline: thin dotted; }
 .markdown-editor a:hover, .markdown-editor a:active{ outline: 0; }
 
-.markdown-editor p{margin:1em 0;}
+.markdown-editor p{margin:0 0 1em;line-height: 1.5em;}
 
 .markdown-editor img{max-width:100%;}
 

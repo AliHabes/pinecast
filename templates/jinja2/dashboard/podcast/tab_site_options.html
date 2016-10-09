@@ -1,0 +1,12 @@
+<div class="card-block card">
+  <strong>{{ _('Site URL') }}</strong>
+  <div class="flex-row">
+    <input class="col"
+      readonly
+      type="url"
+      value="http://{{ site.podcast.slug }}.pinecast.co">
+    <a class="btn" href="http://{{ site.podcast.slug }}.pinecast.co" style="flex: 0 0 150px; margin: 0 0 0 15px;">
+      {{ _('Visit Site') }}
+    </a>
+  </div>
+</div>
