@@ -107,6 +107,16 @@
   <hr>
 
   <strong>{{ _('Categories') }}</strong>
+
+  <aside>
+    <strong>{{ _('What are categories for?') }}</strong>
+    <p>{{ _('The categories that you choose determine where your podcast will show up in the iTunes and Google Play diretories.') }}</p>
+  </aside>
+
+  <p>
+    {{ _('You can choose as many categories as you like, but we recommend choosing three or four that match your show\'s usual topics.') }}
+  </p>
+
   <div class="category-placeholder panel"
     data-name="categories"
     data-default-cats="{{ podcast.get_category_list() }}"></div>
