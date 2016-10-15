@@ -32,11 +32,20 @@ function buildTabs(tabBar) {
     }
 
     tabBar.addEventListener('click', function(e) {
-        if (!e.target.getAttribute('data-tab')) return;
+        let target = e.target;
+        if (target === tabBar) {
+            return;
+        }
+        while (!target.getAttribute('data-tab')) {
+            target = target.parentNode;
+            if (target === tabBar) {
+                return;
+            }
+        }
         e.preventDefault();
-        if (e.target.nodeName !== 'A') return;
+        if (target.nodeName !== 'A') return;
 
-        select(e.target);
+        select(target);
     });
 
     let selected = null;

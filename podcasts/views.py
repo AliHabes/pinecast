@@ -153,6 +153,8 @@ def feed(req, podcast_slug):
 
     resp = HttpResponse('\n'.join(c for c in content if c), content_type='application/rss+xml')
     resp.setdefault('Cache-Control', 'public, max-age=120')
+    resp.setdefault('Access-Control-Allow-Origin', '*')
+    resp.setdefault('Access-Control-Request-Method', 'GET')
     return resp
 
 

@@ -1,5 +1,9 @@
 <strong>{{ _('Basic Podcast Details') }}</strong>
 
+<p>
+  {{ _('Note that changing basic information about your podcast may take time to update on all podcast clients. Some older or buggy clients may not update at all.') }}
+</p>
+
 <form action="?" method="post">
 
   <label>
@@ -17,13 +21,13 @@
     <input type="text"
       name="subtitle"
       maxlength="512"
+      placeholder="{{ _('My great podcast tagline') }}"
       value="{{ default.get('subtitle', podcast.subtitle) }}">
   </label>
 
   <aside>
-    <p>
-      {{ _('"Explicit" means "has explicit language or adult content". This is a signal to podcast directories like iTunes.') }}
-    </p>
+    <p>{{ _('"Explicit" means "has explicit language or adult content".') }}</p>
+    <p><a href="https://pinecast.zendesk.com/hc/en-us/articles/229742727-What-does-Explicit-and-Clean-mean-">{{ _('Learn more...') }}</a></p>
   </aside>
 
   <label class="checkbox">
