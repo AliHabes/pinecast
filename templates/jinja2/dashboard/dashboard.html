@@ -70,15 +70,28 @@
   </ul>
 </div>
 <div class="tab-networks dashboard" style="display: none">
-  <div class="{{ 'tab-buttons' if networks.count() else 'buttons-empty-state' }}">
-    {% if not networks.count() %}
-      <p>{{ _("Start collaborating with your peers on network of podcasts. Create your first network in seconds.") }}</p>
+  {% if not networks.count() %}
+    {% if not minimum_plan(user_settings, PLANS.FEATURE_MIN_NETWORK) %}
+      <div class="upgrade-empty-state">
+        <p>{{ _('Upgrade to our Pro plan and collaborate with your peers using a network. Networks let you share access to your podcasts and view stats all in one place.') }}</p>
+        <a class="btn" href="{{ url('upgrade') }}">
+          {{ _('Upgrade Now') }}
+        </a>
+      </div>
+    {% else %}
+      <div class="buttons-empty-state">
+        <p>{{ _('Start collaborating with your peers on network of podcasts. Create your first network in seconds.') }}</p>
+        <a class="btn" href="{{ url('new_network') }}">
+          {{ _('Start a Network') }}
+        </a>
+      </div>
     {% endif %}
-    <a class="btn" href="{{ url('new_network') }}">
-      {{ _('New Network') }}
-    </a>
-  </div>
-  {% if networks %}
+  {% else %}
+    <div class="tab-buttons">
+      <a class="btn" href="{{ url('new_network') }}">
+        {{ _('New Network') }}
+      </a>
+    </div>
     <ul class="card-list">
       {% for n in networks %}
         <li class="card">

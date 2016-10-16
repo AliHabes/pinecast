@@ -101,7 +101,7 @@
 
   <div class="panel">
     <img class="avatar" src="{{ gravatar(user.email, 120) }}" alt="">
-    <div>
+    <div style="flex: 1 1">
       <a class="btn btn--tiny btn--go" href="https://gravatar.com">{{ _('Visit Gravatar') }}</a>
       <p>{{ _('To change your avatar, please visit {startlink}Gravatar{endlink}.').format(startlink='<a href="https://gravatar.com/">', endlink='</a>')|safe }}</p>
     </div>

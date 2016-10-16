@@ -1015,7 +1015,9 @@ menu.toolbar-right li {
     flex-wrap: wrap;
     height: 400px;
     justify-content: center;
-    padding: 150px;
+    margin: 0 auto;
+    max-width: 650px;
+    padding: 150px 0;
     text-align: center;
 }
 .buttons-empty-state p {
@@ -1458,8 +1460,14 @@ li.user-card span.name {
 .upgrade-empty-state {
     font-size: 1.2em;
     line-height: 2em;
+    margin: 0 auto;
+    max-width: 650px;
     padding: 50px;
     text-align: center;
+}
+.upgrade-empty-state .btn {
+    margin: 0 50px;
+    padding: 0;
 }
 
 .stats-panel + .chart-placeholder .chart-title {
