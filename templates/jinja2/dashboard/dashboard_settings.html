@@ -60,29 +60,6 @@
 </div>
 
 <div class="tab-profile form-block">
-  <strong>{{ _('Profile Picture') }}</strong>
-  <div class="panel">
-    <img class="avatar" src="{{ gravatar(user.email, 120) }}" alt="">
-    <div>
-      <a class="btn btn--tiny btn--go" href="https://gravatar.com">{{ _('Visit Gravatar') }}</a>
-      <p>{{ _('To change your avatar, please visit {startlink}Gravatar{endlink}.').format(startlink='<a href="https://gravatar.com/">', endlink='</a>')|safe }}</p>
-    </div>
-  </div>
-
-  <dl>
-    <dt>{{ _('Account Created') }}</dt>
-    <dd><abbr title="{{ user.date_joined }}">{{ user.date_joined|pretty_date }}</abbr></dd>
-    <dt>{{ _('Plan') }}</dt>
-    <dd>
-      {{ PLAN_NAMES[user_settings.plan] }}
-      {% if not minimum_plan(user, PLANS.PLAN_PRO) %}
-        &nbsp;
-        <a href="{{ url('upgrade') }}">{{ _('Change plan...') }}</a>
-      {% endif %}
-    </dd>
-  </dl>
-
-  <hr>
 
   <form action="{{ url('user_settings_save_tz') }}" class="inline-form" method="post">
     <label>
@@ -102,6 +79,34 @@
 
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
   </form>
+
+  <hr>
+
+  <dl>
+    <dt>{{ _('Account Created') }}</dt>
+    <dd><abbr title="{{ user.date_joined }}">{{ user.date_joined|pretty_date }}</abbr></dd>
+    <dt>{{ _('Plan') }}</dt>
+    <dd>
+      {{ PLAN_NAMES[user_settings.plan] }}
+      {% if not minimum_plan(user, PLANS.PLAN_PRO) %}
+        &nbsp;
+        <a href="{{ url('upgrade') }}">{{ _('Change plan...') }}</a>
+      {% endif %}
+    </dd>
+  </dl>
+
+  <hr>
+
+  <strong>{{ _('Profile Picture') }}</strong>
+
+  <div class="panel">
+    <img class="avatar" src="{{ gravatar(user.email, 120) }}" alt="">
+    <div>
+      <a class="btn btn--tiny btn--go" href="https://gravatar.com">{{ _('Visit Gravatar') }}</a>
+      <p>{{ _('To change your avatar, please visit {startlink}Gravatar{endlink}.').format(startlink='<a href="https://gravatar.com/">', endlink='</a>')|safe }}</p>
+    </div>
+  </div>
+
 </div>
 <div class="tab-access form-block">
 

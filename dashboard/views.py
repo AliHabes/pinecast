@@ -161,14 +161,15 @@ def new_podcast(req):
     ctx = {
         'LOCALES': constants.locales,
         'PODCAST_CATEGORIES': json.dumps(list(CATEGORIES)),
+
+        'reached_podcast_limit': payment_plans.has_reached_podcast_limit(uset)
     }
 
     if not req.POST:
         return _pmrender(req, 'dashboard/podcast/page_new.html', ctx)
 
     # Basic validation
-    if (not req.POST.get('slug') or
-        not req.POST.get('name')):
+    if (not req.POST.get('slug') or not req.POST.get('name')):
         ctx.update(default=req.POST, error=True)
         return _pmrender(req, 'dashboard/podcast/page_new.html', ctx)
 
@@ -187,12 +188,15 @@ def new_podcast(req):
             owner=req.user)
         pod.clean()
         pod.save()
-        # TODO: The following line can throw an exception and create a
-        # duplicate podcast if something has gone really wrong
-        pod.set_category_list(req.POST.get('categories'))
     except Exception as e:
         ctx.update(default=req.POST, error=True)
         return _pmrender(req, 'dashboard/podcast/page_new.html', ctx)
+
+    try:
+        pod.set_category_list(req.POST.get('categories'))
+    except Exception:
+        pass
+
     return redirect('podcast_dashboard', podcast_slug=pod.slug)
 
 

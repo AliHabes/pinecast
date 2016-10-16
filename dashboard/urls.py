@@ -35,7 +35,6 @@ urlpatterns = [
 
     url(r'^/feedback/remove/(?P<podcast_slug>[\w-]+)/(?P<comment_id>[\w-]+)$', views.delete_comment, name='delete_comment'),
 
-    url(r'^/import$', views_importer.importer, name='importer'),
     url(r'^/import/feed$', views_importer.importer_lookup),
 
     url(r'^/services/slug_available$', views.slug_available, name='slug_available'),

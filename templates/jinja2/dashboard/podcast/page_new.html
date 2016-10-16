@@ -3,12 +3,7 @@
 {% block title %}{{ _('New Podcast') }}{% endblock %}
 
 {% block dashboard_body %}
-
-<header>
-  {{ breadcrumb(_('Dashboard'), url('dashboard')) }}
-
-  <h1>{{ _('New Podcast') }}</h1>
-</header>
+<h1>{{ _('New Podcast') }}</h1>
 
 {% if error %}
 <div class="error">
@@ -16,13 +11,26 @@
 </div>
 {% endif %}
 
-<form action="?" method="post">
-  <div class="card-block card">
-    <strong>{{ _('Details') }}</strong>
+<div class="tabs-inline tabs dynamic">
+  <ul>
+    <li class="selected">
+      <a href="" data-tab=".tab-new">{{ _('From Scratch') }}</a>
+    </li>
+    <li>
+      <a href="" data-tab=".tab-import">{{ _('Import From Elsewhere') }}</a>
+    </li>
+  </ul>
+</div>
+
+<div class="tab-new form-block">
+  <strong>{{ _('Basic Podcast Details') }}</strong>
+
+  <form action="?" method="post">
 
     <label>
       <span>{{ _('Name') }}</span>
       <input type="text"
+        class="name-field"
         name="name"
         placeholder="{{ _('My Great Podcast') }}"
         required
@@ -30,142 +38,197 @@
         value="{{ default.get('name') }}">
     </label>
 
+    <aside>
+      <p>
+        {{ _('A slug is used for URLs for your podcast.') }} <a href="https://pinecast.zendesk.com/hc/en-us/articles/207148657">{{ _('Learn about slugs...') }}</a>
+      </p>
+    </aside>
+
     <label>
       <span>{{ _('Slug') }}</span>
       <input type="text"
-        name="slug"
-        placeholder="{{ _('my-great-podcast') }}"
-        required
-        maxlength="64"
-        pattern="[\w-]+"
+        autocomplete="off"
         class="slug-field"
+        name="slug"
+        maxlength="64"
+        placeholder="{{ _('my-great-podcast') }}"
+        pattern="[\w-]+"
+        required
         value="{{ default.get('slug') }}">
-      <div class="url-availability"></div>
     </label>
+    <div class="url-availability"></div>
 
     <label>
       <span>{{ _('Subtitle') }}</span>
       <input type="text"
         name="subtitle"
         maxlength="512"
+        placeholder="{{ _('My great podcast tagline') }}"
         value="{{ default.get('subtitle') }}">
     </label>
 
-    <label>
+    <aside>
+      <p>{{ _('"Explicit" means "has explicit language or adult content".') }}</p>
+      <p><a href="https://pinecast.zendesk.com/hc/en-us/articles/229742727-What-does-Explicit-and-Clean-mean-">{{ _('Learn more...') }}</a></p>
+    </aside>
+
+    <label class="checkbox">
       <input type="checkbox" name="is_explicit" value="true" {{ 'checked' if default.get('is_explicit') == 'true' }}>
-      <span>{{ _('Explicit?') }}</span>
+      <span>{{ _('Podcast contains explicit material') }}</span>
     </label>
 
     <label>
       <span>{{ _('Description') }}</span>
-      {#
-      There's a self XSS here. You could enter </ textarea > or something
-      similar, and it'll parse as valid HTML probably. It's not great, but it's
-      an acceptable risk.
-      #}
-      <textarea name="description">{{ default.get('description')|replace('</textarea>', '')|safe }}</textarea>
+      <textarea name="description" placeholder="{{ _('Let us weave for you a word picture...') }}">{{ default.get('description')|sanitize|safe }}</textarea>
     </label>
 
-  </div>
+    <hr>
 
-  <div class="card-block card">
-    <strong>{{ _('Meta') }}</strong>
+    <label>
+      <span>{{ _('Homepage') }}</span>
+      <input type="url" name="homepage" placeholder="https://mcelroyshows.com" required value="{{ default.get('homepage') }}" pattern="https?://.+">
+    </label>
 
-    <div class="flex-row">
-      <div class="col">
-        <label>
-          <span>{{ _('Homepage') }}</span>
-          <input type="url" name="homepage" placeholder="https://my-great-podcast.biz" required value="{{ default.get('homepage') }}" pattern="https?://.+">
-        </label>
-
-        <label>
-          <span>{{ _('Language') }}</span>
-          <div class="select">
-            {% set deflang = default.get('language', 'en-US') %}
-            <select name="language">
-              {% for raw_locale in sorted(LOCALES.keys()) %}
-                {% set locale = raw_locale.replace('_', '-') %}
-                <option value="{{ locale }}" {{ 'selected' if deflang == locale else '' }}>{{ LOCALES[raw_locale] }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </label>
-
+    <label>
+      <span>{{ _('Language') }}</span>
+      <div class="select">
+        {% set deflang = default.get('language', 'en-US') %}
+        <select name="language">
+          {% for raw_locale in sorted(LOCALES.keys()) %}
+            {% set locale = raw_locale.replace('_', '-') %}
+            <option value="{{ locale }}" {{ 'selected' if deflang == locale else '' }}>{{ LOCALES[raw_locale] }}</option>
+          {% endfor %}
+        </select>
       </div>
-      <div class="col">
-        <label>
-          <span>{{ _('Copyright') }}</span>
-          <input type="text"
-            name="copyright"
-            maxlength="1024"
-            placeholder="{{ _('Copyright 2015 Foo Bar Inc.') }}"
-            required
-            value="{{ default.get('copyright') }}">
-        </label>
+    </label>
 
-        <label>
-          <span>{{ _('Author') }}</span>
-          <input type="text"
-            name="author_name"
-            maxlength="1024"
-            placeholder="Anonymous"
-            required
-            value="{{ default.get('author_name') }}">
-        </label>
+    <label>
+      <span>{{ _('Copyright') }}</span>
+      <input type="text"
+        name="copyright"
+        maxlength="1024"
+        placeholder="{{ _('Copyright 2016 Maximum Fun') }}"
+        required
+        value="{{ default.get('copyright') }}">
+    </label>
 
-      </div>
-    </div>
+    <label>
+      <span>{{ _('Author') }}</span>
+      <input type="text"
+        name="author_name"
+        maxlength="1024"
+        placeholder="Roman Mars"
+        required
+        value="{{ default.get('author_name') }}">
+    </label>
 
-  </div>
+    <hr>
 
-  <div class="card-block card">
     <strong>{{ _('Cover Art') }}</strong>
+
+    <aside>
+      <strong>{{ _('Cover Art Guidelines') }}</strong>
+      <p>{{ _('Your image should be a JPG or PNG. It should be square, at least 1400x1400 pixels, and a maximum of 3000x3000 pixels.') }}</p>
+      <p>{{ _('Images may be up to 2MB.') }}</p>
+    </aside>
+
+    <p>{{ _('Your cover art is the image that listeners will see when searching for your podcast, and on their device while listening.') }}</p>
+
     <div class="upload-placeholder"
-      data-default-url="{{ default.get('image-url') }}"
-      data-default-name="{{ default.get('image-url-name') }}"
+      data-default-url="{{ sign(default.get('image-url')) }}"
       data-default-size="{{ default.get('image-url-size') }}"
-      data-default-type="{{ default.get('image-url-type') }}"
+      data-default-name="{{ default.get('image-url-name') }}"
+      data-default-type="{{ default.get('image-url-type', 'image/jpeg') }}"
       data-accept="image/*"
       data-name="image-url"
       data-type="image"
       data-podcast="$none"></div>
-  </div>
 
-  <div class="card-block card">
+    <hr>
+
     <strong>{{ _('Categories') }}</strong>
-    <div class="category-placeholder"
+
+    <aside>
+      <strong>{{ _('What are categories for?') }}</strong>
+      <p>{{ _('The categories that you choose determine where your podcast will show up in the iTunes and Google Play diretories.') }}</p>
+    </aside>
+
+    <p>
+      {{ _('You can choose as many categories as you like, but we recommend choosing three or four that match your show\'s usual topics.') }}
+    </p>
+
+    <div class="category-placeholder panel"
       data-name="categories"
-      data-trans-unselcats="{{ _('Unselected Categories') }}"
-      data-trans-selcats="{{ _('Selected Categories') }}"
       data-default-cats="{{ default.get('categories') }}"></div>
-  </div>
 
-  <menu class="toolbar">
-    <li><button type="submit">{{ _('Create Podcast') }}</button></li>
-  </menu>
+    <menu class="toolbar">
+      <button class="btn" type="submit">{{ _('Create') }}</button>
+    </menu>
 
-  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-</form>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+  </form>
+
+</div>
+
+<div class="tab-import form-block" style="display: none">
+  {% if not minimum_plan(user, PLANS.FEATURE_MIN_IMPORTER) %}
+    <div class="upgrade-empty-state empty-state">
+      {% if reached_limit %}
+        {% trans %}
+          You currently have a community account which can host up to three
+          podcasts. If you'd like to start another, please upgrade to a paid plan
+          or contact our support team.
+        {% endtrans %}
+      {% else %}
+        {% trans %}
+          The podcast import tool is only available to paid customers. Upgrading
+          your account to any paid plan will give you access.
+        {% endtrans %}
+      {% endif %}
+      <br>
+      <a class="btn" href="{{ url('upgrade') }}">{{ _('Upgrade Now') }}</a>
+    </div>
+  {% else %}
+    <div class="importer-placeholder"
+      data-csrf="{{ csrf_token }}"
+      data-rss-fetch="{{ settings.RSS_FETCH_ENDPOINT }}"></div>
+  {% endif %}
+</div>
 
 {% endblock %}
 
 {% block after_content %}
-<link href="/static/css/markdown-editor.css" rel="stylesheet">
 <script src="/static/js/react-15.0.1.min.js"></script>
 <script src="/static/js/react-dom-15.0.1.min.js"></script>
+<script src="/static/js/ui-podcast-import.js"></script>
 <script src="/static/js/ui-uploader.js"></script>
 <script src="/static/js/disable-forms.js"></script>
 <script>
 window.PODCAST_CATEGORIES = {{ PODCAST_CATEGORIES|safe }};
 
 (function() {
+  var nameField = document.querySelector('.name-field');
   var slugField = document.querySelector('.slug-field');
   var urlAvail = document.querySelector('.url-availability');
 
   var slugDebounce;
   var slugXHR;
 
+  nameField.addEventListener('input', function() {
+    if (slugField.hasGottenValue) {
+      return;
+    }
+    slugField.value = nameField.value.replace(/\s+/g, '-').replace(/[^\w-]/g, '').toLowerCase();
+    if (slugField.value) {
+      triggerValidation();
+    }
+  });
   slugField.addEventListener('input', function() {
+    slugField.hasGottenValue = !!slugField.value;
+    triggerValidation();
+  });
+
+  function triggerValidation() {
     if (slugDebounce) clearTimeout(slugDebounce);
     if (slugXHR) slugXHR.abort();
     if (!slugField.validity.valid) {
@@ -174,7 +237,7 @@ window.PODCAST_CATEGORIES = {{ PODCAST_CATEGORIES|safe }};
       return;
     }
     slugDebounce = setTimeout(validateSlug, 500);
-  });
+  }
 
   function validateSlug() {
     var xhr = new XMLHttpRequest();
@@ -199,4 +262,5 @@ window.PODCAST_CATEGORIES = {{ PODCAST_CATEGORIES|safe }};
 </script>
 {# Must come after the PODCAST_CATEGORIES declaration above #}
 <script src="/static/js/ui-categories.js"></script>
+<script src="/static/js/tabs.js"></script>
 {% endblock %}

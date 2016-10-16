@@ -37,12 +37,7 @@
 
   <label>
     <span>{{ _('Description') }}</span>
-    {#
-    There's a self XSS here. You could enter </ textarea > or something
-    similar, and it'll parse as valid HTML probably. It's not great, but it's
-    an acceptable risk.
-    #}
-    <textarea name="description">{{ default.get('description', podcast.description)|replace('</textarea>', '')|safe }}</textarea>
+    <textarea name="description">{{ default.get('description', podcast.description)|sanitize|safe }}</textarea>
   </label>
 
   <hr>
