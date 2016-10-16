@@ -141,11 +141,14 @@ def start_import(req):
     for ir in asset_requests:
         ir.save()
 
-    payloads = (x.get_payload() for x in asset_requests)
-    payloads = importer_worker.prep_payloads(payloads)
+    payloads = importer_worker.prep_payloads(x.get_payload() for x in asset_requests)
     importer_worker.push_batch(settings.SNS_IMPORT_BUS, payloads)
 
-    return {'error': False, 'ids': [x.id for x in asset_requests]}
+    return {
+        'error': False,
+        'ids': [x.id for x in asset_requests],
+        'elems': {x.id: x.get_json_payload() for x in asset_requests},
+    }
 
 
 @login_required
@@ -156,7 +159,10 @@ def import_progress(req, podcast_slug):
     ids = req.GET.get('ids')
     reqs = AssetImportRequest.objects.filter(id__in=ids.split(','))
     total = reqs.count()
-    return {'status': sum(1.0 for r in reqs if r.resolved) / total * 100.0}
+    return {
+        'elems': {x.id: x.get_json_payload() for x in reqs},
+        'status': sum(1.0 for r in reqs if r.resolved) / total * 100.0,
+    }
 
 
 @login_required

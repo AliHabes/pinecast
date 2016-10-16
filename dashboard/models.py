@@ -35,6 +35,20 @@ class AssetImportRequest(models.Model):
     def get_token(cls):
         return unicode(uuid.uuid4())
 
+    def get_json_payload(self):
+        return {
+            'id': self.id,
+            'item_type': 'image' if self.image_source_url else 'audio',
+            'entity':
+                {'id': str(self.episode.id), 'name': self.episode.title, 'type': 'episode'} if
+                self.episode else
+                {'id': str(self.podcast.id), 'name': self.podcast.name, 'type': 'podcast'},
+            'entity_type': 'episode' if self.episode else 'podcast',
+            'resolved': self.resolved,
+            'failed': self.failed,
+            'failure_message': self.failure_message,
+        }
+
     def resolve(self, new_url):
         if self.resolved:
             raise Exception(ugettext('Attempting to double-resolve import request'))

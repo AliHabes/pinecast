@@ -861,6 +861,13 @@ menu.toolbar-right li {
     border-bottom: 1px solid #444;
 }
 
+.form-block .error {
+    border-radius: 2px;
+    font-weight: 500;
+    margin: 0 0 1em;
+    padding: 0.5em 1em;
+}
+
 
 .progress {
     background: #ecf0f1;
@@ -1509,6 +1516,7 @@ li.user-card span.name {
     height: 1.65em;
     line-height: 1.65em;
     margin: auto;
+    pointer-events: none;
     position: absolute;
     right: 20px;
     text-align: center;

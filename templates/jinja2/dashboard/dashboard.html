@@ -30,7 +30,7 @@
 <div class="tab-shows dashboard">
   <div class="{{ 'tab-buttons' if podcasts else 'buttons-empty-state' }}">
     {% if not podcasts %}
-      <p>{{ _("You're ready to create your first podcast! Choose whether to start a new podcast or import an existing one.") }}</p>
+      <p>{{ _("You're ready to create your first podcast!") }}</p>
     {% endif %}
     <a class="btn" href="{{ url('new_podcast') }}">
       {% if podcasts %}
