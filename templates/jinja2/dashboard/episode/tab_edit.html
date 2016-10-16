@@ -1,0 +1,199 @@
+<form action="{{ url('edit_podcast_episode', podcast_slug=podcast.slug, episode_id=episode.id) }}" method="post">
+  <label>
+    <span>{{ _('Title') }}</span>
+    <input type="text"
+      name="title"
+      placeholder="{{ _('Episode 1 - Best one ever') }}"
+      required
+      maxlength="1024"
+      value="{{ default.get('title', episode.title) }}">
+  </label>
+  <label>
+    <span>{{ _('Subtitle') }}</span>
+    <input type="text"
+      name="subtitle"
+      placeholder="{{ _('You\'ll never believe it') }}"
+      maxlength="1024"
+      value="{{ default.get('subtitle', episode.subtitle) }}">
+  </label>
+
+  <label>
+    <span>{{ _('Explicit Override') }}</span>
+    <div class="select">
+      <select name="explicit_override">
+        {% set exp_ov = default.get('explicit_override', episode.explicit_override) %}
+        <option value="none" {{ 'selected' if exp_ov == 'none' else '' }}>
+          {{ _('Default for podcast (%s)') % (_('explicit') if podcast.is_explicit else _('clean')) }}
+        </option>
+        <option value="expl" {{ 'selected' if exp_ov == 'expl' else '' }}>{{ _('Explicit') }}</option>
+        <option value="clen" {{ 'selected' if exp_ov == 'clen' else '' }}>{{ _('Clean') }}</option>
+      </select>
+    </div>
+  </label>
+
+  <hr>
+
+  <label>
+    <span>{{ _('Copyright') }}</span>
+    <input type="text"
+      name="copyright"
+      maxlength="1024"
+      value="{{ default.get('copyright', episode.copyright) }}"
+      placeholder="{{ _('Copyright 2015 Foo Bar Inc.') }}">
+  </label>
+
+  <label>
+    <span>{{ _('License') }}</span>
+    <input type="text"
+      name="license"
+      maxlength="1024"
+      placeholder="{{ _('Creative Commons 4.0') }}"
+      value="{{ default.get('license', episode.license) }}">
+  </label>
+
+  <hr>
+
+  <strong>{{ _('Audio File') }}</strong>
+
+  <aside>
+    <p>
+      {% trans max_size=PLAN_MAX_FILE_SIZE[user_settings.plan]|filesizeformat(true) %}
+        Your account can upload Mp3 and AAC files up to <b>{{ max_size }}</b>.
+        We recommend saving audio as mono at 128kbps constant bitrate (CBR).
+      {% endtrans %}
+    </p>
+    {% if not minimum_plan(user_settings, PLANS.PLAN_PRO) %}
+      <p>
+        {% trans upgrade_url=url('upgrade') %}
+          <a href="{{ upgrade_url }}">Upgrade</a> to upload larger audio files.
+        {% endtrans %}
+      </p>
+    {% endif %}
+  </aside>
+
+  <div class="upload-placeholder"
+    data-default-url="{{ sign(default.get('audio-url', episode.audio_url)) }}"
+    data-default-size="{{ default.get('audio-url-size', episode.audio_size) }}"
+    data-default-name="{{ default.get('audio-url-name', _('Previously uploaded episode audio')) }}"
+    data-default-type="{{ default.get('audio-url-type', episode.audio_type) }}"
+    data-accept="audio/*"
+    data-name="audio-url"
+    data-type="audio"
+    data-podcast="{{ podcast.slug }}"
+    data-audio-duration-selector=".duration-control"></div>
+
+  <label class="duration-control" style="flex-direction: row">
+    <span>{{ _('Audio Length') }}</span>
+    <input type="number" class="duration-hours" name="duration-hours" value="{{ default.get('duration-hours', (episode.duration / 3600)|round(1, 'floor')|int) }}" title="{{ _('Hours') }}">:
+    <input type="number" class="duration-minutes" name="duration-minutes" value="{{ default.get('duration-minutes', (episode.duration % 3600 / 60)|round(1, 'floor')|int) }}" title="{{ _('Minutes') }}">:
+    <input type="number" class="duration-seconds" name="duration-seconds" value="{{ default.get('duration-seconds', (episode.duration % 60)|round(1, 'floor')|int) }}" title="{{ _('Seconds') }}">
+  </label>
+
+  <hr>
+
+  <aside>
+    <p>{{ _('You can use Markdown to spice up your description.') }}</p>
+    <ul>
+      <li>
+        {% trans %}
+          <code>[Link Text](https://your.link)</code>
+        {% endtrans %}
+      </li>
+      <li>
+        {% trans %}
+          <b>Bold text</b> with <code>**two asterisks**</code>.
+        {% endtrans %}
+      </li>
+      <li>
+        {% trans %}
+          <i>Italic text</i> with <code>*one asterisk*</code>.
+        {% endtrans %}
+      </li>
+    </ul>
+    <p><a href="https://en.support.wordpress.com/markdown-quick-reference/">{{ _('More Markdown information...') }}</a></p>
+  </aside>
+
+  <label for="description-field"><strong>{{ _('Description') }}</strong></label>
+  <textarea id="description-field" name="description" class="description-field">{{ default.get('description', episode.description)|sanitize|safe }}</textarea>
+
+  {% set flags = podcast.get_available_flair_flags() %}
+  {% if flags %}
+    <div class="flair">
+      <strong>{{ _('Flair') }}</strong>
+      <p>{{ _('Flair is shown at the bottom of your episode description.') }}</p>
+      <ul>
+        {% for flag, flag_name in flags %}
+          <li>
+            <label class="checkbox">
+              <input type="checkbox" name="flair_{{ flag }}"{{ ' checked' if default.get('flair_%s' % flag, getattr(episode, flag)) else '' }}>
+              <span>{{ flag_name }}</span>
+            </label>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
+
+  <hr>
+
+  <strong>{{ _('Feedback') }}</strong>
+
+  <p>{{ _('Ask your listeners for specific feedback with a feedback prompt. This will be shown on the episode feedback page and in feedback flair, if enabled.') }}</p>
+
+  <label>
+    <span>{{ _('Custom Prompt') }}</span>
+    <input type="text"
+      name="feedback_prompt"
+      maxlength="1024"
+      value="{{ default.get('feedback_prompt', episode.get_feedback_prompt('')) }}">
+  </label>
+  {% endif %}
+
+  <hr>
+
+  <strong>{{ _('Publish Time') }}</strong>
+
+  <p>
+    {% if podcast.site %}
+      {{ _('The publish time is when the podcast will become visible to your listeners in your podcast feed and on your podcast website.') }}
+    {% else %}
+      {{ _('The publish time is when the podcast will become visible to your listeners in your podcast feed.') }}
+    {% endif %}
+  </p>
+
+  <div class="panel">
+    <label class="segment-full">
+      <span>{{ _('Publish On') }}</span>
+      <input type="datetime-local"
+        name="publish"
+        required
+        value="{{ default.get('publish', (episode.publish + tz_delta).strftime('%Y-%m-%dT%H:%M')) }}">
+      <button class="btn publish-now btn-neutral" type="button">{{ _('Now') }}</button>
+    </label>
+  </div>
+
+  <hr>
+
+  <strong>{{ _('Episode Image') }}</strong>
+
+  <p>{{ _("The episode image is the graphic that will be linked on your show's feed. Some podcast clients will show this image when playing your audio instead of the show's cover image.") }}</p>
+
+  <div class="upload-placeholder"
+    data-default-url="{{ sign(default.get('image-url', episode.image_url)) }}"
+    data-default-size="{{ default.get('image-url-size') }}"
+    data-default-name="{{ default.get('image-url-name') }}"
+    data-default-type="{{ default.get('image-url-type') }}"
+    data-accept="image/*"
+    data-name="image-url"
+    data-type="image"
+    data-podcast="{{ podcast.slug }}"></div>
+
+  <hr>
+
+  <menu class="toolbar">
+    <button class="btn" type="submit">{{ _('Save') }}</button>
+  </menu>
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>

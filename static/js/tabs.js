@@ -7,6 +7,9 @@ function hide(elem) {
 }
 function show(elem) {
     elem.style.display = 'block';
+    Array.from(elem.querySelectorAll('.CodeMirror')).forEach(function(cm) {
+        cm.CodeMirror.refresh();
+    });
 }
 
 function buildTabs(tabBar) {

@@ -21,10 +21,10 @@ FLAIR_SITE_LINK = 'flair_site_link'
 FLAIR_POWERED_BY = 'flair_powered_by'
 FLAIR_TIP_JAR = 'flair_tip_jar'
 FLAIR_FLAGS = (
-    (FLAIR_FEEDBACK, ugettext_lazy('Feedback Link')),
-    (FLAIR_SITE_LINK, ugettext_lazy('Site Link')),
+    (FLAIR_FEEDBACK, ugettext_lazy('Feedback form link')),
+    (FLAIR_SITE_LINK, ugettext_lazy('Link to podcast website')),
     (FLAIR_POWERED_BY, ugettext_lazy('Powered By Pinecast')),
-    (FLAIR_TIP_JAR, ugettext_lazy('Tip Jar')),
+    (FLAIR_TIP_JAR, ugettext_lazy('Tip Jar link')),
 )
 FLAIR_FLAGS_MAP = {k: v for k, v in FLAIR_FLAGS}
 

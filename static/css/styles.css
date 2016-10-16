@@ -99,7 +99,7 @@ ol, ul, dl {
 }
 
 @media (max-width: 700px) {
-    .card {
+    .card:not(table) {
         display: flex;
         flex-direction: column;
     }
@@ -125,7 +125,7 @@ ol, ul, dl {
     padding: 25px 30px;
     position: relative;
 }
-.card > strong:first-child,
+.card > strong,
 .card > .card-btn:first-child + strong,
 .card .chart-title {
     display: block;
@@ -311,6 +311,13 @@ ul .empty-state i {
 .card-block {
     margin: 10px 0;
 }
+.card-block hr {
+    background: #ddd;
+    border: 0;
+    height: 1px;
+    margin: 15px 0;
+    width: 100%;
+}
 
 
 .stats-panel {
@@ -398,7 +405,6 @@ section.row > :last-child {
         flex-direction: column-reverse;
     }
     .row > * {
-        margin-bottom: 5vh;
         margin-left: 0;
         margin-right: 0;
     }
@@ -555,6 +561,15 @@ menu.toolbar-right li {
     text-align: center;
     transition: opacity 0.2s;
 }
+.form-block input + .btn {
+    margin-left: 15px;
+}
+@media (max-width: 700px) {
+    .form-block input + .btn {
+        margin-left: 0;
+        margin-top: 1em;
+    }
+}
 .form-block .btn:disabled {
     opacity: 0.1;
     pointer-events: none;
@@ -626,6 +641,10 @@ menu.toolbar-right li {
 }
 .form-block aside :last-child {
     margin-bottom: 0;
+}
+.form-block aside ul {
+    font-size: 0.9em;
+    padding-left: 15px;
 }
 
 .form-block aside.aside--secure {
@@ -743,7 +762,10 @@ menu.toolbar-right li {
     text-align: right;
 }
 .form-block .panel:not(.inline-form) label > span {
+    align-self: center;
+    flex: 0 0;
     text-align: left;
+    white-space: nowrap;
 }
 
 .form-block .select,
@@ -866,6 +888,41 @@ menu.toolbar-right li {
     font-weight: 500;
     margin: 0 0 1em;
     padding: 0.5em 1em;
+}
+
+.form-block .markdown-editor {
+    height: 250px;
+    margin-bottom: 1em;
+}
+.form-block form label.duration-control input {
+    margin: 0 5px;
+}
+.form-block form label.duration-control input:first-of-type {
+    margin-left: 0;
+}
+.form-block form label.duration-control input:last-of-type {
+    margin-right: 0;
+}
+
+.form-block .flair {
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    padding: 1em 1.5em 0;
+}
+.form-block .flair ul {
+    list-style: none;
+    padding: 0;
+}
+.form-block .flair li label {
+    margin: 0;
+}
+.form-block .flair li + li {
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+.form-block .flair input[type=checkbox] {
+    margin-left: 0;
+}
+.form-block .flair label input[type=checkbox]:checked + span:before {
+    left: 2px;
 }
 
 
@@ -1547,38 +1604,6 @@ li.user-card span.name {
 }
 .site-link + hr {
     margin: 1em 0;
-}
-
-
-.flair-options {
-    background: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 0 0 3px 3px;
-    box-shadow: 0 2px 1px rgba(0, 0, 0, 0.05);
-    padding: 15px;
-}
-.flair-options p {
-    margin: 0 0 15px;
-}
-.flair-options ul {
-    margin: 0;
-    padding: 0;
-}
-.flair-options li {
-    background: #fff;
-    border: 1px solid #5395D3;
-    border-radius: 3px;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-    list-style: none;
-}
-.flair-options li + li {
-    margin-top: 2px;
-}
-.flair-options li label {
-    line-height: 1.25em;
-}
-.flair-options li input {
-    margin: 0.25em;
 }
 
 

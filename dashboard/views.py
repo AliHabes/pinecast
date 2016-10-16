@@ -304,14 +304,6 @@ def edit_podcast_episode(req, podcast_slug, episode_id):
     pod = get_podcast(req, podcast_slug)
     ep = get_object_or_404(PodcastEpisode, id=episode_id, podcast=pod)
 
-    ctx = {
-        'podcast': pod,
-        'episode': ep,
-    }
-
-    if not req.POST:
-        return _pmrender(req, 'dashboard/episode/page_edit.html', ctx)
-
     try:
         naive_publish = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M')  # 2015-07-09T12:00
         adjusted_publish = naive_publish - UserSettings.get_from_user(req.user).get_tz_delta()
@@ -342,9 +334,7 @@ def edit_podcast_episode(req, podcast_slug, episode_id):
             prompt.save()
 
     except Exception as e:
-        ctx['default'] = req.POST
-        ctx['error'] = True
-        return  _pmrender(req, 'dashboard/episode/page_edit.html', ctx)
+        return redirect(reverse('podcast_episode', podcast_slug=pod.slug, episode_id=str(ep.id)) + '?error=true#edit')
     return redirect('podcast_episode', podcast_slug=pod.slug, episode_id=str(ep.id))
 
 

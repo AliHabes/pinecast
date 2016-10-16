@@ -28,17 +28,13 @@
         </span>
       </h2>
     </hgroup>
-
-    <a href="{{ url('edit_podcast_episode', kwargs={'podcast_slug': podcast.slug, 'episode_id': str(episode.id)}) }}" class="btn">
-      {{ _('Edit Episode') }}
-    </a>
   </div>
 </section>
 <nav class="subnav">
   <ul class="bottom-tabs tabs dynamic">
     <li class="selected"><a data-tab=".tab-overview" href="">{{ _('Overview') }}</a></li>
+    <li><a data-tab=".tab-edit" href="">{{ _('Edit') }}</a></li>
     <li><a data-tab=".tab-feedback" href="">{{ _('Feedback') }}</a></li>
-    <li><a data-tab=".tab-audio" href="">{{ _('Audio') }}</a></li>
   </ul>
 </nav>
 {% endblock %}
@@ -89,64 +85,63 @@
     {% endif %}
   </div>
 
+  <iframe src="/player/{{ str(episode.id) }}" seamless height="60" style="border:0" class="pinecast-embed"></iframe>
+
   <section class="row">
     <div class="card-block card markdown-editor-preview">
       {{ episode.get_html_description()|safe }}
     </div>
     <div class="sidebar">
-      {% if podcast.get_site() %}
-        <div class="card-block card">
+      <div class="card-block card">
+        {% if podcast.get_site() %}
           <strong>{{ _('Site Page URL') }}</strong>
           <input type="url"
             readonly
             value="http://{{ podcast.slug }}.pinecast.co/episode/{{ str(episode.id) }}">
-        </div>
-      {% endif %}
+          <hr>
+        {% endif %}
+        <strong>{{ _('Audio URL') }}</strong>
+        <input type="url"
+          readonly
+          value="https://pinecast.com{{ url('listen', kwargs={'episode_id': str(episode.id)}) }}">
+      </div>
     </div>
   </section>
 
   <div class="card-block card">
-    <strong>{{ _('Episode information') }}</strong>
-    <dl>
-      <dt>{{ _('Created') }}</dt> {#- -#}
-      <dd><abbr title="{{ episode.created + tz_delta }}">{{ (episode.created + tz_delta).strftime('%Y-%m-%d') }}</abbr></dd>
-
-      <dt>{{ _('Published') if episode.is_published() else _('Publish On') }}</dt> {#- -#}
-      <dd><abbr title="{{ episode.publish + tz_delta }} (UTC)">{{ (episode.publish + tz_delta).strftime('%Y-%m-%d') }}</abbr></dd>
-
-      <dt>{{ _('Duration') }}</dt> {#- -#}
-      <dd>
-        {{ episode.formatted_duration() }}
-      </dd>
-
-      <dt>{{ _('File Size') }}</dt> {#- -#}
-      <dd>{{ episode.audio_size|filesizeformat }}</dd>
-
-      <dt>{{ _('File Type') }}</dt> {#- -#}
-      <dd>{{ episode.audio_type }}</dd>
-
-      <dt>{{ _('Copyright') }}</dt> {#- -#}
-      <dd>
-        {% if episode.copyright %}
-          {{ episode.copyright }}
-        {% elif podcast.copyright %}
-          {{ podcast.copyright }}<br>
-          <small>{{ _('(inherited copyright from podcast)') }}</small>
+    <strong>{{ _('Embed Code') }}</strong>
+    {% if minimum_plan(owner_settings, PLANS.FEATURE_MIN_PLAYER) %}
+      <p>{{ _('Putting this HTML code on your webpage will show the embeddable player to your visitors.') }}</p>
+      <textarea readonly class="embed-textarea"><iframe src="https://pinecast.com{{ url('player', episode_id=str(episode.id)) }}" seamless height="60" style="border:0" class="pinecast-embed" frameborder="0"></iframe></textarea>
+    {% else %}
+      <div class="upgrade-empty-state empty-state">
+        {% if podcast.owner == user %}
+          {{ _('Upgrade your account to a paid plan to be able to embed the player on other websites.') }}<br>
+          <a class="btn" href="{{ url('upgrade') }}">{{ _('Upgrade Now') }}</a>
+        {% else %}
+          {{ _('The embeddable player is only available to podcasts owned by paid users.') }}
         {% endif %}
-      </dd>
-
-      <dt>{{ _('License') }}</dt> {#- -#}
-      <dd>{{ episode.license }}</dd>
-
-      <dt>{{ _('Explicit Override') }}</dt> {#- -#}
-      {% set exp_ov = episode.explicit_override %}
-      <dd>{{ _('Explicit') if exp_ov == 'expl' else _('Clean') if exp_ov == 'clen' else _('Default for podcast (%s)') % (_('explicit') if podcast.is_explicit else _('clean')) }}</dd>
-
-    </dl>
+      </div>
+    {% endif %}
   </div>
+
+  {% if minimum_plan(owner_settings, PLANS.FEATURE_MIN_TORRENT) %}
+    <div class="card-block card">
+      <strong>{{ _('Torrent URL') }}</strong>
+      <p>{{ _('Note that downloads via BitTorrent are not counted towards listen stats.') }}</p>
+      <input type="url"
+        readonly
+        value="{{ episode.audio_url }}?torrent">
+    </div>
+  {% endif %}
+
 </div>
 
-<div class="tab-feedback">
+<div class="tab-edit form-block">
+  {% include 'dashboard/episode/tab_edit.html' %}
+</div>
+
+<div class="tab-feedback" style="display: none">
   {% if minimum_plan(podcast.owner, PLANS.PLAN_PRO) %}
     <div class="card-block card">
       <strong>{{ _('Comment Box') }}</strong>
@@ -192,47 +187,17 @@
   {% endif %}
 </div>
 
-<div class="tab-audio" style="overflow: hidden; height: 0">
-  <iframe src="/player/{{ str(episode.id) }}" seamless height="60" style="border:0" class="pinecast-embed"></iframe>
-
-  <div class="card-block card">
-    <strong>{{ _('Embed Code') }}</strong>
-    {% if minimum_plan(owner_settings, PLANS.FEATURE_MIN_PLAYER) %}
-      <textarea readonly class="embed-textarea"><iframe src="https://pinecast.com{{ url('player', episode_id=str(episode.id)) }}" seamless height="60" style="border:0" class="pinecast-embed" frameborder="0"></iframe></textarea>
-    {% else %}
-      <div class="upgrade-empty-state empty-state">
-        {% if podcast.owner == user %}
-          {{ _('Upgrade your account to a paid plan to be able to embed the player on other websites.') }}<br>
-          <a class="btn" href="{{ url('upgrade') }}">{{ _('Upgrade Now') }}</a>
-        {% else %}
-          {{ _('The embeddable player is only available to podcasts owned by paid users.') }}
-        {% endif %}
-      </div>
-    {% endif %}
-  </div>
-
-  <div class="card-block card">
-    <strong>{{ _('Audio URL') }}</strong>
-    <input type="url"
-      readonly
-      value="https://pinecast.com{{ url('listen', kwargs={'episode_id': str(episode.id)}) }}">
-  </div>
-
-  {% if minimum_plan(owner_settings, PLANS.FEATURE_MIN_TORRENT) %}
-    <div class="card-block card">
-      <strong>{{ _('Torrent URL') }}</strong>
-      <p>{{ _('Note that downloads via BitTorrent are not counted towards listen stats.') }}</p>
-      <input type="url"
-        readonly
-        value="{{ episode.audio_url }}?torrent">
-    </div>
-  {% endif %}
-
-</div>
-
 {% endblock %}
 
 {% block after_content %}
+<link href="/static/css/markdown-editor.css" rel="stylesheet">
+<script src="/static/js/react-15.0.1.min.js"></script>
+<script src="/static/js/react-dom-15.0.1.min.js"></script>
+<script src="/static/js/markdown-editor.js"></script>
+<script src="/static/js/ui-uploader.js"></script>
 <script src="/static/js/ui-ad.js"></script>
 <script src="/static/js/tabs.js"></script>
+<script>
+markdown(document.querySelector('.description-field'));
+</script>
 {% endblock %}
