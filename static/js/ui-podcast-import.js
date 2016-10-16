@@ -625,7 +625,6 @@ var placeholders = document.querySelectorAll('.importer-placeholder');
 Array.prototype.slice.call(placeholders).forEach(function(placeholder) {
     ReactDOM.render(
         React.createElement(PodcastImporter, {
-            origElement: placeholder,
             csrf: placeholder.getAttribute('data-csrf'),
             rssFetch: placeholder.getAttribute('data-rss-fetch'),
         }),
