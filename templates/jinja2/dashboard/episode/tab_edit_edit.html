@@ -56,21 +56,7 @@
 
   <strong>{{ _('Audio File') }}</strong>
 
-  <aside>
-    <p>
-      {% trans max_size=PLAN_MAX_FILE_SIZE[user_settings.plan]|filesizeformat(true) %}
-        Your account can upload Mp3 and AAC files up to <b>{{ max_size }}</b>.
-        We recommend saving audio as mono at 128kbps constant bitrate (CBR).
-      {% endtrans %}
-    </p>
-    {% if not minimum_plan(user_settings, PLANS.PLAN_PRO) %}
-      <p>
-        {% trans upgrade_url=url('upgrade') %}
-          <a href="{{ upgrade_url }}">Upgrade</a> to upload larger audio files.
-        {% endtrans %}
-      </p>
-    {% endif %}
-  </aside>
+  {% include 'dashboard/episode/asides/aside_audio.html' %}
 
   <div class="upload-placeholder"
     data-default-url="{{ sign(default.get('audio-url', episode.audio_url)) }}"
@@ -92,29 +78,10 @@
 
   <hr>
 
-  <aside>
-    <p>{{ _('You can use Markdown to spice up your description.') }}</p>
-    <ul>
-      <li>
-        {% trans %}
-          <code>[Link Text](https://your.link)</code>
-        {% endtrans %}
-      </li>
-      <li>
-        {% trans %}
-          <b>Bold text</b> with <code>**two asterisks**</code>.
-        {% endtrans %}
-      </li>
-      <li>
-        {% trans %}
-          <i>Italic text</i> with <code>*one asterisk*</code>.
-        {% endtrans %}
-      </li>
-    </ul>
-    <p><a href="https://en.support.wordpress.com/markdown-quick-reference/">{{ _('More Markdown information...') }}</a></p>
-  </aside>
-
   <label for="description-field"><strong>{{ _('Description') }}</strong></label>
+
+  {% include 'dashboard/episode/asides/aside_markdown.html' %}
+
   <textarea id="description-field" name="description" class="description-field">{{ default.get('description', episode.description)|sanitize|safe }}</textarea>
 
   {% set flags = podcast.get_available_flair_flags() %}
@@ -136,20 +103,19 @@
   {% endif %}
 
   {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
+    <hr>
 
-  <hr>
+    <strong>{{ _('Feedback') }}</strong>
 
-  <strong>{{ _('Feedback') }}</strong>
+    <p>{{ _('Ask your listeners for specific feedback with a feedback prompt. This will be shown on the episode feedback page and in feedback flair, if enabled.') }}</p>
 
-  <p>{{ _('Ask your listeners for specific feedback with a feedback prompt. This will be shown on the episode feedback page and in feedback flair, if enabled.') }}</p>
-
-  <label>
-    <span>{{ _('Custom Prompt') }}</span>
-    <input type="text"
-      name="feedback_prompt"
-      maxlength="1024"
-      value="{{ default.get('feedback_prompt', episode.get_feedback_prompt('')) }}">
-  </label>
+    <label>
+      <span>{{ _('Custom Prompt') }}</span>
+      <input type="text"
+        name="feedback_prompt"
+        maxlength="1024"
+        value="{{ default.get('feedback_prompt', episode.get_feedback_prompt('')) }}">
+    </label>
   {% endif %}
 
   <hr>

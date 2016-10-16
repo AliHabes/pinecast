@@ -1,0 +1,15 @@
+<aside>
+  <p>
+    {% trans max_size=PLAN_MAX_FILE_SIZE[user_settings.plan]|filesizeformat(true) %}
+      Your account can upload Mp3 and AAC files up to <b>{{ max_size }}</b>.
+      We recommend saving audio as mono at 128kbps constant bitrate (CBR).
+    {% endtrans %}
+  </p>
+  {% if not minimum_plan(user_settings, PLANS.PLAN_PRO) %}
+    <p>
+      {% trans upgrade_url=url('upgrade') %}
+        <a href="{{ upgrade_url }}">Upgrade</a> to upload larger audio files.
+      {% endtrans %}
+    </p>
+  {% endif %}
+</aside>

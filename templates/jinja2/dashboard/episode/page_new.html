@@ -1,10 +1,6 @@
 {% extends 'dashboard/base.html' %}
 {% block dashboard_body %}
-
-<header>
-  {{ breadcrumb(podcast.name, url('podcast_dashboard', podcast_slug=podcast.slug)) }}
-  <h1>{{ _('New Episode') }}</h1>
-</header>
+<h1>{{ _('New Episode') }}</h1>
 
 {% if error %}
 <div class="error">
@@ -12,40 +8,33 @@
 </div>
 {% endif %}
 
+<div class="form-block">
+
 <form action="?" method="post">
-  <div class="card-block card">
-    <strong>{{ _('Details') }}</strong>
+  <strong>{{ _('Basic Episode Details') }}</strong>
 
-    <label>
-      <span>{{ _('Title') }}</span>
-      <input type="text"
-        name="title"
-        placeholder="{{ _('Episode 1 - Best one ever') }}"
-        required
-        maxlength="1024"
-        value="{{ default.get('title') }}">
-    </label>
+  <label>
+    <span>{{ _('Title') }}</span>
+    <input type="text"
+      name="title"
+      placeholder="{{ _('Episode 1 - Best one ever') }}"
+      required
+      maxlength="1024"
+      value="{{ default.get('title') }}">
+  </label>
 
-    <label>
-      <span>{{ _('Subtitle') }}</span>
-      <input type="text"
-        name="subtitle"
-        placeholder="{{ _('You\'ll never believe it') }}"
-        maxlength="1024"
-        value="{{ default.get('subtitle') }}">
-    </label>
+  <label>
+    <span>{{ _('Subtitle') }}</span>
+    <input type="text"
+      name="subtitle"
+      placeholder="{{ _('You\'ll never believe it') }}"
+      maxlength="1024"
+      value="{{ default.get('subtitle') }}">
+  </label>
 
-    <label>
-      <span>{{ _('Publish On') }}</span>
-      <input type="datetime-local"
-        name="publish"
-        required
-        value="{{ default.get('publish') }}">
-      <button class="publish-now btn-neutral" type="button">{{ _('Now') }}</button>
-    </label>
-
-    <label>
-      <span>{{ _('Explicit Override') }}</span>
+  <label>
+    <span>{{ _('Explicit Override') }}</span>
+    <div class="select">
       <select name="explicit_override">
         {% set exp_ov = default.get('explicit_override') %}
         <option value="none" {{ 'selected' if exp_ov == 'none' else '' }}>
@@ -54,119 +43,143 @@
         <option value="expl" {{ 'selected' if exp_ov == 'expl' else '' }}>{{ _('Explicit') }}</option>
         <option value="clen" {{ 'selected' if exp_ov == 'clen' else '' }}>{{ _('Clean') }}</option>
       </select>
-    </label>
+    </div>
+  </label>
 
-    <label>
-      <span>{{ _('Episode Description') }}</span>
-      {#
-      There's a self XSS here. You could enter </ textarea > or something
-      similar, and it'll parse as valid HTML probably. It's not great, but it's
-      an acceptable risk.
-      #}
-      <textarea name="description" id="description-field">{{ default.get('description', _('# Episode Notes\n\nNotes go here'))|replace('</textarea>', '')|safe }}</textarea>
-    </label>
+  <hr>
 
-    {% set flags = podcast.get_available_flair_flags() %}
-    {% if flags %}
-      <div class="flair-options">
-        <p>{{ _('Choose flair to show at the bottom of your episode description:') }}</p>
-        <ul>
-          {% for flag, flag_name in flags %}
-            <li>
-              <label class="checkbox">
-                <input type="checkbox" name="flair_{{ flag }}"{{ ' checked' if default.get('flair_%s' % flag, getattr(latest_ep, flag) if latest_ep else False) else '' }}>
-                <span>{{ flag_name }}</span>
-              </label>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
+  <label>
+    <span>{{ _('Copyright') }}</span>
+    <input type="text"
+      name="copyright"
+      maxlength="1024"
+      value="{{ default.get('copyright') }}"
+      placeholder="{{ podcast.copyright }}">
+  </label>
 
-  </div>
+  <label>
+    <span>{{ _('License') }}</span>
+    <input type="text"
+      name="license"
+      maxlength="1024"
+      placeholder="{{ _('Creative Commons 4.0') }}"
+      value="{{ default.get('license') }}">
+  </label>
 
-  <div class="card-block card">
-    <strong>{{ _('Episode Image') }}</strong>
+  <hr>
 
-    <div class="upload-placeholder"
-      data-default-url="{{ sign(default.get('image-url', podcast.cover_image)) }}"
-      data-default-size="{{ default.get('image-url-size') }}"
-      data-default-name="{{ default.get('image-url-name', _('Current podcast cover image')) }}"
-      data-default-type="{{ default.get('image-url-type') }}"
-      data-accept="image/*"
-      data-name="image-url"
-      data-type="image"
-      data-podcast="{{ podcast.slug }}"></div>
-  </div>
+  <strong>{{ _('Audio File') }}</strong>
 
-  <div class="card-block card">
-    <strong>{{ _('Audio') }}</strong>
-    <div class="upload-placeholder"
-      data-default-url="{{ sign(default.get('audio-url')) if default.get('audio-url') else '' }}"
-      data-default-size="{{ default.get('audio-url-size') }}"
-      data-default-name="{{ default.get('audio-url-name') }}"
-      data-default-type="{{ default.get('audio-url-type') }}"
-      data-accept="audio/*"
-      data-name="audio-url"
-      data-type="audio"
-      data-podcast="{{ podcast.slug }}"
-      data-audio-duration-selector=".duration-control"></div>
+  {% include 'dashboard/episode/asides/aside_audio.html' %}
 
-    <label class="duration-control">
-      <span>{{ _('Duration') }}</span>
-      <input type="number" class="duration-hours" name="duration-hours" value="{{ default.get('duration-hours', '0') }}" title="{{ _('Hours') }}">:
-      <input type="number" class="duration-minutes" name="duration-minutes" value="{{ default.get('duration-minutes', '0') }}" title="{{ _('Minutes') }}">:
-      <input type="number" class="duration-seconds" name="duration-seconds" value="{{ default.get('duration-seconds', '0') }}" title="{{ _('Seconds') }}">
-    </label>
+  <div class="upload-placeholder"
+    data-default-url="{{ sign(default.get('audio-url')) }}"
+    data-default-size="{{ default.get('audio-url-size') }}"
+    data-default-name="{{ default.get('audio-url-name', _('Previously uploaded episode audio')) }}"
+    data-default-type="{{ default.get('audio-url-type') }}"
+    data-accept="audio/*"
+    data-name="audio-url"
+    data-type="audio"
+    data-podcast="{{ podcast.slug }}"
+    data-audio-duration-selector=".duration-control"></div>
 
-  </div>
+  <label class="duration-control" style="flex-direction: row">
+    <span>{{ _('Audio Length') }}</span>
+    <input type="number" class="duration-hours" name="duration-hours" value="{{ default.get('duration-hours', 0) }}" title="{{ _('Hours') }}">:
+    <input type="number" class="duration-minutes" name="duration-minutes" value="{{ default.get('duration-minutes', 0) }}" title="{{ _('Minutes') }}">:
+    <input type="number" class="duration-seconds" name="duration-seconds" value="{{ default.get('duration-seconds', 0) }}" title="{{ _('Seconds') }}">
+  </label>
+
+  <hr>
+
+  <label for="description-field"><strong>{{ _('Description') }}</strong></label>
+
+  {% include 'dashboard/episode/asides/aside_markdown.html' %}
+
+  <textarea id="description-field" name="description" class="description-field">{{ default.get('description', _('# Episode Notes\n\nNotes go here'))|sanitize|safe }}</textarea>
+
+  {% set flags = podcast.get_available_flair_flags() %}
+  {% if flags %}
+    <div class="flair">
+      <strong>{{ _('Flair') }}</strong>
+      <p>{{ _('Flair is shown at the bottom of your episode description.') }}</p>
+      <ul>
+        {% for flag, flag_name in flags %}
+          <li>
+            <label class="checkbox">
+              <input type="checkbox" name="flair_{{ flag }}"{{ ' checked' if default.get('flair_%s' % flag, getattr(latest_ep, flag) if latest_ep else False) else '' }}>
+              <span>{{ flag_name }}</span>
+            </label>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
 
   {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
-  <div class="card-block card">
+    <hr>
+
     <strong>{{ _('Feedback') }}</strong>
+
+    <p>{{ _('Ask your listeners for specific feedback with a feedback prompt. This will be shown on the episode feedback page and in feedback flair, if enabled.') }}</p>
 
     <label>
       <span>{{ _('Custom Prompt') }}</span>
       <input type="text"
         name="feedback_prompt"
         maxlength="1024"
-        placeholder="{{ _('What did you think of this episode?') }}"
         value="{{ default.get('feedback_prompt') }}">
     </label>
-
-  </div>
   {% endif %}
 
-  <div class="card-block card">
-    <strong>{{ _('Meta') }}</strong>
+  <hr>
 
-    <label>
-      <span>{{ _('Copyright') }}</span>
-      <input type="text"
-        name="copyright"
-        maxlength="1024"
-        value="{{ default.get('copyright') }}"
-        placeholder="{{ podcast.copyright }}">
-      <small>{{ _('Leave blank to use the copyright from the podcast') }}</small>
+  <strong>{{ _('Publish Time') }}</strong>
+
+  <p>
+    {% if podcast.site %}
+      {{ _('The publish time is when the podcast will become visible to your listeners in your podcast feed and on your podcast website.') }}
+    {% else %}
+      {{ _('The publish time is when the podcast will become visible to your listeners in your podcast feed.') }}
+    {% endif %}
+  </p>
+
+  <div class="panel">
+    <label class="segment-full">
+      <span>{{ _('Publish On') }}</span>
+      <input type="datetime-local"
+        name="publish"
+        required
+        value="{{ default.get('publish') }}">
+      <button class="btn publish-now btn-neutral" type="button">{{ _('Now') }}</button>
     </label>
-
-    <label>
-      <span>{{ _('License') }}</span>
-      <input type="text"
-        name="license"
-        maxlength="1024"
-        placeholder="{{ _('Creative Commons 4.0') }}"
-        value="{{ default.get('license') }}">
-    </label>
-
   </div>
 
+  <hr>
+
+  <strong>{{ _('Episode Image') }}</strong>
+
+  <p>{{ _("The episode image is the graphic that will be linked on your show's feed. Some podcast clients will show this image when playing your audio instead of the show's cover image.") }}</p>
+
+  <div class="upload-placeholder"
+    data-default-url="{{ sign(default.get('image-url')) }}"
+    data-default-size="{{ default.get('image-url-size') }}"
+    data-default-name="{{ default.get('image-url-name') }}"
+    data-default-type="{{ default.get('image-url-type') }}"
+    data-accept="image/*"
+    data-name="image-url"
+    data-type="image"
+    data-podcast="{{ podcast.slug }}"></div>
+
+  <hr>
+
   <menu class="toolbar">
-    <li><button type="submit">{{ _('Save New Episode') }}</button></li>
+    <button class="btn" type="submit">{{ _('Save') }}</button>
   </menu>
 
   <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 </form>
+</div>
 
 {% endblock %}
 
@@ -177,6 +190,6 @@
 <script src="/static/js/markdown-editor.js"></script>
 <script src="/static/js/ui-uploader.js"></script>
 <script>
-markdown(document.querySelector('textarea'));
+markdown(document.querySelector('.description-field'));
 </script>
 {% endblock %}

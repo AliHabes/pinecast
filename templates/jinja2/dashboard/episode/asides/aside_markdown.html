@@ -1,0 +1,21 @@
+<aside>
+  <p>{{ _('You can use Markdown to spice up your description.') }}</p>
+  <ul>
+    <li>
+      {% trans %}
+        <code>[Link Text](https://your.link)</code>
+      {% endtrans %}
+    </li>
+    <li>
+      {% trans %}
+        <b>Bold text</b> with <code>**two asterisks**</code>.
+      {% endtrans %}
+    </li>
+    <li>
+      {% trans %}
+        <i>Italic text</i> with <code>*one asterisk*</code>.
+      {% endtrans %}
+    </li>
+  </ul>
+  <p><a href="https://en.support.wordpress.com/markdown-quick-reference/">{{ _('More Markdown information...') }}</a></p>
+</aside>
