@@ -93,7 +93,7 @@
     </div>
     <div class="sidebar">
       <div class="card-block card">
-        {% if podcast.get_site() %}
+        {% if minimum_plan(user_settings, PLANS.FEATURE_MIN_SITES) and podcast.get_site() %}
           <strong>{{ _('Site Page URL') }}</strong>
           <input type="url"
             readonly
@@ -137,7 +137,7 @@
 
 </div>
 
-<div class="tab-edit form-block">
+<div class="tab-edit">
   {% include 'dashboard/episode/tab_edit.html' %}
 </div>
 

@@ -1,0 +1,18 @@
+<strong>{{ _('Delete %s') % episode.title }}</strong>
+
+<p>
+  {% trans name=episode.title %}
+    Are you absolutely sure you wish to delete the episode "{{ name }}"? This is permanent and cannot be undone.
+  {% endtrans %}
+</p>
+
+<form action="{{ url('delete_podcast_episode', podcast_slug=podcast.slug, episode_id=episode.id) }}" method="post">
+
+  <menu class="toolbar">
+    <button type="submit" class="btn btn--danger">
+      {{ _('I am very, very sure') }}
+    </button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>

@@ -234,13 +234,11 @@ def delete_podcast(req, podcast_slug):
     pod.delete()
     return redirect('dashboard')
 
+@require_POST
 @login_required
 def delete_podcast_episode(req, podcast_slug, episode_id):
     pod = get_podcast(req, podcast_slug)
     ep = get_object_or_404(PodcastEpisode, podcast=pod, id=episode_id)
-    if not req.POST:
-        return _pmrender(req, 'dashboard/episode/page_delete.html', {'podcast': pod, 'episode': ep})
-
     ep.delete()
     return redirect('podcast_dashboard', podcast_slug=pod.slug)
 
@@ -299,6 +297,7 @@ def podcast_new_ep(req, podcast_slug):
     return redirect('podcast_dashboard', podcast_slug=pod.slug)
 
 
+@require_POST
 @login_required
 def edit_podcast_episode(req, podcast_slug, episode_id):
     pod = get_podcast(req, podcast_slug)
