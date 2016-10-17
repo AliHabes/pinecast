@@ -162,9 +162,9 @@
   <p>{{ _("The episode image is the graphic that will be linked on your show's feed. Some podcast clients will show this image when playing your audio instead of the show's cover image.") }}</p>
 
   <div class="upload-placeholder"
-    data-default-url="{{ sign(default.get('image-url')) }}"
+    data-default-url="{{ sign(default.get('image-url', podcast.cover_image)) }}"
     data-default-size="{{ default.get('image-url-size') }}"
-    data-default-name="{{ default.get('image-url-name') }}"
+    data-default-name="{{ default.get('image-url-name', _('Current podcast cover image')) }}"
     data-default-type="{{ default.get('image-url-type') }}"
     data-accept="image/*"
     data-name="image-url"
