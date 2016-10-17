@@ -82,7 +82,7 @@
 
   {% include 'dashboard/episode/asides/aside_markdown.html' %}
 
-  <textarea id="description-field" name="description" class="description-field">{{ default.get('description', episode.description)|sanitize|safe }}</textarea>
+  <textarea id="description-field" name="description" class="description-field markdown-editor">{{ default.get('description', episode.description)|sanitize|safe }}</textarea>
 
   {% set flags = podcast.get_available_flair_flags() %}
   {% if flags %}

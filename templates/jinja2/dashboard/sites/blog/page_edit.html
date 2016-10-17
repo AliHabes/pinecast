@@ -27,7 +27,7 @@
 
   <label class="markdwon-editor-small">
     <span>{{ _('Body') }}</span>
-    <textarea name="body">{{ default.get('body', post.body) }}</textarea>
+    <textarea class="markdown-editor" name="body">{{ default.get('body', post.body) }}</textarea>
   </label>
 
   <menu class="toolbar">
@@ -40,14 +40,5 @@
 {% endblock %}
 
 {% block after_content %}
-<link href="/static/css/markdown-editor.css" rel="stylesheet">
 <script src="/static/js/markdown-editor.js"></script>
-<script>
-(function() {
-  var textarea = document.querySelector('textarea');
-  if (textarea) {
-    markdown(textarea);
-  }
-}());
-</script>
 {% endblock %}

@@ -96,7 +96,7 @@
 
   {% include 'dashboard/episode/asides/aside_markdown.html' %}
 
-  <textarea id="description-field" name="description" class="description-field">{{ default.get('description', _('# Episode Notes\n\nNotes go here'))|sanitize|safe }}</textarea>
+  <textarea id="description-field" name="description" class="description-field markdown-editor">{{ default.get('description', _('# Episode Notes\n\nNotes go here'))|sanitize|safe }}</textarea>
 
   {% set flags = podcast.get_available_flair_flags() %}
   {% if flags %}
@@ -184,10 +184,6 @@
 {% endblock %}
 
 {% block after_content %}
-<link href="/static/css/markdown-editor.css" rel="stylesheet">
 <script src="/static/js/markdown-editor.js"></script>
 <script src="/static/js/ui-uploader.js"></script>
-<script>
-markdown(document.querySelector('.description-field'));
-</script>
 {% endblock %}

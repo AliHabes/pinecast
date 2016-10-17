@@ -203,7 +203,6 @@
 {% endblock %}
 
 {% block after_content %}
-<link href="/static/css/markdown-editor.css" rel="stylesheet">
 <script src="/static/js/react-15.0.1.min.js"></script>
 <script src="/static/js/react-dom-15.0.1.min.js"></script>
 <script src="/static/js/markdown-editor.js"></script>
@@ -216,18 +215,10 @@ window.PODCAST_CATEGORIES = {{ PODCAST_CATEGORIES|safe }};
 {# Must come after the PODCAST_CATEGORIES declaration above #}
 <script src="/static/js/ui-categories.js"></script>
 <script>
-(function() {
-  var textarea = document.querySelector('textarea');
-  if (textarea) {
-    markdown(textarea);
-  }
-}());
-
 Array.from(document.querySelectorAll('.confirm-delete')).forEach(function(elem) {
   elem.addEventListener('input', function(e) {
     document.querySelector(elem.getAttribute('data-confirming')).disabled = elem.value !== elem.placeholder;
   });
 });
-
 </script>
 {% endblock %}
