@@ -88,7 +88,7 @@
           <td>
             <a href="mailto:{{ tip.tipper.get_email() }}">{{ tip.tipper.get_email() }}</a>
           </td>
-          <td>${{ tip.amount / 10 }}</td>
+          <td>{{ '$%.2f' % (tip.amount / 100) }}</td>
           <td>{{ tip.occurred_at|pretty_date }}</td>
         </tr>
       {% endfor %}
