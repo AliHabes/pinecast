@@ -1,0 +1,19 @@
+<div class="card-block card">
+  <strong>{{ _('Tip Jar') }}</strong>
+  <p>
+    {% trans %}Make money through your podcast with your Pinecast Tip Jar.{% endtrans %}
+  </p>
+  {% if user == podcast.owner %}
+    <p>
+      {% trans us_url=(url('dashboard') + '#settings,subscription') %}
+        Before you can start accepting tips, you must <a href="{{ us_url }}">add bank account details</a> to your account.
+      {% endtrans %}
+    </p>
+  {% else %}
+    <p>
+      {% trans %}
+        The owner of this podcast needs to add their bank account details to their account in order to start accepting tips on this podcast. An account is required in order for us to process payments.
+      {% endtrans %}
+    </p>
+  {% endif %}
+</div>

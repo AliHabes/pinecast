@@ -1,60 +1,40 @@
-{% set owner_us = get_user_settings(podcast.owner) %}
-{% if not owner_us.has_connected_account() %}
-  <div class="card-block card">
-    <strong>{{ _('Tip Jar') }}</strong>
-    <p>
-      {% trans %}Make money through your podcast with your Pinecast Tip Jar.{% endtrans %}
-    </p>
-    {% if user == podcast.owner %}
-      <p>
-        {% trans us_url=(url('dashboard') + '#settings,subscription') %}
-          Before you can start accepting tips, you must <a href="{{ us_url }}">add bank account details</a> to your account.
-        {% endtrans %}
-      </p>
-    {% else %}
-      <p>
-        {% trans %}
-          The owner of this podcast needs to add their bank account details to their account in order to start accepting tips on this podcast. An account is required in order for us to process payments.
-        {% endtrans %}
-      </p>
+<div class="card-block card">
+  <div class="stats-panel">
+    <div class="segment">
+      <span>{{ _('All Time') }}</span>
+      <em>
+        {{ '$%0.2f' % (podcast.total_tips / 100) }}
+      </em>
+    </div>
+    <div class="segment">
+      <span>{{ _('Last Payout') }}</span>
+      {% set last_payout_date = podcast.last_payout_date() %}
+      <em title="{{ last_payout_date }}">
+        {{ last_payout_date|pretty_date if last_payout_date else _('Never') }}
+      </em>
+    </div>
+    {% set average_tip_this_month = podcast.average_tip_value_this_month() %}
+    {% if average_tip_this_month %}
+      <div class="segment">
+        <span>{{ _('Month Average') }}</span>
+        <em>
+          {{ '$%0.2f' % (average_tip_this_month / 100) }}
+        </em>
+      </div>
+    {% endif %}
+
+    {% if owner_us.plan == PLANS['PLAN_DEMO'] %}
+      <div class="segment">
+        <span>{{ _('Fees Paid') }}</span>
+        <em>
+          {{ '$%0.2f' % (podcast.tip_fees_paid() / 100) }}
+        </em>
+      </div>
     {% endif %}
   </div>
-{% else %}
-  <div class="card-block card">
-    <div class="stats-panel">
-      <div class="segment">
-        <span>{{ _('All Time') }}</span>
-        <em>
-          {{ '$%0.2f' % (podcast.total_tips / 100) }}
-        </em>
-      </div>
-      <div class="segment">
-        <span>{{ _('Last Payout') }}</span>
-        {% set last_payout_date = podcast.last_payout_date() %}
-        <em title="{{ last_payout_date }}">
-          {{ last_payout_date|pretty_date if last_payout_date else _('Never') }}
-        </em>
-      </div>
-      {% set average_tip_this_month = podcast.average_tip_value_this_month() %}
-      {% if average_tip_this_month %}
-        <div class="segment">
-          <span>{{ _('Month Average') }}</span>
-          <em>
-            {{ '$%0.2f' % (average_tip_this_month / 100) }}
-          </em>
-        </div>
-      {% endif %}
+</div>
 
-      {% if owner_us.plan == PLANS['PLAN_DEMO'] %}
-        <div class="segment">
-          <span>{{ _('Fees Paid') }}</span>
-          <em>
-            {{ '$%0.2f' % (podcast.tip_fees_paid() / 100) }}
-          </em>
-        </div>
-      {% endif %}
-    </div>
-  </div>
+<section class="row reverse-on-mobile">
   {% set next_payout_date = podcast.next_payout_date() %}
   {% if next_payout_date %}
     <div class="card-block card">
@@ -76,16 +56,42 @@
       </p>
     </div>
   {% endif %}
-  <div class="card-block card">
-    <strong>{{ _('Tip Jar URL') }}</strong>
-      <p>
-        {% trans %}
-          Share this address with your listeners to receive contributions to your podcast.
-        {% endtrans %}
-      </p>
-    <input type="url"
-      title="{{ _('Tip Jar') }}"
-      readonly
-      value="https://pinecast.com{{ url('tip_jar', podcast_slug=podcast.slug) }}">
+  <div class="sidebar">
+    <div class="card-block card">
+      <strong>{{ _('Tip Jar URL') }}</strong>
+        <p>
+          {% trans %}
+            Share this address with your listeners to receive contributions to your podcast.
+          {% endtrans %}
+        </p>
+      <input type="url"
+        title="{{ _('Tip Jar') }}"
+        readonly
+        value="https://pinecast.com{{ url('tip_jar', podcast_slug=podcast.slug) }}">
+    </div>
   </div>
+</section>
+
+{% set podcast_tips = podcast.tip_events.order_by('-occurred_at') %}
+{% if podcast_tips.count() %}
+  <table class="card">
+    <thead>
+      <tr>
+        <th>{{ _('Tipper') }}</th>
+        <th>{{ _('Tip Amount') }}</th>
+        <th>{{ _('Date') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tip in podcast_tips %}
+        <tr>
+          <td>
+            <a href="mailto:{{ tip.tipper.get_email() }}">{{ tip.tipper.get_email() }}</a>
+          </td>
+          <td>${{ tip.amount / 10 }}</td>
+          <td>{{ tip.occurred_at|pretty_date }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endif %}

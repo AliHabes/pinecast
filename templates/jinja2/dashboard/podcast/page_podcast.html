@@ -173,7 +173,12 @@
 </div>
 
 <div class="tab-tips" style="display: none">
-  {% include 'dashboard/podcast/tab_tips.html' %}
+  {% set owner_us = get_user_settings(podcast.owner) %}
+  {% if not owner_us.has_connected_account() %}
+    {% include 'dashboard/podcast/tab_tips_accountless.html' %}
+  {% else %}
+    {% include 'dashboard/podcast/tab_tips.html' %}
+  {% endif %}
 </div>
 
 {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITES) %}
