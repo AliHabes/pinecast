@@ -883,7 +883,8 @@ menu.toolbar-right li {
     border-bottom: 1px solid #444;
 }
 
-.form-block .error {
+.form-block .error,
+.form-block .warning {
     border-radius: 2px;
     font-weight: 500;
     margin: 0 0 1em;
@@ -1023,10 +1024,16 @@ menu.toolbar-right li {
 .uploader.is-uploading {
     align-items: center;
     display: flex;
+    flex-wrap: wrap;
 }
 .uploader.is-uploading .progress {
     flex: 1 1;
     margin: 0 20px 0 0;
+}
+.uploader .warning,
+.uploader .error {
+    flex-basis: 100%;
+    margin: 1em 0 0;
 }
 
 
