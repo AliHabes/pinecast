@@ -4,7 +4,7 @@
   {{ _('Note that changing basic information about your podcast may take time to update on all podcast clients. Some older or buggy clients may not update at all.') }}
 </p>
 
-<form action="?" method="post">
+<form action="{{ url('edit_podcast', podcast_slug=podcast.slug) }}" method="post">
 
   <label>
     <span>{{ _('Name') }}</span>
