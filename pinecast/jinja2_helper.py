@@ -4,7 +4,6 @@ import json
 import string
 
 import gfm
-import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -52,7 +51,7 @@ def environment(**options):
             -12.0,
             -11.0,
             -10.0,
-            -9.5,
+            #-9.5,
             -9.0,
             -8.0,
             -7.0,
@@ -60,7 +59,7 @@ def environment(**options):
             -6.0,
             -5.0,
             -4.0,
-            -3.5,
+            #-3.5,
             -3.0,
             -2.0,
             -1.0,
@@ -68,28 +67,27 @@ def environment(**options):
             1.0,
             2.0,
             3.0,
-            3.5,
+            #3.5,
             4.0,
-            4.5,
+            #4.5,
             5.0,
-            5.5,
+            #5.5,
             6.0,
-            6.5,
+            #6.5,
             7.0,
             8.0,
-            8.5,
-            8.75,
+            #8.5,
+            # 8.75,
             9.0,
-            9.5,
+            #9.5,
             10.0,
-            10.5,
+            #10.5,
             11.0,
             12.0,
-            12.75,
+            # 12.75,
             13.0,
             14.0,
         ],
-        'tz_offset': helpers.tz_offset,
     })
     env.filters['format_tz'] = format_tz
     env.filters['https'] = lambda s: ('https:%s' % s[5:]) if s.startswith('http:') else s

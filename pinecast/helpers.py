@@ -3,7 +3,6 @@ from functools import wraps
 
 import bleach
 import django.core.urlresolvers
-import pytz
 import requests
 from django.conf import settings
 from django.core.urlresolvers import reverse as reverse_django
@@ -34,11 +33,6 @@ def reverse(viewname, kwargs=None, **kw):
         other_kw['urlconf'] = kwargs['urlconf']
         del kwargs['urlconf']
     return reverse_django(viewname, kwargs=kwargs, **other_kw)
-
-
-def tz_offset(tz_name):
-    offset = pytz.timezone(tz_name)._utcoffset
-    return offset.seconds // 3600 + offset.days * 24
 
 
 def cached_method(func):

@@ -1,7 +1,6 @@
 import re
 from urllib import quote as urlencode
 
-import pytz
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -13,7 +12,7 @@ from django.views.decorators.http import require_POST
 from .models import UserSettings
 from dashboard.views import _pmrender
 from pinecast.email import get_expired_page, get_signed_url, request_must_be_confirmed, send_confirmation_email, send_notification_email
-from pinecast.helpers import get_object_or_404, reverse, tz_offset
+from pinecast.helpers import get_object_or_404, reverse
 from pinecast.signatures import signer
 
 
