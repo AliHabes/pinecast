@@ -139,7 +139,7 @@ def forgot_password_finish(req):
 @require_POST
 def user_settings_page_savetz(req):
     us = UserSettings.get_from_user(req.user)
-    us.tz_offset = tz_offset(req.POST.get('timezone'))
+    us.tz_offset = float(req.POST.get('timezone'))
     us.save()
     return redirect(reverse('dashboard') + '?success=tz#settings')
 

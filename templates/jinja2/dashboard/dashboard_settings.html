@@ -67,7 +67,7 @@
       <div class="select">
         <select name="timezone">
           {% for tz in timezones %}
-            <option{{ ' selected' if user_settings.tz_offset == tz_offset(tz) else '' }}>{{ tz }}</option>
+            <option value="{{ tz }}" {{ ' selected' if user_settings.tz_offset == tz else '' }}>{{ tz|format_tz }}</option>
           {% endfor %}
         </select>
       </div>
