@@ -54,7 +54,7 @@ def network_dashboard(req, network_id):
             [str(p.id) for p in net_podcasts], async_ctx)
 
     top_episodes = []
-    for x in top_episodes_query():
+    for x in sorted(top_episodes_query(), key=lambda x: -1 * x['podcast'])[:75]:
         try:
             episode = PodcastEpisode.objects.get(id=x['episode'])
         except Exception as e:
