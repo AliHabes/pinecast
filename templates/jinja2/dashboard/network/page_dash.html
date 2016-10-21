@@ -19,11 +19,10 @@
   <ul class="bottom-tabs tabs dynamic">
     <li class="selected"><a data-tab=".tab-overview" href="">{{ _('Overview') }}</a></li>
     <li><a data-tab=".tab-members" href="">{{ _('Members') }}</a></li>
-    <li>
-      <a href="{{ url('network_edit', network_id=network.id) }}">
-        {{ _('Settings') }}
-      </a>
-    </li>
+    {% if len(net_podcasts) %}
+      <li><a data-tab=".tab-shows" href="">{{ _('Shows') }}</a></li>
+    {% endif %}
+    <li><a data-tab=".tab-settings" href="">{{ _('Settings') }}</a></li>
   </ul>
 </nav>
 {% endblock %}
@@ -39,96 +38,156 @@
         data-chart-type="line"
         data-has-legend="true"></div>
     </div>
-
+  {% else %}
+    <div class="form-block" style="padding-top: 40px">
+      <h1>{{ _('Get your network started') }}</h1>
+      <p>{{ _('To begin, add a first show to the network.') }}</p>
+      {% include 'dashboard/network/tab_add_show.html' %}
+    </div>
   {% endif %}
-  <div class="card-block card">
-    <a href="{{ url('network_add_show', network_id=network.id) }}" class="btn card-btn">
-      {% if network.podcast_set.count() %}
-        {{ _('Add another podcast') }}
-      {% else %}
-        {{ _('Add a podcast') }}
-      {% endif %}
-    </a>
-    <strong>{{ _('Network Podcasts') }}</strong>
-    {% for p in net_podcasts %}
-      <div class="card-item">
-        <strong>
-          <a href="{{ url('podcast_dashboard', podcast_slug=p.slug) }}">{{ p.name }}</a>
-        </strong>
+</div>
 
-        <p>{{ p.description }}</p>
+{% if len(net_podcasts) %}
+  <div class="tab-shows" style="display: none">
+    <div class="tabs-inline tabs dynamic" data-hash-pos="1">
+      <ul>
+        <li class="selected">
+          <a href="" data-tab=".tab-show-list">{{ _('Show List') }}</a>
+        </li>
+        <li>
+          <a href="" data-tab=".tab-add-show">{{ _('Add Show') }}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="tab-show-list form-block">
+      {% for p in net_podcasts %}
+        <div class="panel">
+          <h2 class="segment-full" style="font-size: 1.25em; margin-bottom: 0.5em">
+            <a href="{{ url('podcast_dashboard', podcast_slug=p.slug) }}">{{ p.name }}</a>
+          </h2>
 
-        {% if user == network.owner or p.owner == user %}
-          <menu class="toolbar">
-            <a href="{{ url('network_remove_podcast', network_id=network.id, podcast_slug=p.slug) }}" title="{{ _('Remove this podcast from the network') }}">
-              {{ _('Remove') }}
-            </a>
-          </menu>
-        {% endif %}
+          <p class="segment-full">{{ p.description }}</p>
+
+          {% if user == network.owner or p.owner == user %}
+            <form action="{{ url('network_remove_podcast', network_id=network.id, podcast_slug=p.slug) }}" method="post" style="padding-bottom: 1em">
+              <button class="btn btn--tiny btn--danger btn--subtle" type="submit">
+                {{ _('Remove') }}
+              </button>
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            </form>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="tab-add-show form-block" style="display: none">
+      {% include 'dashboard/network/tab_add_show.html' %}
+    </div>
+  </div>
+{% endif %}
+
+<div class="tab-members" style="display: none">
+  <div class="tabs-inline tabs dynamic" data-hash-pos="1">
+    <ul>
+      <li class="selected">
+        <a href="" data-tab=".tab-member-list">{{ _('Details') }}</a>
+      </li>
+      <li>
+        <a href="" data-tab=".tab-add-member">{{ _('Add Member') }}</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="tab-member-list form-block">
+    <div class="panel">
+      <img src="{{ gravatar(network.owner.email) }}" alt="" class="avatar">
+      <div class="segment-fill">
+        <strong style="display: block">{{ _('Owner') }}</strong>
+        <a href="mailto:{{ network.owner.email }}" class="email">{{ network.owner.email }}</a>
+      </div>
+    </div>
+
+    <hr>
+
+    <strong style="display: block; margin-bottom: 1em">{{ _('Network Members') }}</strong>
+
+    {% for m in network.members.all() %}
+      <div class="panel">
+        <img src="{{ gravatar(m.email) }}" alt="" class="avatar">
+
+        <div>
+          <p>{{ m.email }}</p>
+
+          {% if m != network.owner or m == user and m != network.owner %}
+            <form action="{{ url('network_remove_member', network_id=network.id, member_id=m.id) }}" method="post" style="padding-bottom: 1em">
+              <button class="btn btn--tiny btn--danger btn--subtle" type="submit">
+                {{ _('Remove') }}
+              </button>
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            </form>
+          {% endif %}
+        </div>
       </div>
     {% endfor %}
   </div>
-</div>
 
-<div class="tab-members" style="overflow: hidden; height: 0">
-  <div class="card card-block">
-    <strong>{{ _('Owner') }}</strong>
-    <address class="user-card">
-      <img src="{{ gravatar(network.owner.email) }}" alt="">
-      <span class="name">{{ network.owner.email }}</span>
-      <a href="mailto:{{ network.owner.email }}" class="email">{{ network.owner.email }}</a>
-    </address>
+  <div class="tab-add-member form-block" style="display: none">
+    <strong>{{ _('Add Member') }}</strong>
+    {% if error == 'udne' %}
+      <div class="error">{{ _('A user with that email address could not be found.') }}</div>
+    {% endif %}
+    <form class="inline-form panel" action="{{ url('network_add_member', network_id=network.id) }}" method="post">
+      <label>
+        <strong>{{ _('Email') }}</strong>
+        <input type="email" name="email" placeholder="mypodcastfriend@pinecast.com">
+      </label>
+
+      <menu class="toolbar">
+        <button class="btn" type="submit">{{ _('Add') }}</button>
+      </menu>
+
+      <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    </form>
   </div>
 
-  {% if minimum_plan(user, PLANS.PLAN_STARTER) %}
-    <div class="card card-block">
-      <strong>{{ _('Add Member') }}</strong>
-      {% if add_member_error %}
-        <div class="error">{{ add_member_error }}</div>
-      {% endif %}
-      {% if add_member_success %}
-        <div class="success">{{ _('Member added successfully') }}</div>
-      {% endif %}
-      <form action="{{ url('network_add_member', network_id=network.id) }}" method="POST">
-        <label>
-          <span>{{ _('Email') }}</span>
-          <input type="email" name="email">
-        </label>
+</div>
 
-        <menu class="toolbar">
-          <li><button type="submit">{{ _('Add Member') }}</button></li>
-        </menu>
-
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-      </form>
+<div class="tab-settings" style="display: none">
+  {% if user == network.owner %}
+    <div class="tabs-inline tabs dynamic" data-hash-pos="1">
+      <ul>
+        <li class="selected">
+          <a href="" data-tab=".tab-details">{{ _('Details') }}</a>
+        </li>
+        <li class="tab--danger">
+          <a href="" data-tab=".tab-deactivate">{{ _('Deactivate Network') }}</a>
+        </li>
+      </ul>
     </div>
   {% endif %}
 
-  <div class="card-block card">
-    <strong>{{ _('Network Members') }}</strong>
-    {% for m in network.members.all() %}
-      <div class="card-item">
-        <a class="comment-from" href="mailto:{{ m.email }}">
-          <img src="{{ gravatar(m.email) }}" alt="">
-        </a>
-
-        <p>{{ m.email }}</p>
-
-        {% if m != network.owner or m == user and m != network.owner %}
-          <menu class="toolbar">
-            <a href="{{ url('network_remove_member', network_id=network.id, member_id=m.id) }}">
-              {{ _('Remove') }}
-            </a>
-          </menu>
-        {% endif %}
-      </div>
-    {% endfor %}
+  <div class="tab-details form-block">
+    {% include 'dashboard/network/tab_details.html' %}
   </div>
+
+  {% if user == network.owner %}
+    <div class="tab-deactivate form-block" style="display: none">
+      {% include 'dashboard/network/tab_deactivate.html' %}
+    </div>
+  {% endif %}
+
 </div>
 
 {% endblock %}
 
 {% block after_content %}
-<script src="/static/js/ui-chart.js"></script>
 <script src="/static/js/tabs.js"></script>
+<script src="/static/js/ui-chart.js"></script>
+<script src="/static/js/ui-uploader.js"></script>
+<script>
+Array.from(document.querySelectorAll('.confirm-delete')).forEach(function(elem) {
+  elem.addEventListener('change', function(e) {
+    document.querySelector(elem.getAttribute('data-confirming')).disabled = !elem.validity.valid;
+  });
+});
+</script>
 {% endblock %}

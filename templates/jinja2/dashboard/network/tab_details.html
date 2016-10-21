@@ -1,0 +1,30 @@
+<strong>{{ _('Edit %s') % network.name }}</strong>
+
+<form action="{{ url('network_edit', network_id=network.id) }}" method="post">
+  <label>
+    <span>{{ _('Network Name') }}</span>
+    <input type="text" name="name" required value="{{ default.get('name', network.name) }}">
+  </label>
+
+  <hr>
+
+  <strong>{{ _('Cover Image') }}</strong>
+
+  <div class="upload-placeholder"
+    data-default-url="{{ sign(default.get('image-url', network.image_url or '')) }}"
+    data-default-size="{{ default.get('image-url-size', '') }}"
+    data-default-name="{{ default.get('image-url-name', '') }}"
+    data-default-type="{{ default.get('image-url-type', '') }}"
+    data-accept="image/*"
+    data-name="image-url"
+    data-type="image"
+    data-podcast="$net"
+    data-optional="true"
+    data-no-itunes-size-check="true"></div>
+
+  <menu class="toolbar">
+    <button class="btn" type="submit">{{ _('Save') }}</button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>

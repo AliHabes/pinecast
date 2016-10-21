@@ -89,10 +89,6 @@ select {
     padding: 7px;
 }
 
-.duration-control input {
-    padding: 10px;
-    width: 60px;
-}
 
 .username-field:not(:focus) {
     border: 1px dotted #999;

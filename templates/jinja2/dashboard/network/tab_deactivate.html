@@ -1,0 +1,26 @@
+<strong>{{ _('Deactivate %s') % network.name }}</strong>
+
+<p>
+  {% trans %}
+    Deactivating this network will make it unavailable. It can only be re-activated by Pinecast Support. If you are sure you wish to deactivate it, check the box below
+  {% endtrans %}
+</p>
+
+<p>{{ _('If you\'re sure you wish to do this, enter the slug of the podcast in the box below.') }}</p>
+<form action="{{ url('network_deactivate', network_id=network.id) }}" method="post">
+
+  <div class="panel">
+    <label class="checkbox">
+      <input class="confirm-delete"
+        data-confirming=".delete-confirm-button-network"
+        type="checkbox" name="confirm" required>
+      <span>{{ _('I am sure I wish to deactivate the network') }}</span>
+    </label>
+  </div>
+
+  <menu class="toolbar">
+    <button class="btn btn--danger delete-confirm-button-network" disabled type="submit">{{ _('Deactivate Network') }}</button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>

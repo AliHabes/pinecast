@@ -39,18 +39,3 @@ button:disabled, .btn:disabled {
 .btn-danger {
     background: #FF5252;
 }
-
-.btn-neutral {
-    background: #ddd;
-    color: #222;
-}
-
-.btn.card-btn {
-    float: right;
-    margin: 0;
-}
-.btn.card-btn + * {
-    display: block;
-    line-height: 30px;
-    margin-bottom: 30px;
-}

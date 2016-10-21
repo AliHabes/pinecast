@@ -583,6 +583,12 @@ menu.toolbar-right li {
     border-color: #b00;
     color: #b00;
 }
+.form-block .btn.btn--subtle {
+    opacity: 0.2;
+}
+.form-block .btn.btn--subtle:hover {
+    opacity: 1;
+}
 .form-block .btn.btn--go {
     padding-right: 20px;
 }
@@ -753,13 +759,15 @@ menu.toolbar-right li {
     padding: 0;
     position: relative;
 }
-.form-block form:not(.inline-form) label > span {
+.form-block form label > span {
     color: #444;
-    flex: 0 0 30%;
     font-size: 14px;
     font-weight: 600;
     padding-right: 1em;
     text-align: right;
+}
+.form-block form:not(.inline-form) label > span {
+    flex: 0 0 30%;
 }
 .form-block .panel:not(.inline-form) label > span {
     align-self: center;
@@ -769,8 +777,8 @@ menu.toolbar-right li {
 }
 
 .form-block .select,
-.form-block form:not(.inline-form) label input,
-.form-block form:not(.inline-form) label textarea {
+.form-block form label input,
+.form-block form label textarea {
     background: rgba(255, 255, 255, 0.8);
     border: 2px solid #777;
     border-radius: 2px;
@@ -779,7 +787,7 @@ menu.toolbar-right li {
     padding: 0 15px;
     position: relative;
 }
-.form-block form:not(.inline-form) label input[type=file] {
+.form-block form label input[type=file] {
     padding: 0;
 }
 .form-block form label input[type=checkbox],
@@ -1433,93 +1441,6 @@ main > header h2 {
     font-weight: 500;
     text-align: center;
 }
-
-
-.breadcrumb {
-    bottom: 0;
-    color: #607D8B;
-    font-size: 14px;
-    display: block;
-    height: 2em;
-    left: 0;
-    line-height: 2em;
-    margin: auto;
-    padding-left: 25px;
-    position: absolute;
-    top: 0;
-}
-.breadcrumb svg {
-    bottom: 0;
-    display: block;
-    height: 20px;
-    left: 0;
-    margin: auto -25px auto 0;
-    max-width: 25%;
-    overflow: hidden;
-    position: absolute;
-    text-overflow: ellipsis;
-    top: 0;
-    white-space: nowrap;
-    width: 20px;
-}
-
-address.user-card {
-    font-size: 14px;
-    font-style: normal;
-    padding-left: 50px;
-}
-
-address.user-card img {
-    border-radius: 40px;
-    float: left;
-    height: 40px;
-    margin-left: -50px;
-    width: 40px;
-}
-
-address.user-card > * {
-    display: block;
-}
-
-address.user-card span.name {
-    font-size: 18px;
-    font-weight: 400;
-}
-
-.network-members {
-    list-style: none;
-    margin: 0;
-    padding-left: 0;
-}
-
-.network-members li + li {
-    border-top: 1px solid #eee;
-}
-
-li.user-card {
-    font-size: 13px;
-    font-style: normal;
-    padding: 15px 0 15px 40px;
-    position: relative;
-}
-
-li.user-card img {
-    border-radius: 20px;
-    float: left;
-    height: 20px;
-    margin-left: -30px;
-    width: 20px;
-}
-
-li.user-card > * {
-    display: block;
-}
-
-li.user-card span.name {
-    font-size: 1.1em;
-    font-weight: bold;
-}
-
 
 .upgrade-empty-state {
     font-size: 1.2em;

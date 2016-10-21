@@ -1,0 +1,26 @@
+<strong>{{ _('Add show to %s') % network.name }}</strong>
+
+{% if error == 'aslg' %}
+  <div class="error">
+    {{ _('A podcast with that slug does not exist.') }}
+  </div>
+{% elif error == 'nown' %}
+  <div class="error">
+    {{ _('You may own add podcasts that you own to a network.') }}
+  </div>
+{% endif %}
+
+<form class="inline-form panel" action="{{ url('network_add_show', network_id=network.id) }}" method="post">
+
+
+  <label>
+    <strong>{{ _('Podcast Slug') }}</strong>
+    <input type="text" name="slug" pattern="[\w-]+" required placeholder="my-awesome-show">
+  </label>
+
+  <menu class="toolbar">
+    <button class="btn" type="submit">{{ _('Add') }}</button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>

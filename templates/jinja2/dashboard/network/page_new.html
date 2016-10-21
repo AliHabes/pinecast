@@ -1,29 +1,32 @@
 {% extends 'dashboard/base.html' %}
+
+{% block title %}{{ _('New Podcast Network') }}{% endblock %}
+
 {% block dashboard_body %}
+<h1>{{ _('New Podcast Network') }}</h1>
 
-<header>
-  {{ breadcrumb(_('Dashboard'), url('dashboard')) }}
-  <h1>{{ _('New Podcast Network') }}</h1>
-</header>
+<div class="form-block">
+  <form method="post">
+    {% if error %}
+    <div class="error">
+      {{ error }}
+    </div>
+    {% endif %}
 
-{% if error %}
-  <div class="error">{{ error }}</div>
-{% endif %}
-
-<form method="post">
-
-  <div class="card card-block">
-    <strong>{{ _('Network Details') }}</strong>
+    <aside>
+      <p>{{ _('You can add podcasts and collaborators to your network once it has been created.') }}</p>
+    </aside>
 
     <label>
       <span>{{ _('Network Name') }}</span>
-      <input type="text" name="name" required value="{{ default.get('name') }}">
+      <input type="text" name="name" required value="{{ default.get('name') }}" placeholder="Radiotopia">
     </label>
 
-  </div>
+    <hr>
 
-  <div class="card-block card">
     <strong>{{ _('Cover Image') }}</strong>
+
+    <p>{{ _('A cover image is optional, but recommended.') }}</p>
 
     <div class="upload-placeholder"
       data-default-url="{{ sign(default.get('image-url', '')) }}"
@@ -36,14 +39,15 @@
       data-podcast="$net"
       data-optional="true"
       data-no-itunes-size-check="true"></div>
-  </div>
 
-  <menu class="toolbar">
-    <li><button type="submit">{{ _('Save') }}</button></li>
-  </menu>
+    <menu class="toolbar">
+      <button class="btn" type="submit">{{ _('Create') }}</button>
+    </menu>
 
-  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-</form>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+  </form>
+</div>
 
 {% endblock %}
 
