@@ -6,11 +6,12 @@ from django.utils.translation import ugettext, ugettext_lazy
 from django.views.decorators.http import require_POST
 
 import accounts.payment_plans as plans
+import analytics.query as analytics_query
 import pinecast.email
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
 from pinecast.helpers import get_object_or_404, reverse
-from podcasts.models import Podcast
+from podcasts.models import Podcast, PodcastEpisode
 from views import _pmrender, signer
 
 
@@ -44,11 +45,27 @@ def new_network(req):
 @login_required
 def network_dashboard(req, network_id):
     net = get_object_or_404(Network, deactivated=False, id=network_id, members__in=[req.user])
+
+    net_podcasts = net.podcast_set.all()
+
+    with analytics_query.AsyncContext() as async_ctx:
+        top_episodes_query = analytics_query.get_top_episodes(
+            [str(p.id) for p in net_podcasts], async_ctx)
+
+    top_episodes = []
+    for x in top_episodes_query():
+        try:
+            episode = PodcastEpisode.objects.get(id=x['episode'])
+        except Exception as e:
+            continue
+        top_episodes.append({'episode': episode, 'count': x['podcast']})
+
     return _pmrender(req,
                      'dashboard/network/page_dash.html',
                      {'error': req.GET.get('error'),
                       'network': net,
-                      'net_podcasts': net.podcast_set.all()})
+                      'net_podcasts': net_podcasts,
+                      'top_episodes': top_episodes})
 
 @require_POST
 @login_required

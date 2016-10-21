@@ -1,5 +1,7 @@
 {% extends 'dashboard/base.html' %}
 
+{% block title %}{{ network.name }} | Pinecast{% endblock %}
+
 {% block subheader %}
 <section class="subheader">
   <div>
@@ -38,6 +40,27 @@
         data-chart-type="line"
         data-has-legend="true"></div>
     </div>
+
+    <table class="card">
+      <thead>
+        <tr>
+          <th>{{ _('Episode Title') }}</th>
+          <th>{{ _('Listen Count') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in top_episodes %}
+          <tr>
+            <td>
+              <a href="{{ url('podcast_episode', podcast_slug=e.episode.podcast.slug, episode_id=e.episode.id) }}">
+                {{ e.episode.title }}
+              </a>
+            </td>
+            <td>{{ e.count }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   {% else %}
     <div class="form-block" style="padding-top: 40px">
       <h1>{{ _('Get your network started') }}</h1>
