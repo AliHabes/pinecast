@@ -41,6 +41,39 @@
         data-has-legend="true"></div>
     </div>
 
+    {% if upcoming_episodes %}
+      <table class="card">
+        <thead>
+          <tr>
+            <th>{{ _('Upcoming Episode Title') }}</th>
+            <th>{{ _('Podcast') }}</th>
+            <th>{{ _('Publish Date') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in upcoming_episodes %}
+            <tr>
+              <td>
+                <a href="{{ url('podcast_episode', podcast_slug=net_podcasts_map[str(e.podcast_id)].slug, episode_id=e.id) }}">
+                  {{ e.title }}
+                </a>
+              </td>
+              <td>
+                <a href="{{ url('podcast_dashboard', podcast_slug=net_podcasts_map[str(e.podcast_id)].slug) }}">
+                  {{ e.podcast.name }}
+                </a>
+              </td>
+              <td>
+                <abbr title="{{ e.publish }}">
+                  {{ e.publish|pretty_date }}
+                </abbr>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
     <table class="card">
       <thead>
         <tr>
@@ -58,7 +91,7 @@
               </a>
             </td>
             <td>
-              <a href="{{ url('podcast_dashboard', podcast_slug=e.episode.podcast.slug) }}">
+              <a href="{{ url('podcast_dashboard', podcast_slug=e.podcast.slug) }}">
                 {{ e.podcast.name }}
               </a>
             </td>

@@ -10,7 +10,7 @@ import analytics.query as analytics_query
 import pinecast.email
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
-from pinecast.helpers import get_object_or_404, reverse
+from pinecast.helpers import get_object_or_404, reverse, round_now
 from podcasts.models import Podcast, PodcastEpisode
 from views import _pmrender, signer
 
@@ -65,12 +65,18 @@ def network_dashboard(req, network_id):
             'podcast': pod_map[str(episode.podcast_id)],
         })
 
+    upcoming_episodes = PodcastEpisode.objects.filter(
+        podcast__in=net_podcasts,
+        publish__gt=round_now())
+
     return _pmrender(req,
                      'dashboard/network/page_dash.html',
                      {'error': req.GET.get('error'),
                       'network': net,
                       'net_podcasts': net_podcasts,
-                      'top_episodes': top_episodes})
+                      'net_podcasts_map': pod_map,
+                      'top_episodes': top_episodes,
+                      'upcoming_episodes': list(upcoming_episodes)})
 
 @require_POST
 @login_required
