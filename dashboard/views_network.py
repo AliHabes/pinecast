@@ -47,6 +47,7 @@ def network_dashboard(req, network_id):
     net = get_object_or_404(Network, deactivated=False, id=network_id, members__in=[req.user])
 
     net_podcasts = net.podcast_set.all()
+    pod_map = {str(p.id): p for p in net_podcasts}
 
     with analytics_query.AsyncContext() as async_ctx:
         top_episodes_query = analytics_query.get_top_episodes(
@@ -58,7 +59,11 @@ def network_dashboard(req, network_id):
             episode = PodcastEpisode.objects.get(id=x['episode'])
         except Exception as e:
             continue
-        top_episodes.append({'episode': episode, 'count': x['podcast']})
+        top_episodes.append({
+            'count': x['podcast'],
+            'episode': episode,
+            'podcast': pod_map[str(episode.podcast_id)],
+        })
 
     return _pmrender(req,
                      'dashboard/network/page_dash.html',

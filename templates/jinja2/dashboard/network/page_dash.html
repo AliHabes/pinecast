@@ -45,6 +45,7 @@
       <thead>
         <tr>
           <th>{{ _('Episode Title') }}</th>
+          <th>{{ _('Podcast') }}</th>
           <th>{{ _('Listen Count') }}</th>
         </tr>
       </thead>
@@ -52,8 +53,13 @@
         {% for e in top_episodes %}
           <tr>
             <td>
-              <a href="{{ url('podcast_episode', podcast_slug=e.episode.podcast.slug, episode_id=e.episode.id) }}">
+              <a href="{{ url('podcast_episode', podcast_slug=e.podcast.slug, episode_id=e.episode.id) }}">
                 {{ e.episode.title }}
+              </a>
+            </td>
+            <td>
+              <a href="{{ url('podcast_dashboard', podcast_slug=e.episode.podcast.slug) }}">
+                {{ e.podcast.name }}
               </a>
             </td>
             <td>{{ e.count }}</td>
