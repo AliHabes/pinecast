@@ -17,5 +17,9 @@ class HostnameRedirect(object):
             req.path == '/.well-known/acme-challenge/CHjGQzwy6kL5FSQxIt8ObzsUOu2LQpAIWUWeF6zenyw'):
             return HttpResponse('CHjGQzwy6kL5FSQxIt8ObzsUOu2LQpAIWUWeF6zenyw.djl0LF2Nvo-i_b9QJg_lNk4QjgSlIxCaUuPo3U3R-p0')
 
+        elif (hostname == 'pinecast.com.herokudns.com' and
+            req.path == '/.well-known/acme-challenge/MVX7oTixZVZaCcZ-Yk2-hyGj_FgAfrZK4pFzDlYrKjE'):
+            return HttpResponse('MVX7oTixZVZaCcZ-Yk2-hyGj_FgAfrZK4pFzDlYrKjE.djl0LF2Nvo-i_b9QJg_lNk4QjgSlIxCaUuPo3U3R-p0')
+
         return HttpResponsePermanentRedirect(
             'https://%s%s' % (PREFERRED_HOSTNAME, req.get_full_path()))
