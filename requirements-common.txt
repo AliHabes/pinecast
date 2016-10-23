@@ -13,7 +13,7 @@ Jinja2==2.7.3
 MarkupSafe==0.23
 PyYAML==3.11
 requests==2.8.1
-rollbar==0.13.3
+rollbar==0.13.5
 six==1.9.0
 stripe==1.27.1
 ua-parser==0.3.6
