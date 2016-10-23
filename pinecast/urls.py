@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import logout
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.i18n import javascript_catalog
 
@@ -38,5 +39,9 @@ urlpatterns = (
         url(r'^jsi18n/$', javascript_catalog, js_info_dict),
 
         url(r'^favicon\.ico$', lambda *_: redirect('/static/img/favicon.png')),
+
+        # Let's Encrypt!
+        url(r'^\.well-known/acme-challenge/XNKH55GTiDUDP_h2A7B93bGpIHm5bkKsjRTwWWP4QnA$',
+            lambda *_: HttpResponse('XNKH55GTiDUDP_h2A7B93bGpIHm5bkKsjRTwWWP4QnA.djl0LF2Nvo-i_b9QJg_lNk4QjgSlIxCaUuPo3U3R-p0')),
     ]
 )
