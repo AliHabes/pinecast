@@ -281,7 +281,7 @@
         },
 
         description: '{{ _('Set payment card on Pinecast') }}',
-        email: {{ user.email|json|safe }},
+        email: {{ user.email|safe_json }},
         image: '/static/img/256x256.png',
         name: 'Pinecast',
         panelLabel: '{{ _('Set payment card') }}',

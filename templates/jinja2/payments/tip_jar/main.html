@@ -1,13 +1,121 @@
 {% extends 'payments/tip_jar/base.html' %}
 
 {% block content_inner %}
-  <div class="tip-form"
-    data-existing-card='{{ existing_card|json }}'
-    data-podcast="{{ podcast.slug }}"
-    data-publishable-key="{{ STRIPE_PUBLISHABLE_KEY }}"></div>
+<div class="tip-selection">
+  <div class="tip-amount-selector-wrapper label">
+    <span>{{ _('How much would you like to contribute?') }}</span>
+    <div class="tip-amount-selector">
+      <label>
+        <input type="radio" name="amount" value="100">
+        <span>$1</span>
+      </label>
+      <label>
+        <input type="radio" name="amount" value="300">
+        <span>$3</span>
+      </label>
+      <label>
+        <input type="radio" name="amount" value="500">
+        <span>$5</span>
+      </label>
+      <label>
+        <input type="radio" name="amount" value="1000">
+        <span>$10</span>
+      </label>
+      {% if minimum_plan(podcast.owner, PLANS.PLAN_STARTER) %}
+        <label>
+          <input type="radio" name="amount" value="2000">
+          <span>$20</span>
+        </label>
+        {% if minimum_plan(podcast.owner, PLANS.PLAN_PRO) %}
+          <label>
+            <input type="radio" name="amount" value="5000">
+            <span>$50</span>
+          </label>
+          {% if minimum_plan(podcast.owner, PLANS.PLAN_ULTIMATE) %}
+            <label>
+              <input type="radio" name="amount" value="10000">
+              <span>$100</span>
+            </label>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+  <div class="tip-frequency-selector label" style="display: none">
+    <span>{{ _('Do you want to send a one-time tip or become a monthly donor?') }}</span>
+    <div class="tip-frequency">
+      <button data-frequency="charge">{{ _('One Time Tip') }}</button>
+      <button data-frequency="subscribe">{{ _('Subscribe') }}</button>
+    </div>
+  </div>
+</div>
+<div class="tip-success" style="display: none">
+  {{ _('Your tip was submitted to %s. <3') % podcast.name }}
+</div>
+<div class="tip-error error" style="display: none">
+  {{ _('There was a problem submitting your tip. Please try again in a moment.') }}
+</div>
+</div>
 {% endblock %}
 
 {% block after_content %}
 <script src="https://js.stripe.com/v2/"></script>
-<script src="/static/js/ui-tip-form.js"></script>
+<script src="https://checkout.stripe.com/checkout.js"></script>
+<script>
+window.addEventListener('load', function() {
+  var amount = 0;
+
+  var handler = StripeCheckout.configure({
+    key: '{{ STRIPE_PUBLISHABLE_KEY }}',
+
+    email: {{ user.email|safe_json }},
+    image: {{ podcast.cover_image|https|safe_json }},
+    name: {{ podcast.name|safe_json }},
+    zipCode: true,
+  });
+
+  document.querySelector('.tip-amount-selector').addEventListener('change', function(e) {
+    document.querySelector('.tip-frequency-selector').style.display = 'block';
+    amount = parseInt(e.target.value, 10);
+  }, true);
+  document.querySelector('.tip-frequency').addEventListener('click', function(e) {
+    var freq = e.target.getAttribute('data-frequency');
+    if (!freq) {
+      return;
+    }
+
+    if (freq === 'charge') {
+      handler.open({
+        amount: amount,
+        panelLabel: '{{ _('Send a {{amount}} tip') }}',
+        token: complete.bind(null, 'charge'),
+      });
+    } else {
+      handler.open({
+        amount: amount,
+        panelLabel: '{{ _('Subscribe at {{amount}}/mo') }}',
+        token: complete.bind(null, 'subscribe'),
+      });
+    }
+  }, true);
+
+  function complete(type, token) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+      //
+    };
+    xhr.onerror = function() {
+      //
+    };
+    xhr.open('post', {{ url('send_tip', podcast_slug=podcast.slug)|safe_json }}, true);
+
+    var fd = new FormData();
+    fd.append('type', type);
+    fd.append('token', token.id);
+    fd.append('email', token.email);
+    xhr.send(fd);
+  }
+
+});
+</script>
 {% endblock %}

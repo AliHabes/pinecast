@@ -40,19 +40,6 @@ hgroup h1, hgroup h2, hgroup h3 {
     font-weight: 300;
 }
 
-.cc-form label, .cc-form .label {
-    display: block;
-    margin: 0;
-}
-
-.cc-form .cvc-label,
-.cc-form .expiration-label  {
-    padding-left: 10px;
-}
-
-.cc-form div:last-child {
-    flex: 1 1;
-}
 
 label > span,
 .label > span {
@@ -120,9 +107,10 @@ label > span,
 
 
 .tip-amount-selector-wrapper {
+    margin-bottom: 20px;
     padding: 0;
 }
-.tip-amount-selector-wrapper > span {
+.label > span {
     text-align: center;
 }
 .tip-amount-selector {
@@ -146,6 +134,14 @@ label > span,
     font-weight: 300;
 }
 
+.tip-frequency {
+    display: flex;
+    margin-top: 15px;
+}
+.tip-frequency button {
+    margin: 0 10px;
+}
+
 
 input[type=radio] {
     -moz-appearance: none;
@@ -163,6 +159,7 @@ input[type=radio] + span:before {
     display: block;
     height: 25px;
     margin: 0 auto;
+    transition: background 0.3s, box-shadow 0.3s;
     width: 25px;
 }
 input[type=radio]:checked + span:before {

@@ -57,7 +57,9 @@ INSTALLED_APPS = (
     'sites',
 )
 if DEBUG:
-    INSTALLED_APPS = INSTALLED_APPS + ('django_nose', 'debug_toolbar', )
+    INSTALLED_APPS = INSTALLED_APPS + ('django_nose', )
+if DEBUG and os.environ.get('DEBUG_TOOLBAR'):
+    INSTALLED_APPS = INSTALLED_APPS + ('debug_toolbar', )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

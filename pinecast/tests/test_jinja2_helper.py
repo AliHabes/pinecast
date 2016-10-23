@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from nose.tools import eq_
 
-from ..jinja2_helper import pretty_date
+from ..jinja2_helper import pretty_date, safe_json
 
 
 def test_pretty_date_future():
@@ -32,3 +32,22 @@ def test_pretty_date_past():
     eq_(pretty_date(datetime.utcnow() - timedelta(days=14)), '2 weeks ago')
     eq_(pretty_date(datetime.utcnow() - timedelta(days=60)), '2 months ago')
     eq_(pretty_date(datetime.utcnow() - timedelta(days=365)), '1 year ago')
+
+
+def test_safe_json():
+    unsafe = '<"\'>'
+    safe = '"&lt;&#34;&#39;&gt;"'
+    eq_(str(safe_json(unsafe)), safe)
+    eq_(str(safe_json(None)), 'null')
+    eq_(str(safe_json(1)), '1')
+    eq_(str(safe_json(1.5)), '1.5')
+    eq_(str(safe_json(long(100))), '100')
+    eq_(str(safe_json(True)), 'true')
+    eq_(str(safe_json(False)), 'false')
+
+    eq_(str(safe_json([])), '[]')
+    eq_(str(safe_json([1, 'foo'])), '[1,"foo"]')
+    eq_(str(safe_json([1, ['foo', unsafe]])), '[1,["foo",%s]]' % safe)
+
+    eq_(str(safe_json({'foo': 'bar'})), '{"foo":"bar"}')
+    eq_(str(safe_json({'foo': {'zip': unsafe}})), '{"foo":{"zip":%s}}' % safe)

@@ -9,23 +9,29 @@ from podcasts.models import Podcast
 
 
 class TipUser(StripeCustomerMixin, models.Model):
-    sms_number = models.CharField(max_length=32, blank=True, null=True)
     email_address = models.EmailField(blank=True, null=True)
 
     created = models.DateTimeField(auto_now=True)
 
     stripe_customer_id = models.CharField(max_length=128, blank=True, null=True)
 
+    @classmethod
+    def tip_user_from(cls, auto_save=True, **kwargs):
+        try:
+            return cls.objects.get(**kwargs)
+        except cls.DoesNotExist:
+            x = cls(**kwargs)
+            if auto_save: x.save()
+            return x
+
     def get_email(self):
         return self.email_address
 
 
 class TipEvent(models.Model):
-    tipper = models.ForeignKey(TipUser, related_name='tip_events')
+    tipper = models.ForeignKey(TipUser, related_name='tip_events', null=True)
     podcast = models.ForeignKey(Podcast, related_name='tip_events')
     occurred_at = models.DateTimeField(auto_now=True)
-    # if settings.DEBUG:
-    #     occurred_at.editable = True
 
     stripe_charge = models.CharField(max_length=64, null=True)
 

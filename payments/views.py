@@ -1,6 +1,7 @@
 import iso8601
 import rollbar
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import ugettext
 from django.views.decorators.http import require_POST
@@ -31,17 +32,18 @@ def tips(req, podcast_slug):
     pod = get_object_or_404(Podcast, slug=podcast_slug)
     us = UserSettings.get_from_user(pod.owner)
     if not us.stripe_payout_managed_account:
-        redirect(pod.homepage)
+        if pod.homepage:
+            return redirect(pod.homepage)
+        else:
+            raise Http404()
 
-    ctx = {'podcast': pod}
-    if req.GET.get('error'):
-        ctx['error'] = req.GET.get('error')
+    ctx = {'error': req.GET.get('error'),
+           'podcast': pod,
+           'session': req.session.get('pay_session'),
+           'user': {'email': None}}
 
     if req.GET.get(CONFIRMATION_PARAM):
         return views_tips.create_session(req, ctx)
-
-    if not req.session.get('pay_session'):
-        return views_tips.no_session(req, ctx)
 
     return views_tips.tip_flow(req, ctx)
 

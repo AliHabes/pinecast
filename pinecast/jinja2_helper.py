@@ -4,6 +4,7 @@ import json
 import string
 
 import gfm
+import jinja2
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -92,6 +93,7 @@ def environment(**options):
     env.filters['format_tz'] = format_tz
     env.filters['https'] = lambda s: ('https:%s' % s[5:]) if s.startswith('http:') else s
     env.filters['json'] = json.dumps
+    env.filters['safe_json'] = safe_json
     env.filters['markdown'] = gfm.markdown
     env.filters['pretty_date'] = pretty_date
     env.filters['sanitize'] = helpers.sanitize
@@ -194,3 +196,19 @@ def pretty_date(time=None):
     if day_diff < 365:
         return ungettext('{n} month ago', '{n} months ago', day_diff / 30).format(n=day_diff / 30)
     return ungettext('{n} year ago', '{n} years ago', day_diff / 365).format(n=day_diff / 365)
+
+
+def safe_json(data):
+    if data is None:
+        return 'null'
+    elif isinstance(data, bool):
+        return 'true' if data else 'false'
+    elif isinstance(data, (int, long, float)):
+        return str(data)
+    elif isinstance(data, (tuple, list)):
+        return jinja2.Markup('[%s]' % ','.join(safe_json(x) for x in data))
+    elif isinstance(data, dict):
+        return jinja2.Markup('{%s}' % ','.join(
+            '%s:%s' % (safe_json(key), safe_json(val)) for key, val in data.items()))
+    safe_data = str(jinja2.escape(data))
+    return jinja2.Markup(json.dumps(safe_data))

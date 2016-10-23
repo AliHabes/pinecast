@@ -1,6 +1,7 @@
 from urllib import quote
 
 import rollbar
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext
 from django.views.decorators.http import require_POST
@@ -54,6 +55,16 @@ def no_session(req, ctx):
     return _pmrender(req, 'payments/tip_jar/login.html', ctx)
 
 
+def tip_flow(req, ctx, tip_user=None):
+    try:
+        ctx['tipper'] = TipUser.objects.get(id=ctx['session'])
+        ctx['existing_card'] = tip_user.get_card_info()
+    except TipUser.DoesNotExist:
+        pass
+
+    return _pmrender(req, 'payments/tip_jar/main.html', ctx)
+
+
 def create_session(req, ctx):
     validates = validate_confirmation(req)
     email = req.GET.get('email')
@@ -67,18 +78,8 @@ def create_session(req, ctx):
     # saved for that email.
     tip_user = TipUser.objects.get(email_address=email)
 
-    req.session['pay_session'] = tip_user.id
+    ctx['session'] = req.session['pay_session'] = tip_user.id
     return tip_flow(req, ctx, tip_user)
-
-
-def tip_flow(req, ctx, tip_user=None):
-    # Same logic here as above.
-    tip_user = tip_user or TipUser.objects.get(id=req.session['pay_session'])
-
-    ctx['tipper'] = tip_user
-    ctx['existing_card'] = tip_user.get_card_info()
-
-    return _pmrender(req, 'payments/tip_jar/main.html', ctx)
 
 
 @require_POST
@@ -103,9 +104,8 @@ def set_tip_payment_method(req):
 
 @require_POST
 @json_response
-def send_tip(req):
-    if not req.session.get('pay_session'):
-        return {'error': 'no session'}
+def send_tip(req, podcast_slug):
+    pod = get_object_or_404(Podcast, slug=podcast_slug)
 
     try:
         amount = int(req.POST.get('amount'))
@@ -114,45 +114,54 @@ def send_tip(req):
     except Exception:
         return {'error': 'bad amount'}
 
+    tip_type = req.POST.get('type')
+    token = req.POST.get('token')
+    email = req.POST.get('email')
 
-    pod = get_object_or_404(Podcast, slug=req.POST.get('podcast'))
     owner_us = UserSettings.get_from_user(pod.owner)
+    if owner_us.plan == PLAN_DEMO and tip_type == 'subscribe':
+        return {'error': ugettext('You cannot have recurring tips for free podcasts.')}
+
     if amount > PLAN_TIP_LIMITS[owner_us.plan]:
         return {'error': ugettext('That tip is too large for %s') % pod.name}
 
+    # tip_user = get_object_or_404(TipUser, id=req.session['pay_session'])
+    # customer = tip_user.get_stripe_customer()
+    # if not customer:
+    #     return {'error': 'no customer'}
 
-    tip_user = get_object_or_404(TipUser, id=req.session['pay_session'])
-    customer = tip_user.get_stripe_customer()
-    if not customer:
-        return {'error': 'no customer'}
+    if tip_type == 'charge':
+        application_fee = int(amount * 0.05) if owner_us.plan == PLAN_DEMO else 0
+        try:
+            stripe_charge = stripe.Charge.create(
+                amount=amount,
+                application_fee=application_fee,
+                currency='usd',
+                description='Tip for %s' % pod.name,
+                destination=owner_us.stripe_payout_managed_account,
+            )
 
-    application_fee = int(amount * 0.05) if owner_us.plan == PLAN_DEMO else 0
+        except Exception as e:
+            rollbar.report_message('Error when sending tip: %s' % str(e), 'error')
+            return {'error': str(e)}
 
-    try:
-        stripe_charge = stripe.Charge.create(
-            amount=amount,
-            application_fee=application_fee,
-            currency='usd',
-            customer=customer.id,
-            description='Tip for %s' % pod.name,
-            destination=owner_us.stripe_payout_managed_account,
-        )
-
-    except Exception as e:
-        rollbar.report_message('Error when sending tip: %s' % str(e), 'error')
-        return {'error': str(e)}
-
-    else:
         pod.total_tips += amount
         pod.save()
 
+        user_with_email = TipEvent.tip_user_from(email_address=email)
+
         tip_event = TipEvent(
-            tipper=tip_user,
+            tipper=user_with_email,
             podcast=pod,
             amount=amount,
             fee_amount=application_fee,
             stripe_charge=stripe_charge.id)
         tip_event.save()
+
+    elif tip_type == 'subscribe':
+        pass
+    else:
+        return HttpResponse(status=400)
 
     send_notification_email(
         None,
