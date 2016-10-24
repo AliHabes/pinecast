@@ -28,26 +28,6 @@ def upgrade(req):
     return _pmrender(req, 'payments/main.html', ctx)
 
 
-def tips(req, podcast_slug):
-    pod = get_object_or_404(Podcast, slug=podcast_slug)
-    us = UserSettings.get_from_user(pod.owner)
-    if not us.stripe_payout_managed_account:
-        if pod.homepage:
-            return redirect(pod.homepage)
-        else:
-            raise Http404()
-
-    ctx = {'error': req.GET.get('error'),
-           'podcast': pod,
-           'session': req.session.get('pay_session'),
-           'user': {'email': None}}
-
-    if req.GET.get(CONFIRMATION_PARAM):
-        return views_tips.create_session(req, ctx)
-
-    return views_tips.tip_flow(req, ctx)
-
-
 AVAILABLE_PLANS = {
     'demo': payment_plans.PLAN_DEMO,
     'starter': payment_plans.PLAN_STARTER,
@@ -112,26 +92,6 @@ Please contact Pinecast support if you have any questions.''') %
 
     return redirect('upgrade')
 
-
-@require_POST
-@login_required
-@json_response
-def set_payment_method(req):
-    us = UserSettings.get_from_user(req.user)
-    customer = us.get_stripe_customer()
-    try:
-        if customer:
-            customer.source = req.POST.get('token')
-            customer.save()
-        else:
-            us.create_stripe_customer(req.POST.get('token'))
-    except stripe.error.CardError as e:
-        return {'error': ugettext('Card was rejected by the bank. %s') % str(e)}
-    except Exception as e:
-        rollbar.report_message(str(e), 'error')
-        return {'error': ugettext('The card could not be processed')}
-
-    return {'success': True, 'id': us.stripe_customer_id}
 
 @require_POST
 @login_required

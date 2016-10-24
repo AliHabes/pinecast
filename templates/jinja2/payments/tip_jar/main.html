@@ -47,12 +47,22 @@
       <button data-frequency="charge">{{ _('One Time Tip') }}</button>
       <button data-frequency="subscribe">{{ _('Subscribe') }}</button>
     </div>
+
+    <p>
+      {% trans %}
+        Transactions are handled securely by <a href="https://stripe.com">Stripe</a>.
+      {% endtrans %}
+    </p>
   </div>
 </div>
-<div class="tip-success" style="display: none">
-  {{ _('Your tip was submitted to %s. <3') % podcast.name }}
+<div class="tip-success tip-success-charge" style="display: none">
+  {{ _('Your tip was sent to %s! <3') % podcast.name }}
 </div>
-<div class="tip-error error" style="display: none">
+<div class="tip-success tip-success-subscribe" style="display: none">
+  {{ _("We've sent you a confirmation email. Click the link to confirm your subscription.") }}
+</div>
+<div class="tip-error-spec error" style="display: none"></div>
+<div class="tip-error-gen error" style="display: none">
   {{ _('There was a problem submitting your tip. Please try again in a moment.') }}
 </div>
 </div>
@@ -100,19 +110,35 @@ window.addEventListener('load', function() {
   }, true);
 
   function complete(type, token) {
+    document.querySelector('.tip-selection').style.display = 'none';
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
-      //
+      var parsed;
+      try {
+        parsed = JSON.parse(xhr.responseText);
+      } catch (e) {
+        xhr.onerror();
+        return;
+      }
+      if (parsed.error) {
+        var errBox = document.querySelector('.tip-error-spec');
+        errBox.style.display = 'block';
+        errBox.textContent = errBox.innerText = parsed.error;
+      } else {
+        document.querySelector('.tip-success-' + type).style.display = 'block';
+      }
     };
     xhr.onerror = function() {
-      //
+      document.querySelector('.tip-error-gen').style.display = 'block';
     };
     xhr.open('post', {{ url('send_tip', podcast_slug=podcast.slug)|safe_json }}, true);
 
     var fd = new FormData();
     fd.append('type', type);
+    fd.append('amount', amount);
     fd.append('token', token.id);
     fd.append('email', token.email);
+    fd.append('csrfmiddlewaretoken', {{ csrf_token|safe_json }});
     xhr.send(fd);
   }
 

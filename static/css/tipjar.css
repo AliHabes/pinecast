@@ -141,6 +141,15 @@ label > span,
 .tip-frequency button {
     margin: 0 10px;
 }
+.tip-frequency-selector p {
+    color: #ddd;
+    font-size: 0.8em;
+    margin: 2em 0;
+    text-align: center;
+}
+.tip-frequency-selector p a {
+    color: #bbb;
+}
 
 
 input[type=radio] {
@@ -171,4 +180,11 @@ input[type=radio]:focus + span:before {
 }
 input[type=radio]:focus:checked + span:before {
     box-shadow: inset 0 0 0 2px #fff, 0 0 4px #5395D3;
+}
+
+
+.tip_success {
+    color: #23BA5A;
+    padding: 2em 0;
+    text-align: center;
 }

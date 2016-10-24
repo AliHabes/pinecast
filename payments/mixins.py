@@ -21,6 +21,17 @@ class StripeCustomerMixin(object):
 
         self.stripe_customer_id = customer.id
         self.save()
+        return True
+
+    def update_stripe_customer(self, token):
+        if not self.stripe_customer_id:
+            return self.create_stripe_customer(token)
+
+        cust = stripe.Customer.retrieve(self.stripe_customer_id)
+        cust.source = token
+        cust.save()
+
+        return False
 
     def get_stripe_description(self):
         return 'Anonymous'
