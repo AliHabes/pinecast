@@ -267,6 +267,8 @@ def podcast_new_ep(req, podcast_slug):
         naive_publish = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M')  # 2015-07-09T12:00
         adjusted_publish = naive_publish - tz_delta
 
+        image_url = req.POST.get('image-url')
+
         ep = PodcastEpisode(
             podcast=pod,
             title=req.POST.get('title'),
@@ -279,7 +281,7 @@ def podcast_new_ep(req, podcast_slug):
             audio_size=int(req.POST.get('audio-url-size')),
             audio_type=req.POST.get('audio-url-type'),
 
-            image_url=signer.unsign(req.POST.get('image-url')),
+            image_url=signer.unsign(image_url) if image_url else pod.cover_image,
 
             copyright=req.POST.get('copyright'),
             license=req.POST.get('license'),
@@ -317,7 +319,11 @@ def edit_podcast_episode(req, podcast_slug, episode_id):
         ep.audio_size = int(req.POST.get('audio-url-size'))
         ep.audio_type = req.POST.get('audio-url-type')
 
-        ep.image_url = signer.unsign(req.POST.get('image-url'))
+        image_url = req.POST.get('image-url')
+        if image_url:
+            ep.image_url = signer.unsign(req.POST.get('image-url'))
+        else:
+            ep.image_url = pod.cover_image
 
         ep.copyright = req.POST.get('copyright')
         ep.license = req.POST.get('license')
