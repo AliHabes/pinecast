@@ -172,6 +172,48 @@
   </form>
 </div>
 <div class="tab-subscription form-block">
+  {% if user_settings.plan != PLANS.PLAN_DEMO %}
+    <strong>{{ _('Plan') }}</strong>
+
+    <div class="panel">
+      <div class="segment-fill">
+        <b>{{ _('Plan') }}</b><br>
+        {{ PLAN_NAMES[user_settings.plan] }}
+      </div>
+      <div class="segment-fill">
+        <b>{{ _('Payment Method') }}</b><br>
+        {% if user_settings.has_payment_method() %}
+          {{ _('Available') }}
+        {% else %}
+          <span style="color: #b00">{{ _('Not Set') }}</span>
+        {% endif %}
+      </div>
+      <div class="segment-fill">
+        <b>{{ _('Status') }}</b><br>
+        {% set customer = user_settings.get_stripe_customer() %}
+        {% set subscriptions = customer and customer.subscriptions.data %}
+        {% set subscription = subscriptions and subscriptions[0] %}
+        {% if subscription and subscription.status == 'active' %}
+          <span style="color: #0b0">{{ _('Active') }}</span>
+        {% elif subscription and subscription.status == 'past_due' %}
+          <span style="color: #b00">{{ _('Past Due') }}</span>
+        {% elif subscription and subscription.status == 'trialing' %}
+          <span style="color: #0b0">{{ _('Trialing') }}</span>
+        {% elif subscription and subscription.status == 'unpaid' %}
+          <span style="color: #b00">{{ _('Unpaid') }}</span>
+        {% else %}
+          <span style="color: #888">{{ _('Unavailable') }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <p>
+      <a href="{{ url('upgrade') }}">{{ _('Change your plan...') }}</a>
+    </p>
+
+    <hr>
+  {% endif %}
+
   <strong>{{ _('Payment Card') }}</strong>
 
   <aside class="aside--secure">
