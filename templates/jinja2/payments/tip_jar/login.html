@@ -1,6 +1,7 @@
 {% extends 'payments/tip_jar/base.html' %}
 
-{% block content_inner %}
+{% block content %}
+<main>
 <form method="post" action="?" class="card">
 
   {% if error %}
@@ -24,4 +25,5 @@
   <button type="submit">{{ _('Submit') }}</button>
   <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 </form>
+</main>
 {% endblock %}

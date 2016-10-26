@@ -28,9 +28,19 @@ def tip_flow(req, podcast_slug):
         else:
             raise Http404()
 
+    recurring_tip = None
+    pay_session = req.session.get('pay_session')
+    if pay_session:
+        try:
+            tipper = TipUser.objects.get(id=pay_session)
+            recurring_tip = RecurringTip.objects.get(
+                podcast=pod, tipper=tipper, deactivated=False)
+        except Exception as e:
+            raise e
+
     ctx = {'error': req.GET.get('error'),
+           'recurring_tip': recurring_tip,
            'podcast': pod,
-           'session': req.session.get('pay_session'),
            'user': {'email': None}}
 
     return _pmrender(req, 'payments/tip_jar/main.html', ctx)
@@ -242,7 +252,7 @@ def confirm_sub(req, podcast_slug):
 
 
 def subscriptions(req):
-    if not req.session['pay_session']:
+    if not req.session.get('pay_session'):
         return redirect('tip_jar_login')
 
     tip_user = get_object_or_404(TipUser, id=req.session['pay_session'])
@@ -251,14 +261,15 @@ def subscriptions(req):
 
 
 def subscriptions_login(req):
+    email = req.GET.get('email', req.POST.get('email'))
     if req.GET.get(CONFIRMATION_PARAM):
         validated = validate_confirmation(req)
         if validated:
             try:
-                tip_user = TipUser.objects.get(email=req.GET.get('email'))
+                tip_user = TipUser.objects.get(email=email)
             except TipUser.DoesNotExist:
                 # Verified because they just confirmed their email
-                tip_user = TipUser(email=req.GET.get('email'), verified=True)
+                tip_user = TipUser(email=email, verified=True)
                 tip_user.save()
 
             req.session['pay_session'] = tip_user.id
@@ -276,12 +287,12 @@ def subscriptions_login(req):
             'to see your podcast subscriptions.'),
         reverse('tip_jar_login') + '?email=%s' % quote(email))
 
-    return _pmrender(req, 'payments/tip_jar/check_email.html', ctx)
+    return _pmrender(req, 'payments/tip_jar/check_email.html')
 
 
 @require_POST
 def cancel_sub(req, podcast_slug):
-    if not req.session['pay_session']:
+    if not req.session.get('pay_session'):
         return redirect('tip_jar_login')
 
     try:

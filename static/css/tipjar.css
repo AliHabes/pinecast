@@ -162,7 +162,7 @@ input[type=radio] {
     width: 0;
 }
 input[type=radio] + span:before {
-    border: 1px solid #dcdada;
+    border: 1px solid #bbb;
     border-radius: 25px;
     content: "";
     display: block;
@@ -238,4 +238,21 @@ input[type=radio]:focus:checked + span:before {
 .existing-tip .buttons .btn--danger {
     border-color: #b00;
     color: #b00;
+}
+
+.existing-tip-banner {
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    margin: 0 50px 40px;
+    padding: 20px;
+    text-align: center;
+}
+
+.existing-tip-login {
+    text-align: center;
+    font-size: 12px;
+    margin-bottom: 20px;
+}
+.existing-tip-login a {
+    color: #bbb;
 }

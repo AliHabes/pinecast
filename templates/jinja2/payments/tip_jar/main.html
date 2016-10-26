@@ -3,9 +3,20 @@
 {% block title %}{{ podcast.name }}{% endblock %}
 
 {% block content_inner %}
+{% if recurring_tip %}
+  <div class="existing-tip-banner">
+    {% trans subs_url=url('tip_jar_subs') %}
+      You have an active subscription to this podcast already. <a href="{{ subs_url }}">Manage subscriptions...</a>
+    {% endtrans %}
+  </div>
+{% endif %}
 <div class="tip-selection">
   <div class="tip-amount-selector-wrapper label">
-    <span>{{ _('How much would you like to contribute?') }}</span>
+    {% if recurring_tip %}
+      <span>{{ _('How much would you update your monthly contribution to?') }}</span>
+    {% else %}
+      <span>{{ _('How much would you like to contribute?') }}</span>
+    {% endif %}
     <div class="tip-amount-selector">
       <label>
         <input type="radio" name="amount" value="100">
@@ -44,11 +55,19 @@
     </div>
   </div>
   <div class="tip-frequency-selector label" style="display: none">
-    <span>{{ _('Do you want to send a one-time tip or become a monthly donor?') }}</span>
-    <div class="tip-frequency">
-      <button data-frequency="charge">{{ _('One Time Tip') }}</button>
-      <button data-frequency="subscribe">{{ _('Subscribe') }}</button>
-    </div>
+    {% if recurring_tip %}
+      <span>{{ _('Do you want to send a one-time tip or update your subscription?') }}</span>
+      <div class="tip-frequency">
+        <button data-frequency="charge">{{ _('New One Time Tip') }}</button>
+        <button data-frequency="subscribe">{{ _('Update Subscription') }}</button>
+      </div>
+    {% else %}
+      <span>{{ _('Do you want to send a one-time tip or become a monthly donor?') }}</span>
+      <div class="tip-frequency">
+        <button data-frequency="charge">{{ _('One Time Tip') }}</button>
+        <button data-frequency="subscribe">{{ _('Subscribe') }}</button>
+      </div>
+    {% endif %}
 
     <p>
       {% trans %}
@@ -56,6 +75,13 @@
       {% endtrans %}
     </p>
   </div>
+  {% if not recurring_tip %}
+    <p class="existing-tip-login">
+      <a href="{{ url('tip_jar_login') }}">
+        {{ _('Already a subscriber?') }}
+      </a>
+    </p>
+  {% endif %}
 </div>
 <div class="tip-success tip-success-charge" style="display: none">
   {{ _('Your tip was sent to %s! <3') % podcast.name }}
@@ -67,7 +93,6 @@
 <div class="tip-error-spec error" style="display: none"></div>
 <div class="tip-error-gen error" style="display: none">
   {{ _('There was a problem submitting your tip. Please try again in a moment.') }}
-</div>
 </div>
 {% endblock %}
 
