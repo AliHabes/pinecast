@@ -53,6 +53,11 @@ def upgrade_set_plan(req):
         if existing_subs:
             existing_sub = existing_subs[0]
             existing_sub.delete()
+
+        for podcast in req.user.podcast_set.all():
+            for tip in podcast.recurring_tips.all():
+                tip.cancel()
+
         us.plan = payment_plans.PLAN_DEMO
         us.save()
         return redirect('upgrade')

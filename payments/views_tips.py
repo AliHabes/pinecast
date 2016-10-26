@@ -148,7 +148,8 @@ def confirm_sub(req, podcast_slug):
     # TODO: confirm that the podcast can receive subscriptions
     pod = get_object_or_404(Podcast, slug=podcast_slug)
     owner_us = UserSettings.get_from_user(pod.owner)
-    if not owner_us.stripe_payout_managed_account:
+    if (not owner_us.stripe_payout_managed_account or
+        owner_us.plan == PLAN_DEMO):
         return HttpResponse(status=400)
 
     amount = int(req.GET.get('amount'))
@@ -295,12 +296,6 @@ def cancel_sub(req, podcast_slug):
     except RecurringTip.DoesNotExist:
         return redirect('tip_jar_subs')
 
-    subscription = stripe.Subscription.retrieve(
-        recurring_tip.stripe_subscription_id,
-        stripe_account=UserSettings.get_from_user(pod.owner).stripe_payout_managed_account)
-    subscription.delete()
-
-    recurring_tip.deactivated = True
-    recurring_tip.save()
+    recurring_tip.cancel()
 
     return redirect('tip_jar_subs')

@@ -5,6 +5,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy
 
 from .stripe_lib import stripe
+from accounts.models import UserSettings
 from payments.mixins import StripeCustomerMixin
 from podcasts.models import Podcast
 
@@ -44,6 +45,16 @@ class RecurringTip(models.Model):
 
     def get_subscription(self):
         return stripe.Subscription.retrieve(self.stripe_subscription_id)
+
+    def cancel(self):
+        us = UserSettings.get_from_user(pod.owner)
+        subscription = stripe.Subscription.retrieve(
+            self.stripe_subscription_id,
+            stripe_account=us.stripe_payout_managed_account)
+        subscription.delete()
+
+        self.deactivated = True
+        self.save()
 
 
 class TipEvent(models.Model):

@@ -231,6 +231,10 @@ def edit_podcast(req, podcast_slug):
 def delete_podcast(req, podcast_slug):
     # This doesn't use `get_podcast` because only the owner may delete the podcast
     pod = get_object_or_404(Podcast, slug=podcast_slug, owner=req.user)
+
+    for tip in pod.recurring_tips.all():
+        tip.cancel()
+
     pod.delete()
     return redirect('dashboard')
 
