@@ -27,10 +27,12 @@ def environment(**options):
     env = Environment(**options)
     env.globals.update({
         'static': staticfiles_storage.url,
+
         'dir': dir,
         'float': float,
         'int': int,
         'len': len,
+        'now': lambda: datetime.datetime.now(),
         'sorted': sorted,
         'str': str,
         'url': helpers.reverse,

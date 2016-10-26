@@ -346,6 +346,16 @@ def edit_podcast_episode(req, podcast_slug, episode_id):
         return redirect(reverse('podcast_episode', podcast_slug=pod.slug, episode_id=str(ep.id)) + '?error=true#edit')
     return redirect('podcast_episode', podcast_slug=pod.slug, episode_id=str(ep.id))
 
+@require_POST
+@login_required
+def podcast_episode_publish_now(req, podcast_slug, episode_id):
+    pod = get_podcast(req, podcast_slug)
+    ep = get_object_or_404(PodcastEpisode, id=episode_id, podcast=pod)
+
+    ep.publish = datetime.datetime.now()
+    ep.save()
+
+    return redirect('podcast_episode', podcast_slug=pod.slug, episode_id=str(ep.id))
 
 @login_required
 def podcast_episode(req, podcast_slug, episode_id):

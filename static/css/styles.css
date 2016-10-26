@@ -1734,3 +1734,37 @@ main > header h2 {
         display: none;
     }
 }
+
+.future-publish {
+    position: relative;
+}
+.future-publish form {
+    display: none;
+}
+.future-publish:hover form {
+    align-items: center;
+    bottom: 0;
+    display: flex;
+    left: 0;
+    line-height: 1.25em;
+    margin: auto;
+    position: absolute;
+    top: 0;
+}
+.future-publish abbr {
+    display: inline-block;
+    line-height: 1.25em;
+}
+.future-publish:hover abbr {
+    visibility: hidden;
+}
+
+.future-publish .btn {
+    background: transparent;
+    border: 1px solid #666;
+    border-radius: 2px;
+    color: #666;
+    margin: 0;
+    padding: 4px 6px;
+    text-transform: none;
+}
