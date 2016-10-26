@@ -23,9 +23,9 @@ input[type="number"],
 input[type="password"],
 input[type="datetime-local"],
 textarea {
-    background: #FBFBFB;
-    border: 1px solid #DCDADA;
-    border-radius: 3px;
+    background: #fdfdfd;
+    border: 1px solid #bbb;
+    border-radius: 2px;
     box-shadow: 0 0 0 transparent;
     font-size: 14px;
     margin: 2px 0 5px;

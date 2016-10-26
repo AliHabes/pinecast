@@ -10,7 +10,7 @@ from podcasts.models import Podcast, PodcastEpisode
 
 
 class AssetImportRequest(models.Model):
-    created = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     podcast = models.ForeignKey(Podcast, null=True, blank=True)
     episode = models.ForeignKey(PodcastEpisode, null=True, blank=True)

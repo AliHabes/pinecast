@@ -15,7 +15,7 @@ PyYAML==3.11
 requests==2.8.1
 rollbar==0.13.5
 six==1.9.0
-stripe==1.27.1
+stripe==1.41.0
 ua-parser==0.3.6
 user-agents==0.3.2
 wsgiref==0.1.2

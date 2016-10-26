@@ -1,0 +1,45 @@
+{% extends 'payments/tip_jar/base.html' %}
+
+{% block content %}
+<main>
+  <div class="card">
+    <hgroup>
+      <h1>{{ _('Podcast Subscriptions') }}</h1>
+    </hgroup>
+
+    {% set rts = tip_user.recurring_tips.filter(deactivated=False) %}
+    {% if rts.count() %}
+      <p>{{ _('These are the podcasts that you currently contribute to every month.') }}</p>
+
+      <ul class="existing-tips">
+        {% for rt in rts.all() %}
+          <li class="card existing-tip">
+            <strong>{{ rt.podcast.name }}</strong>
+            <div>
+              <span>
+                <b>{{ _('Amount') }}</b>
+                {{ '$%.2f' % (float(rt.amount) / 100) }}
+              </span>
+              <span>
+                <b>{{ _('Start Date') }}</b>
+                <abbr title="{{ rt.created }}">
+                  {{ rt.created|pretty_date }}
+                </abbr>
+              </span>
+            </div>
+            <div class="buttons">
+              <a class="btn" href="{{ url('tip_jar', podcast_slug=rt.podcast.slug) }}">Update</a>
+              <form action="{{ url('cancel_sub', podcast_slug=rt.podcast.slug) }}" method="post">
+                <button class="btn btn--danger">Cancel</button>
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>{{ _('You currently do not subscribe to any podcasts.') }}</p>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

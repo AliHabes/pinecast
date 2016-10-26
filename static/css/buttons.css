@@ -5,12 +5,12 @@ button, .btn {
     -webkit-appearance: none;
     background: #5395D3;
     border: 0;
-    border-radius: 3px;
+    border-radius: 2px;
     box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
     color: #fff;
     cursor: pointer;
     display: block;
-    font-size: 13px;
+    font-size: 14px;
     margin: 20px 0;
     padding: 9px 30px;
     position: relative;

@@ -96,7 +96,7 @@ class SiteBlogPost(models.Model):
     site = models.ForeignKey(Site)
     title = models.CharField(max_length=512)
     slug = models.SlugField()
-    created = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
     publish = models.DateTimeField()
     body = models.TextField()
 

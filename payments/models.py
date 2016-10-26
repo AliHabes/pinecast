@@ -12,7 +12,7 @@ from podcasts.models import Podcast
 class TipUser(models.Model):
     email_address = models.EmailField(blank=True, null=True)
 
-    created = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
     verified = models.BooleanField(default=False)
 
     @classmethod
@@ -32,6 +32,8 @@ class RecurringTip(models.Model):
     tipper = models.ForeignKey(TipUser, related_name='recurring_tips')
     podcast = models.ForeignKey(Podcast, related_name='recurring_tips')
 
+    created = models.DateTimeField(auto_now_add=True)
+
     amount = models.PositiveIntegerField(
         default=0, help_text=ugettext_lazy('Value of recurring tip in cents'))
 
@@ -47,7 +49,7 @@ class RecurringTip(models.Model):
 class TipEvent(models.Model):
     tipper = models.ForeignKey(TipUser, related_name='tip_events', null=True)
     podcast = models.ForeignKey(Podcast, related_name='tip_events')
-    occurred_at = models.DateTimeField(auto_now=True)
+    occurred_at = models.DateTimeField(auto_now_add=True)
 
     stripe_charge = models.CharField(max_length=64, null=True)
     recurring_tip = models.ForeignKey(RecurringTip, related_name='tip_events', null=True)

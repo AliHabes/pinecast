@@ -4,7 +4,7 @@ from podcasts.models import Podcast, PodcastEpisode
 
 
 class Feedback(models.Model):
-    created = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     podcast = models.ForeignKey(Podcast)
     episode = models.ForeignKey(PodcastEpisode, null=True, blank=True)

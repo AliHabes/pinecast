@@ -11,48 +11,12 @@ from .stripe_lib import stripe
 from accounts.payment_plans import PLAN_DEMO, PLAN_TIP_LIMITS
 from accounts.models import UserSettings
 from dashboard.views import _pmrender
-from pinecast.email import (send_anon_confirmation_email as send_email,
+from pinecast.email import (CONFIRMATION_PARAM,
+                            send_anon_confirmation_email as send_email,
                             send_notification_email,
                             validate_confirmation)
 from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import Podcast
-
-
-# def no_session(req, ctx):
-#     if not req.POST:
-#         return _pmrender(req, 'payments/tip_jar/login.html', ctx)
-
-#     has_user = False
-#     if req.POST.get('email'):
-#         email = req.POST.get('email')
-#         tip_user = None
-#         try:
-#             tip_user = TipUser.objects.get(email_address=email)
-#             has_user = True
-#         except TipUser.DoesNotExist:
-#             try:
-#                 tip_user = TipUser(email_address=email)
-#                 tip_user.save()
-#                 has_user = True
-#             except Exception as e:
-#                 pass
-
-#         if has_user:
-#             send_email(
-#                 email,
-#                 ugettext('Leave a tip for %s') % ctx['podcast'].name,
-#                 ugettext(
-#                     'Thanks for verifying your email! Click the link below '
-#                     'to choose your level of support for %s.' %
-#                     ctx['podcast'].name),
-#                 reverse('tip_jar', podcast_slug=ctx['podcast'].slug) +
-#                 '?email=%s' % quote(email))
-
-#     if has_user:
-#         return _pmrender(req, 'payments/tip_jar/check_email.html', ctx)
-
-#     ctx['error'] = ugettext('That email address did not work.')
-#     return _pmrender(req, 'payments/tip_jar/login.html', ctx)
 
 
 def tip_flow(req, podcast_slug):
@@ -69,27 +33,7 @@ def tip_flow(req, podcast_slug):
            'session': req.session.get('pay_session'),
            'user': {'email': None}}
 
-    # if req.GET.get(CONFIRMATION_PARAM):
-    #     return views_tips.create_session(req, ctx)
-
     return _pmrender(req, 'payments/tip_jar/main.html', ctx)
-
-
-# def create_session(req, ctx):
-#     validates = validate_confirmation(req)
-#     email = req.GET.get('email')
-#     if not validates or not email:
-#         return redirect(
-#             reverse('tip_jar', podcast_slug=ctx['podcast'].slug) +
-#             '?error=bad_token')
-
-#     # This should never throw, unless the TipUser was manually deleted.
-#     # The validated URL should never have been created if a TipUser was not
-#     # saved for that email.
-#     tip_user = TipUser.objects.get(email_address=email)
-
-#     ctx['session'] = req.session['pay_session'] = tip_user.id
-#     return tip_flow(req, ctx, tip_user)
 
 
 @require_POST
@@ -115,9 +59,9 @@ def send_tip(req, podcast_slug):
 
 
     if tip_type == 'charge':
-        return _send_one_time_tip(req, podcast, owner_us, amount)
+        return _send_one_time_tip(req, pod, owner_us, amount)
     elif tip_type == 'subscribe':
-        return _auth_subscription(req, podcast, amount)
+        return _auth_subscription(req, pod, amount)
     else:
         return HttpResponse(status=400)
 
@@ -156,15 +100,16 @@ def _send_one_time_tip(req, podcast, owner_us, amount):
 
     send_notification_email(
         None,
-        'Thanks for leaving a tip!',
-        'Your tip was sent: %s received $%0.2f. Thanks for supporting your '
-        'favorite content creators!' % (podcast.name, float(amount) / 100),
+        ugettext('Thanks for leaving a tip!'),
+        ugettext('Your tip was sent: %s received $%0.2f. Thanks for supporting your '
+                 'favorite content creators!') %
+            (podcast.name, float(amount) / 100),
         email=email)
     send_notification_email(
         podcast.owner,
-        'Your podcast was tipped!',
-        '%s received a tip of $%0.2f from %s. You should send them an email '
-        'thanking them for their generosity.' % (
+        ugettext('Your podcast was tipped!'),
+        ugettext('%s received a tip of $%0.2f from %s. You should send them an email '
+                 'thanking them for their generosity.') % (
             podcast.name, float(amount) / 100, tip_user.email_address))
 
     return {'success': True}
@@ -222,7 +167,7 @@ def confirm_sub(req, podcast_slug):
     try:
         sub = RecurringTip.objects.get(tipper=tip_user, podcast=pod, deactivated=False)
         if sub.amount == amount:
-            return _render_subscriptions_page(req)
+            return redirect('tip_jar_subs')
 
         # Update Stripe with the new amount
         sub_obj = sub.get_subscription()
@@ -238,9 +183,23 @@ def confirm_sub(req, podcast_slug):
             pod.total_tips += amount - old_amount
             pod.save()
 
-        return _render_subscriptions_page(req)
+        return redirect('tip_jar_subs')
     except RecurringTip.DoesNotExist:
         pass
+
+    managed_account = owner_us.stripe_payout_managed_account
+
+    # Check that the tip sub plan exists
+    plans = stripe.Plan.list(stripe_account=managed_account)
+    if not plans.data:
+        stripe.Plan.create(
+            amount=100,
+            currency='usd',
+            id='tipsub',
+            interval='month',
+            name='Podcast Tip Jar',
+            statement_descriptor='PODCAST TIP JAR',
+            stripe_account=managed_account)
 
     # Create the customer associated with the managed account
     sub = RecurringTip(tipper=tip_user, podcast=pod, amount=amount)
@@ -248,8 +207,8 @@ def confirm_sub(req, podcast_slug):
         email=email,
         plan='tipsub',
         quantity=amount / 100,
-        stripe_account=owner_us.stripe_payout_managed_account,
-    )
+        source=token,
+        stripe_account=managed_account)
     sub.stripe_customer_id = customer.id
     sub.stripe_subscription_id = customer.subscriptions.data[0].id
     sub.save()
@@ -266,19 +225,82 @@ def confirm_sub(req, podcast_slug):
 
     send_notification_email(
         None,
-        'Thanks for leaving a tip!',
-        'Your tip was sent: %s received $%0.2f. Thanks for supporting your '
-        'favorite content creators!' % (pod.name, float(amount) / 100),
+        ugettext('Thanks for leaving a tip!'),
+        ugettext('Your tip was sent: %s received $%0.2f. Thanks for supporting your '
+                 'favorite content creators!') % (pod.name, float(amount) / 100),
         email=email)
     send_notification_email(
         pod.owner,
-        'Your podcast was tipped!',
-        '%s received a tip of $%0.2f from %s. You should send them an email '
-        'thanking them for their generosity.' % (
+        ugettext('Someone subscribed to your podcast!'),
+        ugettext('%s received a tip of $%0.2f from %s. Their subscription will '
+                 'pay out once every month. You should send them an email '
+                 'thanking them for their generosity.') % (
             pod.name, float(amount) / 100, email))
 
-    return _render_subscriptions_page(req)
+    return redirect('tip_jar_subs')
 
 
-def _render_subscriptions_page(req):
-    pass
+def subscriptions(req):
+    if not req.session['pay_session']:
+        return redirect('tip_jar_login')
+
+    tip_user = get_object_or_404(TipUser, id=req.session['pay_session'])
+    ctx = {'tip_user': tip_user}
+    return _pmrender(req, 'payments/tip_jar/subscriptions.html', ctx)
+
+
+def subscriptions_login(req):
+    if req.GET.get(CONFIRMATION_PARAM):
+        validated = validate_confirmation(req)
+        if validated:
+            try:
+                tip_user = TipUser.objects.get(email=req.GET.get('email'))
+            except TipUser.DoesNotExist:
+                # Verified because they just confirmed their email
+                tip_user = TipUser(email=req.GET.get('email'), verified=True)
+                tip_user.save()
+
+            req.session['pay_session'] = tip_user.id
+            return redirect('tip_jar_subs')
+        # fallthrough
+
+    if not req.POST:
+        return _pmrender(req, 'payments/tip_jar/login.html')
+
+    send_email(
+        req.POST.get('email'),
+        ugettext('Podcast Tip Jar - Email Verification'),
+        ugettext(
+            'Thanks for verifying your email! Click the link below '
+            'to see your podcast subscriptions.'),
+        reverse('tip_jar_login') + '?email=%s' % quote(email))
+
+    return _pmrender(req, 'payments/tip_jar/check_email.html', ctx)
+
+
+@require_POST
+def cancel_sub(req, podcast_slug):
+    if not req.session['pay_session']:
+        return redirect('tip_jar_login')
+
+    try:
+        pod = Podcast.objects.get(slug=podcast_slug)
+    except Podcast.DoesNotExist:
+        return redirect('tip_jar_subs')
+
+    tipper = TipUser.objects.get(id=req.session['pay_session'])
+
+    try:
+        recurring_tip = RecurringTip.objects.get(tipper=tipper, podcast=pod, deactivated=False)
+    except RecurringTip.DoesNotExist:
+        return redirect('tip_jar_subs')
+
+    subscription = stripe.Subscription.retrieve(
+        recurring_tip.stripe_subscription_id,
+        stripe_account=UserSettings.get_from_user(pod.owner).stripe_payout_managed_account)
+    subscription.delete()
+
+    recurring_tip.deactivated = True
+    recurring_tip.save()
+
+    return redirect('tip_jar_subs')

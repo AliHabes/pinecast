@@ -36,7 +36,7 @@ class Podcast(models.Model):
     name = models.CharField(max_length=256)
     subtitle = models.CharField(max_length=512, default='', blank=True)
 
-    created = models.DateTimeField(auto_now=True, editable=False)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
     cover_image = models.URLField(max_length=500)
     description = models.TextField(blank=True)
     is_explicit = models.BooleanField(default=False)
@@ -193,7 +193,7 @@ class PodcastEpisode(models.Model):
     podcast = models.ForeignKey(Podcast)
     title = models.CharField(max_length=1024)
     subtitle = models.CharField(max_length=1024, default='', blank=True)
-    created = models.DateTimeField(auto_now=True, editable=False)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
     publish = models.DateTimeField()
     description = models.TextField(default='')
     duration = models.PositiveIntegerField(

@@ -52,7 +52,7 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
 class Network(models.Model):
     owner = models.ForeignKey(User, related_name='network_ownership')
     name = models.CharField(max_length=256)
-    created = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     image_url = models.URLField(blank=True, null=True, max_length=500)
     deactivated = models.BooleanField(default=False)

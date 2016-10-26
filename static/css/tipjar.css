@@ -183,8 +183,59 @@ input[type=radio]:focus:checked + span:before {
 }
 
 
-.tip_success {
+.tip-success {
     color: #23BA5A;
+    line-height: 2em;
     padding: 2em 0;
     text-align: center;
+}
+
+.existing-tips {
+    list-style: none;
+    padding: 0;
+}
+.card.existing-tip {
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    margin-bottom: 15px;
+    padding: 15px;
+}
+.existing-tip strong {
+    display: block;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.existing-tip > div {
+    display: flex;
+}
+.existing-tip > div > span {
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+    font-weight: 400;
+    margin-right: 20px;
+}
+.existing-tip > div > span > b {
+    color: #aaa;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.existing-tip .buttons {
+    display: flex;
+    padding-top: 10px;
+}
+.existing-tip .buttons .btn {
+    color: #666;
+    background: transparent;
+    border: 1px solid #000;
+    border-radius: 3px;
+    margin: 0 10px 0 0;
+    padding: 4px 6px;
+    text-transform: none;
+}
+.existing-tip .buttons .btn--danger {
+    border-color: #b00;
+    color: #b00;
 }

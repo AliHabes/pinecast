@@ -28,6 +28,8 @@ def environment(**options):
     env.globals.update({
         'static': staticfiles_storage.url,
         'dir': dir,
+        'float': float,
+        'int': int,
         'len': len,
         'sorted': sorted,
         'str': str,
