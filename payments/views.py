@@ -1,13 +1,17 @@
+import json
+
 import iso8601
 import rollbar
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 import accounts.payment_plans as payment_plans
 import views_tips
+from .models import RecurringTip, TipEvent
 from .stripe_lib import stripe
 from accounts.models import UserSettings
 from dashboard.views import _pmrender
@@ -164,3 +168,37 @@ def set_tip_cashout(req):
             req.POST.get('token'), ip, legal_entity)
 
     return {'success': True}
+
+
+@csrf_exempt
+@require_POST
+def hook(req):
+    try:
+        body = json.loads(req.body)
+        event = stripe.Event.retrieve(body['id'])
+    except Exception:
+        return HttpResponse(status=400)
+
+    if event.type != 'invoice.payment_succeeded':
+        return HttpResponse(status=200)
+
+    try:
+        sub = RecurringTip.objects.get(
+            stripe_subscription_id=event.data.object.subscription)
+    except RecurringTip.DoesNotExist:
+        return HttpResponse(status=200)
+
+    amount = event.data.object.total
+    pod = sub.podcast
+
+    tip_event = TipEvent(
+        tipper=sub.tipper,
+        podcast=pod,
+        amount=amount,
+        recurring_tip=sub)
+    tip_event.save()
+
+    pod.total_tips += amount
+    pod.save()
+
+    return HttpResponse(status=200)

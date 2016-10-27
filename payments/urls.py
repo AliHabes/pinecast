@@ -13,6 +13,8 @@ urlpatterns = [
     url(r'^upgrade$', views.upgrade, name='upgrade'),
     url(r'^upgrade/set_plan$', views.upgrade_set_plan, name='upgrade_set_plan'),
 
+    url(r'^hook$', views.hook, name='payments_webhook'),
+
     url(r'^services/set_payment_method_redir$', views.set_payment_method_redir, name='set_payment_method_redir'),
     url(r'^services/send_tip/(?P<podcast_slug>[\w-]+)$', views_tips.send_tip, name='send_tip'),
     url(r'^services/cancel_sub/(?P<podcast_slug>[\w-]+)$', views_tips.cancel_sub, name='cancel_sub'),

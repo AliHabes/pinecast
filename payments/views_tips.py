@@ -224,15 +224,18 @@ def confirm_sub(req, podcast_slug):
     sub.stripe_subscription_id = customer.subscriptions.data[0].id
     sub.save()
 
-    tip_event = TipEvent(
-        tipper=tip_user,
-        podcast=pod,
-        amount=amount,
-        recurring_tip=sub)
-    tip_event.save()
 
-    pod.total_tips += amount
-    pod.save()
+    # We don't update total_tips or create a tip event here. That happens when
+    # the web hook from Stripe tells us that the payment succeeded.
+
+    # tip_event = TipEvent(
+    #     tipper=tip_user,
+    #     podcast=pod,
+    #     amount=amount,
+    #     recurring_tip=sub)
+    # tip_event.save()
+    # pod.total_tips += amount
+    # pod.save()
 
     send_notification_email(
         None,
