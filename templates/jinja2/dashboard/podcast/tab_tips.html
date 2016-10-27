@@ -78,6 +78,7 @@
     <thead>
       <tr>
         <th>{{ _('Tipper') }}</th>
+        <th>{{ _('Type') }}</th>
         <th>{{ _('Tip Amount') }}</th>
         <th>{{ _('Date') }}</th>
       </tr>
@@ -87,6 +88,9 @@
         <tr>
           <td>
             <a href="mailto:{{ tip.tipper.get_email() }}">{{ tip.tipper.get_email() }}</a>
+          </td>
+          <td>
+            {{ _('Recurring') if tip.recurring_tip else _('One-Time') }}
           </td>
           <td>{{ '$%.2f' % (tip.amount / 100) }}</td>
           <td>{{ tip.occurred_at|pretty_date }}</td>

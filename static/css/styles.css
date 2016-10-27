@@ -663,6 +663,16 @@ menu.toolbar-right li {
         linear-gradient(#148, #148) repeat-x;
     color: #148;
 }
+.form-block aside.aside--danger {
+    border-color: #b00;
+    color: #D31010;
+}
+.form-block aside.aside--danger a {
+    background-image: linear-gradient(#F8F9FA, #F8F9FA) no-repeat,
+        linear-gradient(#F8F9FA, #F8F9FA) no-repeat,
+        linear-gradient(#D31010, #D31010) repeat-x;
+    color: #D31010;
+}
 
 @media (max-width: 1000px) {
     .form-block aside {
