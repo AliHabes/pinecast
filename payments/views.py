@@ -2,6 +2,7 @@ import json
 
 import iso8601
 import rollbar
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
@@ -175,20 +176,23 @@ def set_tip_cashout(req):
 def hook(req):
     try:
         body = json.loads(req.body)
-        event = stripe.Event.retrieve(body['id'])
+
+        # Validate the event
+        if not settings.DEBUG:
+            stripe.Event.retrieve(body['id'], stripe_account=body['user_id'])
     except Exception:
         return HttpResponse(status=400)
 
-    if event.type != 'invoice.payment_succeeded':
+    if body['type'] != 'invoice.payment_succeeded':
         return HttpResponse(status=200)
 
     try:
         sub = RecurringTip.objects.get(
-            stripe_subscription_id=event.data.object.subscription)
+            stripe_subscription_id=body['data']['object']['subscription'])
     except RecurringTip.DoesNotExist:
         return HttpResponse(status=200)
 
-    amount = event.data.object.total
+    amount = body['data']['object']['total']
     pod = sub.podcast
 
     tip_event = TipEvent(
