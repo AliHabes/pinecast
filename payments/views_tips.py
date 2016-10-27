@@ -155,7 +155,6 @@ def confirm_sub(req, podcast_slug):
     if not validate_confirmation(req):
         return _pmrender(req, 'payments/tip_jar/bad_link.html', ctx)
 
-    # TODO: confirm that the podcast can receive subscriptions
     pod = get_object_or_404(Podcast, slug=podcast_slug)
     owner_us = UserSettings.get_from_user(pod.owner)
     if (not owner_us.stripe_payout_managed_account or

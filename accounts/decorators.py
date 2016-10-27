@@ -16,7 +16,6 @@ def restrict_minimum_plan(minimum_plan):
 
             uset = UserSettings.get_from_user(req.user)
             if not payment_plans.minimum(uset.plan, minimum_plan):
-                # TODO: Redirect to an upgrade page
                 return HttpResponseForbidden('Your plan does not allow you to use that feature')
 
             return view(*args, **kwargs)
