@@ -82,7 +82,7 @@ def _send_one_time_tip(req, podcast, owner_us, amount):
 
     tip_user = TipUser.tip_user_from(email_address=email)
 
-    application_fee = int(amount * 0.05) if owner_us.plan == PLAN_DEMO else 0
+    application_fee = int(amount * 0.3) if owner_us.plan == PLAN_DEMO else 0
     try:
         stripe_charge = stripe.Charge.create(
             amount=amount,
