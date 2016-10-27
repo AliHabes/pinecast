@@ -72,6 +72,29 @@
   </div>
 </section>
 
+{% set recurring_tips = podcast.recurring_tips.filter(deactivated=False).order_by('-created') %}
+{% if recurring_tips.count() %}
+  <table class="card">
+    <thead>
+      <tr>
+        <th>{{ _('Subscriber') }}</th>
+        <th>{{ _('Monthly Amount') }}</th>
+        <th>{{ _('Subscription Start') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tip in recurring_tips %}
+        <tr>
+          <td>
+            <a href="mailto:{{ tip.tipper.get_email() }}">{{ tip.tipper.get_email() }}</a>
+          </td>
+          <td>{{ '$%.2f' % (tip.amount / 100) }}</td>
+          <td>{{ tip.created|pretty_date }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
 {% set podcast_tips = podcast.tip_events.order_by('-occurred_at') %}
 {% if podcast_tips.count() %}
   <table class="card">

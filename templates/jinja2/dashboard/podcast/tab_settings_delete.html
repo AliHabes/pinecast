@@ -1,6 +1,6 @@
 <strong>{{ _('Delete %s') % podcast.name }}</strong>
 
-{% if podcast.recurring_tips.count() %}
+{% if podcast.recurring_tips.filter(deactivated=False).count() %}
   <aside class="aside--danger">
     <p>{{ _('This podcast has active recurring tips. If you delete the podcast, those subscriptions will be permanently cancelled.') }}</p>
   </aside>
