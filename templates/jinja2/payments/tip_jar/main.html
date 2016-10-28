@@ -39,7 +39,7 @@
           <input type="radio" name="amount" value="2000">
           <span>$20</span>
         </label>
-        {% if minimum_plan(podcast.owner, PLANS.PLANS_COMMUNITY) %}
+        {% if minimum_plan(podcast.owner, PLANS.PLAN_COMMUNITY) %}
           <label>
             <input type="radio" name="amount" value="5000">
             <span>$50</span>
@@ -89,9 +89,13 @@
 <div class="tip-success tip-success-charge" style="display: none">
   {{ _('Your tip was sent to %s! <3') % podcast.name }}
 </div>
-<div class="tip-success tip-success-subscribe" style="display: none">
+<div class="tip-success tip-success-subscribe-pending" style="display: none">
   {{ _("We've sent you a confirmation email.") }}<br>
   {{ _('Click the link to confirm your subscription.') }}
+</div>
+<div class="tip-success tip-success-subscribe-complete" style="display: none">
+  {{ _("You're all set!") }}<br>
+  {{ _('You are now a subscriber of %s.') % podcast.name }}
 </div>
 <div class="tip-error-spec error" style="display: none"></div>
 <div class="tip-error-gen error" style="display: none">
@@ -158,7 +162,11 @@ window.addEventListener('load', function() {
         errBox.style.display = 'block';
         errBox.textContent = errBox.innerText = parsed.error;
       } else {
-        document.querySelector('.tip-success-' + type).style.display = 'block';
+        if (parsed.status) {
+          document.querySelector('.tip-success-' + type + '-' + parsed.status).style.display = 'block';
+        } else {
+          document.querySelector('.tip-success-' + type).style.display = 'block';
+        }
       }
     };
     xhr.onerror = function() {

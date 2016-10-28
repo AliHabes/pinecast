@@ -134,7 +134,15 @@ def _auth_subscription(req, podcast, amount):
         return {'error': ugettext('No valid email address was found.')}
 
     # Create the tip user if it doesn't already exist
-    TipUser.tip_user_from(email_address=email)
+    tipper = TipUser.tip_user_from(email_address=email)
+
+    print tipper.id, req.session.get('pay_session'), tipper.id == req.session.get('pay_session')
+    if tipper.id == req.session.get('pay_session'):
+        try:
+            _finish_sub(req, podcast, amount, email, token)
+            return {'success': True, 'status': 'complete'}
+        except Exception as e:
+            pass
 
     send_email(
         email,
@@ -149,7 +157,7 @@ def _auth_subscription(req, podcast, amount):
             '?email=%s&token=%s&amount=%d' %
                 (quote(email), quote(token), amount))
 
-    return {'success': True}
+    return {'success': True, 'status': 'pending'}
 
 
 def confirm_sub(req, podcast_slug):
@@ -157,14 +165,27 @@ def confirm_sub(req, podcast_slug):
         return _pmrender(req, 'payments/tip_jar/bad_link.html', ctx)
 
     pod = get_object_or_404(Podcast, slug=podcast_slug)
+
+    try:
+        amount = int(req.GET.get('amount'))
+    except ValueError:
+        return HttpResponse(status=400)
+    email = req.GET.get('email')
+    token = req.GET.get('token')
+
+    try:
+        result = _finish_sub(req, pod, amount, email, token)
+        if result:
+            return redirect('tip_jar_subs')
+    except Exception:
+        return HttpResponse(status=400)
+
+
+def _finish_sub(req, pod, amount, email, token):
     owner_us = UserSettings.get_from_user(pod.owner)
     if (not owner_us.stripe_payout_managed_account or
         owner_us.plan == PLAN_DEMO):
-        return HttpResponse(status=400)
-
-    amount = int(req.GET.get('amount'))
-    email = req.GET.get('email')
-    token = req.GET.get('token')
+        raise Exception('invalid plan')
 
     tip_user = TipUser.tip_user_from(email_address=email, auto_save=False)
     if not tip_user.verified:
@@ -178,7 +199,7 @@ def confirm_sub(req, podcast_slug):
     try:
         sub = RecurringTip.objects.get(tipper=tip_user, podcast=pod, deactivated=False)
         if sub.amount == amount:
-            return redirect('tip_jar_subs')
+            return True
 
         # Update Stripe with the new amount
         sub_obj = sub.get_subscription()
@@ -197,7 +218,14 @@ def confirm_sub(req, podcast_slug):
         #     pod.total_tips += amount - old_amount
         #     pod.save()
 
-        return redirect('tip_jar_subs')
+        send_notification_email(
+            None,
+            ugettext('Your subscription was updated.'),
+            ugettext('Your subscription to %s was updated to $%0.2f. Thanks '
+                     'for supporting your favorite content creators!') %
+                (pod.name, float(amount) / 100),
+            email=email)
+        return True
     except RecurringTip.DoesNotExist:
         pass
 
@@ -217,12 +245,15 @@ def confirm_sub(req, podcast_slug):
 
     # Create the customer associated with the managed account
     sub = RecurringTip(tipper=tip_user, podcast=pod, amount=amount)
-    customer = stripe.Customer.create(
-        email=email,
-        plan='tipsub',
-        quantity=amount / 100,
-        source=token,
-        stripe_account=managed_account)
+    try:
+        customer = stripe.Customer.create(
+            email=email,
+            plan='tipsub',
+            quantity=amount / 100,
+            source=token,
+            stripe_account=managed_account)
+    except stripe.error.InvalidRequestError:
+        return True
     sub.stripe_customer_id = customer.id
     sub.stripe_subscription_id = customer.subscriptions.data[0].id
     sub.save()
@@ -254,7 +285,7 @@ def confirm_sub(req, podcast_slug):
                  'thanking them for their generosity.') % (
             pod.name, float(amount) / 100, email))
 
-    return redirect('tip_jar_subs')
+    return True
 
 
 def subscriptions(req):
