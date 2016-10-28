@@ -130,6 +130,11 @@ input[type=radio]:focus:checked + span:before {
 }
 
 
+.tip-loading {
+    color: #666;
+    padding: 20px 0;
+    text-align: center;
+}
 .tip-success {
     color: #23BA5A;
     line-height: 2em;

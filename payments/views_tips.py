@@ -30,18 +30,19 @@ def tip_flow(req, podcast_slug):
 
     recurring_tip = None
     pay_session = req.session.get('pay_session')
+    tipper = None
     if pay_session:
+        tipper = TipUser.objects.get(id=pay_session, verified=True)
         try:
-            tipper = TipUser.objects.get(id=pay_session)
             recurring_tip = RecurringTip.objects.get(
                 podcast=pod, tipper=tipper, deactivated=False)
         except Exception as e:
-            raise e
+            pass
 
     ctx = {'error': req.GET.get('error'),
            'recurring_tip': recurring_tip,
            'podcast': pod,
-           'user': {'email': None}}
+           'tipper': tipper}
 
     return _pmrender(req, 'payments/tip_jar/main.html', ctx)
 
@@ -139,7 +140,7 @@ def _auth_subscription(req, podcast, amount):
         email,
         ugettext('Confirm your subscription for %s') % podcast.name,
         ugettext(
-            'Thanks for pledging your support for %s at %0.2f every month! '
+            'Thanks for pledging your support for %s at $%0.2f every month! '
             'To finish the process and activate your subscription, click the '
             'link below. The link in this email will expire after one day.\n\n'
             'If you did not request this, you can ignore this email.' %
@@ -181,7 +182,8 @@ def confirm_sub(req, podcast_slug):
 
         # Update Stripe with the new amount
         sub_obj = sub.get_subscription()
-        sub_obj.amount = amount
+        sub_obj.quantity = int(amount / 100)
+        sub_obj.source = token
         sub_obj.save()
 
         # Update the DB with the new amount
@@ -189,9 +191,11 @@ def confirm_sub(req, podcast_slug):
         sub.amount = amount
         sub.save()
 
-        if amount > old_amount:
-            pod.total_tips += amount - old_amount
-            pod.save()
+        # Updating total_tips is done with the wb hook.
+
+        # if amount > old_amount:
+        #     pod.total_tips += amount - old_amount
+        #     pod.save()
 
         return redirect('tip_jar_subs')
     except RecurringTip.DoesNotExist:
@@ -268,7 +272,7 @@ def subscriptions_login(req):
         validated = validate_confirmation(req)
         if validated:
             try:
-                tip_user = TipUser.objects.get(email=email)
+                tip_user = TipUser.objects.get(email_address=email)
             except TipUser.DoesNotExist:
                 # Verified because they just confirmed their email
                 tip_user = TipUser(email=email, verified=True)

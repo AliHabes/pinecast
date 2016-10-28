@@ -44,10 +44,13 @@ class RecurringTip(models.Model):
     deactivated = models.BooleanField(default=False)
 
     def get_subscription(self):
-        return stripe.Subscription.retrieve(self.stripe_subscription_id)
+        us = UserSettings.get_from_user(self.podcast.owner)
+        stripe_account = us.stripe_payout_managed_account
+        return stripe.Subscription.retrieve(
+            self.stripe_subscription_id, stripe_account=stripe_account)
 
     def cancel(self):
-        us = UserSettings.get_from_user(pod.owner)
+        us = UserSettings.get_from_user(self.podcast.owner)
         subscription = stripe.Subscription.retrieve(
             self.stripe_subscription_id,
             stripe_account=us.stripe_payout_managed_account)

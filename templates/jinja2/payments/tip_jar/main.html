@@ -39,7 +39,7 @@
           <input type="radio" name="amount" value="2000">
           <span>$20</span>
         </label>
-        {% if minimum_plan(podcast.owner, PLANS.PLAN_PRO) %}
+        {% if minimum_plan(podcast.owner, PLANS.PLANS_COMMUNITY) %}
           <label>
             <input type="radio" name="amount" value="5000">
             <span>$50</span>
@@ -83,6 +83,9 @@
     </p>
   {% endif %}
 </div>
+<div class="tip-loading" style="display: none">
+  {{ _('Processing tip...') }}
+</div>
 <div class="tip-success tip-success-charge" style="display: none">
   {{ _('Your tip was sent to %s! <3') % podcast.name }}
 </div>
@@ -106,7 +109,7 @@ window.addEventListener('load', function() {
   var handler = StripeCheckout.configure({
     key: '{{ STRIPE_PUBLISHABLE_KEY }}',
 
-    email: {{ user.email|safe_json }},
+    email: {{ (tipper.email_address|safe_json) if tipper else 'null' }},
     image: {{ podcast.cover_image|https|safe_json }},
     name: {{ podcast.name|safe_json }},
     zipCode: true,
@@ -139,8 +142,10 @@ window.addEventListener('load', function() {
 
   function complete(type, token) {
     document.querySelector('.tip-selection').style.display = 'none';
+    document.querySelector('.tip-loading').style.display = 'block';
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
+      document.querySelector('.tip-loading').style.display = 'none';
       var parsed;
       try {
         parsed = JSON.parse(xhr.responseText);
@@ -157,6 +162,7 @@ window.addEventListener('load', function() {
       }
     };
     xhr.onerror = function() {
+      document.querySelector('.tip-loading').style.display = 'none';
       document.querySelector('.tip-error-gen').style.display = 'block';
     };
     xhr.open('post', {{ url('send_tip', podcast_slug=podcast.slug)|safe_json }}, true);
