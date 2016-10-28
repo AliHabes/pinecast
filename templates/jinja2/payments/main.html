@@ -23,6 +23,7 @@
         Card info is stored securely by <a href="https://stripe.com/">Stripe</a>.
       {% endtrans %}
     </p>
+
     {% include 'payments/paymentmethod/new.html' %}
 
     <footer>
@@ -41,9 +42,4 @@
 
 {% endif %}
 
-{% endblock %}
-
-{% block after_content %}
-<script src="https://js.stripe.com/v2/"></script>
-<script src="/static/js/ui-cc.js"></script>
 {% endblock %}

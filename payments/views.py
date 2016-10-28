@@ -108,6 +108,12 @@ Please contact Pinecast support if you have any questions.''') %
 def set_payment_method_redir(req):
     us = UserSettings.get_from_user(req.user)
     customer = us.get_stripe_customer()
+
+    if req.POST.get('next_url') == 'upgrade':
+        next_url = reverse('upgrade')
+    else:
+        next_url = reverse('dashboard')
+
     try:
         if customer:
             customer.source = req.POST.get('token')
@@ -115,12 +121,12 @@ def set_payment_method_redir(req):
         else:
             us.create_stripe_customer(req.POST.get('token'))
     except stripe.error.CardError as e:
-        return redirect(reverse('dashboard') + '?error=crej#settings')
+        return redirect(next_url + '?error=crej#settings')
     except Exception as e:
         rollbar.report_message(str(e), 'error')
-        return redirect(reverse('dashboard') + '?error=cerr#settings')
+        return redirect(next_url + '?error=cerr#settings')
 
-    return redirect(reverse('dashboard') + '?success=csuc#settings')
+    return redirect(next_url + '?success=csuc#settings')
 
 
 @require_POST
