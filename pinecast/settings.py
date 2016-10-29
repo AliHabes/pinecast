@@ -46,6 +46,8 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
 
     'accounts',
@@ -62,6 +64,7 @@ if DEBUG and os.environ.get('DEBUG_TOOLBAR'):
     INSTALLED_APPS = INSTALLED_APPS + ('debug_toolbar', )
 
 MIDDLEWARE_CLASSES = (
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -181,7 +184,7 @@ STATICFILES_DIRS = STATIC_DIRS = (
 )
 STATIC_ROOT = STATIC_DIRS[0] + 'root'
 
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 GETCONNECT_IO_PID = os.environ.get('GETCONNECT_IO_PID')
