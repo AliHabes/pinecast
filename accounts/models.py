@@ -48,6 +48,63 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
     def get_stripe_description(self):
         return 'user:%d' % self.user.id
 
+    def set_plan(self, new_plan_val):
+        orig_plan = self.plan
+        customer = self.get_stripe_customer()
+        if not customer:
+            return False
+
+        existing_subs = customer.subscriptions.all(limit=1)['data']
+
+        # Handle downgrades to free
+        if new_plan_val == payment_plans.PLAN_DEMO:
+            if existing_subs:
+                existing_sub = existing_subs[0]
+                existing_sub.delete()
+
+            for podcast in self.user.podcast_set.all():
+                for tip in podcast.recurring_tips.all():
+                    tip.cancel()
+
+            self.plan = payment_plans.PLAN_DEMO
+            self.save()
+            return True
+
+        plan_stripe_id = payment_plans.STRIPE_PLANS[new_plan_val]
+
+        if existing_subs:
+            existing_sub = existing_subs[0]
+            existing_sub.plan = plan_stripe_id
+            try:
+                existing_sub.save()
+            except Exception as e:
+                rollbar.report_message(str(e), 'error')
+                return 'card_error'
+        else:
+            try:
+                customer.subscriptions.create(plan=plan_stripe_id)
+            except stripe.error.CardError:
+                return 'card_error'
+            except Exception as e:
+                rollbar.report_message(str(e), 'error')
+                return 'card_error'
+
+        self.plan = new_plan_val
+        self.save()
+
+        was_upgrade = (
+            payment_plans.PLAN_RANKS[orig_plan] <= payment_plans.PLAN_RANKS[new_plan_val])
+        send_notification_email(
+            self.user,
+            ugettext('Your account has been %s') %
+                (ugettext('upgraded') if was_upgrade else ugettext('downgraded')),
+            ugettext('Your Pinecast account has been updated successfully. '
+                     'Your account is now marked as "%s".\n\n'
+                     'Please contact Pinecast support if you have any '
+                     'questions.') %
+                payment_plans.PLANS_MAP[new_plan_val])
+        return True
+
 
 class Network(models.Model):
     owner = models.ForeignKey(User, related_name='network_ownership')

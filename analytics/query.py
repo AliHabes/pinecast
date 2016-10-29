@@ -141,7 +141,7 @@ def get_top_episodes(podcast, async, timeframe=None):
          'filter': {'podcast': where_clause}}
     if timeframe:
         q['timeframe'] = timeframe
-    print q
+
     data = query_async('listen', q)
 
     return async.add(data, lambda d: d['results'] if 'results' in d else [])

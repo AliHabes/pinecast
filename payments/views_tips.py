@@ -136,7 +136,6 @@ def _auth_subscription(req, podcast, amount):
     # Create the tip user if it doesn't already exist
     tipper = TipUser.tip_user_from(email_address=email)
 
-    print tipper.id, req.session.get('pay_session'), tipper.id == req.session.get('pay_session')
     if tipper.id == req.session.get('pay_session'):
         try:
             _finish_sub(req, podcast, amount, email, token)
@@ -272,16 +271,10 @@ def _finish_sub(req, pod, amount, email, token):
     # pod.save()
 
     send_notification_email(
-        None,
-        ugettext('Thanks for leaving a tip!'),
-        ugettext('Your tip was sent: %s received $%0.2f. Thanks for supporting your '
-                 'favorite content creators!') % (pod.name, float(amount) / 100),
-        email=email)
-    send_notification_email(
         pod.owner,
         ugettext('Someone subscribed to your podcast!'),
-        ugettext('%s received a tip of $%0.2f from %s. Their subscription will '
-                 'pay out once every month. You should send them an email '
+        ugettext('%s will receive a tip of $%0.2f from %s. Their subscription '
+                 'will pay out once every month. You should send them an email '
                  'thanking them for their generosity.') % (
             pod.name, float(amount) / 100, email))
 

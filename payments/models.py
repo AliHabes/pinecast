@@ -28,6 +28,9 @@ class TipUser(models.Model):
     def get_email(self):
         return self.email_address
 
+    def __unicode__(self):
+        return '%s%s' % (self.email_address, ' (v)' if self.verified else '')
+
 
 class RecurringTip(models.Model):
     tipper = models.ForeignKey(TipUser, related_name='recurring_tips')
@@ -42,6 +45,9 @@ class RecurringTip(models.Model):
     stripe_subscription_id = models.CharField(max_length=128)
 
     deactivated = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return '%s - %s' % (self.tipper.email_address, self.amount)
 
     def get_subscription(self):
         us = UserSettings.get_from_user(self.podcast.owner)

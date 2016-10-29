@@ -59,13 +59,15 @@ https://pinecast.com{url}
 
 def send_notification_email(user, subject, description, email=None):
     email = email or user.email
-    body = ugettext('''Hey Pinecaster,
+    body = ugettext('''{greeting}
 
 {description}
 
 Thanks,
 The Pinecast Team
-    ''').format(description=description)
+    ''').format(
+        description=description,
+        greeting='Hey Pinecaster,' if user else 'Hi there,')
     return _send_mail(email, subject, body)
 
 

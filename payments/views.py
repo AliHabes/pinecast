@@ -21,6 +21,9 @@ from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import Podcast
 
 
+BASE_URL = 'https://pinecast.com' if not settings.DEBUG else 'http://localhost:8000'
+
+
 @login_required
 def upgrade(req):
     us = UserSettings.get_from_user(req.user)
@@ -43,64 +46,20 @@ AVAILABLE_PLANS = {
 @login_required
 def upgrade_set_plan(req):
     new_plan = req.POST.get('plan')
+    if new_plan not in AVAILABLE_PLANS:
+        return redirect('upgrade')
+
+    new_plan_val = AVAILABLE_PLANS[new_plan]
 
     us = UserSettings.get_from_user(req.user)
-    customer = us.get_stripe_customer()
-    if not customer or new_plan not in AVAILABLE_PLANS:
+    result = us.set_plan(new_plan_val)
+
+    if not result:
         return redirect('upgrade')
-
-    orig_plan = us.plan
-    new_plan_val = AVAILABLE_PLANS[new_plan]
-    existing_subs = customer.subscriptions.all(limit=1)['data']
-
-    # Handle downgrades to free
-    if new_plan_val == payment_plans.PLAN_DEMO:
-        if existing_subs:
-            existing_sub = existing_subs[0]
-            existing_sub.delete()
-
-        for podcast in req.user.podcast_set.all():
-            for tip in podcast.recurring_tips.all():
-                tip.cancel()
-
-        us.plan = payment_plans.PLAN_DEMO
-        us.save()
-        return redirect('upgrade')
-
-    plan_stripe_id = payment_plans.STRIPE_PLANS[new_plan_val]
-
-    if existing_subs:
-        existing_sub = existing_subs[0]
-        existing_sub.plan = plan_stripe_id
-        try:
-            existing_sub.save()
-        except Exception as e:
-            rollbar.report_message(str(e), 'error')
-            return redirect('upgrade')
+    elif result == 'card_error':
+        return redirect(reverse('upgrade') + '?error=card')
     else:
-        try:
-            sub = customer.subscriptions.create(plan=plan_stripe_id)
-        except stripe.error.CardError:
-            return redirect(reverse('upgrade') + '?error=card')
-        except Exception as e:
-            rollbar.report_message(str(e), 'error')
-            return redirect('upgrade')
-
-    us.plan = new_plan_val
-    us.save()
-
-    was_upgrade = payment_plans.PLAN_RANKS[orig_plan] <= new_plan_val
-    send_notification_email(
-        req.user,
-        ugettext('Your account has been %s') %
-        (ugettext('upgraded') if was_upgrade else ugettext('downgraded')),
-        ugettext('''Your Pinecast account has been updated successfully.
-Your account is now marked as "%s".
-
-Please contact Pinecast support if you have any questions.''') %
-        payment_plans.PLANS_MAP[new_plan_val])
-
-    return redirect('upgrade')
+        return redirect('upgrade')
 
 
 @require_POST
@@ -182,33 +141,141 @@ def set_tip_cashout(req):
 def hook(req):
     try:
         body = json.loads(req.body)
-
-        # Validate the event
-        if not settings.DEBUG:
-            stripe.Event.retrieve(body['id'], stripe_account=body['user_id'])
-    except Exception:
+    except Exception as e:
+        rollbar.report_message(
+            'Error parsing Stripe hook JSON: %s' % str(e), 'warn')
         return HttpResponse(status=400)
 
-    if body['type'] != 'invoice.payment_succeeded':
-        return HttpResponse(status=200)
+    if not settings.DEBUG:
+        try:
+            # Validate the event
+            stripe.Event.retrieve(
+                body['id'], stripe_account=body.get('user_id'))
+        except Exception as e:
+            rollbar.report_message(
+                'Error fetching Stripe event: %s' % str(e), 'warn')
+            return HttpResponse(status=400)
 
-    try:
-        sub = RecurringTip.objects.get(
-            stripe_subscription_id=body['data']['object']['subscription'])
-    except RecurringTip.DoesNotExist:
-        return HttpResponse(status=200)
 
-    amount = body['data']['object']['total']
-    pod = sub.podcast
+    if body['type'] == 'invoice.payment_succeeded' and body.get('user_id'):
+        sub = _get_subscription(body)
+        if not sub: return HttpResponse(status=200)
 
-    tip_event = TipEvent(
-        tipper=sub.tipper,
-        podcast=pod,
-        amount=amount,
-        recurring_tip=sub)
-    tip_event.save()
+        amount = int(body['data']['object']['total'])
+        pod = sub.podcast
 
-    pod.total_tips += amount
-    pod.save()
+        tip_event = TipEvent(
+            tipper=sub.tipper,
+            podcast=pod,
+            amount=amount,
+            recurring_tip=sub)
+        tip_event.save()
+
+        pod.total_tips += amount
+        pod.save()
+
+        email = sub.tipper.email_address
+        send_notification_email(
+            None,
+            ugettext('Thanks for leaving a tip!'),
+            ugettext('Your tip was sent: %s received $%0.2f. Thanks for supporting your '
+                     'favorite content creators!') % (pod.name, float(amount) / 100),
+            email=email)
+        send_notification_email(
+            pod.owner,
+            ugettext('%s received a tip of $%0.2f') % (pod.name, float(amount) / 100),
+            ugettext('%s received a tip of $%0.2f from %s as part of a monthly '
+                     'subscription to the show. You should send them an email '
+                     'thanking them for their generosity.') %
+                (pod.name, float(amount) / 100, email))
+
+    elif body['type'] == 'invoice.payment_failed':
+        if body.get('user_id'):
+            _handle_failed_tip_sub(body)
+        else:
+            _handle_failed_subscription(body)
 
     return HttpResponse(status=200)
+
+
+def _get_subscription(event_body):
+    sub_id = event_body['data']['object']['subscription']
+    try:
+        return RecurringTip.objects.get(stripe_subscription_id=sub_id)
+    except RecurringTip.DoesNotExist:
+        rollbar.report_message(
+            'Event on unknown subscription: %s' % sub_id, 'warn')
+        return None
+
+
+def _handle_failed_tip_sub(body):
+    sub = _get_subscription(body)
+    if not sub: return HttpResponse(status=200)
+
+    closed = body['data']['object']['closed']
+    pod = sub.podcast
+    if closed:
+        sub.deactivated = True
+        sub.save()
+
+        send_notification_email(
+            None,
+            ugettext('Your subscription to %s was cancelled') % pod.name,
+            ugettext('We attempted to charge your card for your '
+                     'subscription to %s, but the payment failed multiple '
+                     'times. If you wish to remain subscribed, please '
+                     'visit the link below to enter new payment '
+                     'information.\n\n%s') %
+                (pod.name, BASE_URL + reverse('tip_jar', podcast_slug=pod.slug)),
+            email=sub.tipper.email_address)
+    else:
+        send_notification_email(
+            None,
+            ugettext('Your subscription to %s has problems') % pod.name,
+            ugettext('We attempted to charge your card for your '
+                     'subscription to %s, but the payment failed. Please '
+                     'visit the tip jar and update your subscription with '
+                     'new card details as soon as possible. You can do that '
+                     'at the link below.\n\n%s') %
+                (pod.name, BASE_URL + reverse('tip_jar', podcast_slug=pod.slug)),
+            email=sub.tipper.email_address)
+
+
+def _handle_failed_subscription(body):
+    customer = body['data']['object']['customer']
+    try:
+        us = UserSettings.objects.get(stripe_customer_id=customer)
+    except UserSettings.DoesNotExist:
+        rollbar.report_message('Unknown customer: %s' % customer, 'warn')
+        return
+
+    closed = body['data']['object']['closed']
+    user = us.user
+    if closed:
+        us.set_plan(payment_plans.PLAN_DEMO)
+        send_notification_email(
+            user,
+            ugettext('Your Pinecast subscription was cancelled.'),
+            ugettext('Pinecast attempted to charge your payment card multiple '
+                     'times, but was unable to collect payment. Your '
+                     'account has been downgraded to a free Demo plan. Only '
+                     'the ten most recent episodes from each of your podcasts '
+                     'will be shown to your listeners. All recurring tip '
+                     'subscriptions to your podcasts have also been '
+                     'cancelled.\n\nNo content or settings have been deleted '
+                     'from your account. If you wish to re-subscribe, you may '
+                     'do so at any time at the URL below.\n\n%s') %
+                (BASE_URL + reverse('upgrade')))
+    else:
+        send_notification_email(
+            user,
+            ugettext('Payment failed for Pinecast subscription'),
+            ugettext('Pinecast attempted to charge your payment card for your '
+                     'current subscription, but was unable to collect payment. '
+                     'If we fail to process your card three times, your '
+                     'account will automatically be downgraded to a free Demo '
+                     'plan.\n\n'
+                     'No changes have currently been made to your account or '
+                     'plan. Please update your payment information at the URL '
+                     'below.\n\n%s') %
+                (BASE_URL + reverse('dashboard') + '#settings,subscription'))
