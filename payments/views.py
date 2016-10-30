@@ -138,6 +138,7 @@ def set_tip_cashout(req):
 
 @csrf_exempt
 @require_POST
+@json_response
 def hook(req):
     try:
         body = json.loads(req.body)
@@ -159,7 +160,7 @@ def hook(req):
 
     if body['type'] == 'invoice.payment_succeeded' and body.get('user_id'):
         sub = _get_subscription(body)
-        if not sub: return HttpResponse(status=200)
+        if not sub: return {'warning': 'subscription unrecognized'}
 
         amount = int(body['data']['object']['total'])
         pod = sub.podcast
@@ -189,13 +190,15 @@ def hook(req):
                      'thanking them for their generosity.') %
                 (pod.name, float(amount) / 100, email))
 
+        return {'success': 'emails sent, tip event processed'}
+
     elif body['type'] == 'invoice.payment_failed':
         if body.get('user_id'):
-            _handle_failed_tip_sub(body)
+            return _handle_failed_tip_sub(body)
         else:
-            _handle_failed_subscription(body)
+            return _handle_failed_subscription(body)
 
-    return HttpResponse(status=200)
+    return {'success': 'ignored'}
 
 
 def _get_subscription(event_body):
@@ -210,7 +213,7 @@ def _get_subscription(event_body):
 
 def _handle_failed_tip_sub(body):
     sub = _get_subscription(body)
-    if not sub: return HttpResponse(status=200)
+    if not sub: return {'warning': 'subscription unrecognized'}
 
     closed = body['data']['object']['closed']
     pod = sub.podcast
@@ -228,6 +231,8 @@ def _handle_failed_tip_sub(body):
                      'information.\n\n%s') %
                 (pod.name, BASE_URL + reverse('tip_jar', podcast_slug=pod.slug)),
             email=sub.tipper.email_address)
+
+        return {'success': 'nastygram sent, subscription deactivated'}
     else:
         send_notification_email(
             None,
@@ -240,6 +245,8 @@ def _handle_failed_tip_sub(body):
                 (pod.name, BASE_URL + reverse('tip_jar', podcast_slug=pod.slug)),
             email=sub.tipper.email_address)
 
+        return {'success': 'nastygram sent'}
+
 
 def _handle_failed_subscription(body):
     customer = body['data']['object']['customer']
@@ -247,7 +254,7 @@ def _handle_failed_subscription(body):
         us = UserSettings.objects.get(stripe_customer_id=customer)
     except UserSettings.DoesNotExist:
         rollbar.report_message('Unknown customer: %s' % customer, 'warn')
-        return
+        return {'warning': 'customer unrecognized'}
 
     closed = body['data']['object']['closed']
     user = us.user
@@ -266,6 +273,8 @@ def _handle_failed_subscription(body):
                      'from your account. If you wish to re-subscribe, you may '
                      'do so at any time at the URL below.\n\n%s') %
                 (BASE_URL + reverse('upgrade')))
+
+        return {'success': 'nastygram sent, account downgraded'}
     else:
         send_notification_email(
             user,
@@ -279,3 +288,4 @@ def _handle_failed_subscription(body):
                      'plan. Please update your payment information at the URL '
                      'below.\n\n%s') %
                 (BASE_URL + reverse('dashboard') + '#settings,subscription'))
+        return {'success': 'nastygram sent'}
