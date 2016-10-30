@@ -59,7 +59,7 @@ def upgrade_set_plan(req):
     elif result == 'card_error':
         return redirect(reverse('upgrade') + '?error=card')
     else:
-        return redirect('upgrade')
+        return redirect(reverse('upgrade') + '?success')
 
 
 @require_POST
