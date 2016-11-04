@@ -6,6 +6,7 @@ Django==1.10.2
 gfm==0.0.3
 grequests==0.3.0
 html5lib==1.0b7
+influxdb==3.0.0
 iso8601==0.1.11
 itsdangerous==0.24
 Jinja2==2.8
