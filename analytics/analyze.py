@@ -44,12 +44,14 @@ def get_request_ip(req):
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         return x_forwarded_for.split(',')[0]
-    
+
     return req.META.get('REMOTE_ADDR')
 
 
 def get_request_hash(req):
     ua = req.META.get('HTTP_USER_AGENT', 'Unknown')
     ip = get_request_ip(req)
-    today = datetime.date.today().isoformat()
-    return base64.b64encode('%s:%s:%s' % (today, ip, ua))
+    return get_raw_request_hash(ua, ip, datetime.date.today())
+
+def get_raw_request_hash(ua, ip, ts):
+    return base64.b64encode('%s:%s:%s' % (ts.isoformat(), ip, ua))

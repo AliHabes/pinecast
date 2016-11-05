@@ -40,14 +40,29 @@ def listen(req, episode_id):
             },
         }, req=req)
 
+        analytics_log.write_influx(
+            'listen',
+            {
+                'podcast': unicode(ep.podcast.id),
+                'episode': unicode(ep.id),
+
+                'browser': browser,
+                'device': device,
+                'os': os,
+                'source': 'embed' if req.GET.get('embed') else 'direct',
+            },
+            {
+                'hash': analyze.get_request_hash(req),
+                'ip': analyze.get_request_ip(req),
+                'ua': req.META.get('HTTP_USER_AGENT'),
+            }
+        )
+
     return redirect(_asset(ep.audio_url))
 
 
 def feed(req, podcast_slug):
     pod = get_object_or_404(Podcast, slug=podcast_slug)
-
-    if pod.rss_redirect:
-        return redirect(pod.rss_redirect, permanent=True)
 
     items = []
     episodes = pod.get_episodes()
@@ -99,6 +114,11 @@ def feed(req, podcast_slug):
                 yield '<itunes:category text=%s>%s</itunes:category>' % (
                     quoteattr(k), '\n'.join(render_cat(v)))
 
+    if pod.rss_redirect:
+        canonical_url = pod.rss_redirect
+    else:
+        canonical_url = 'https://pinecast.com/feed/%s' % escape(pod.slug)
+
     content = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<rss xmlns:atom="http://www.w3.org/2005/Atom"',
@@ -108,10 +128,11 @@ def feed(req, podcast_slug):
         '<channel>',
         '<title>%s</title>' % escape(pod.name),
         '<link>%s</link>' % escape(pod.homepage),
-        '<atom:link href="https://pinecast.com/feed/%s" rel="self" type="application/rss+xml" />' % escape(pod.slug),
+        '<atom:link href="%s" rel="self" type="application/rss+xml" />' % canonical_url,
         '<language>%s</language>' % escape(pod.language),
         '<copyright>%s</copyright>' % escape(pod.copyright),
         '<generator>Pinecast (https://pinecast.com)</generator>',
+        ('<itunes:new-feed-url>%s</itunes:new-feed-url>' % escape(canonical_url) if pod.rss_redirect else ''),
         ('<itunes:subtitle>%s</itunes:subtitle>' % escape(pod.subtitle)) if pod.subtitle else '',
         '<itunes:author>%s</itunes:author>' % escape(pod.author_name),
         '<description><![CDATA[%s]]></description>' % pod.description,
@@ -139,6 +160,23 @@ def feed(req, podcast_slug):
 
     if not analyze.is_bot(req):
         browser, device, os = analyze.get_device_type(req)
+        analytics_log.write_influx(
+            'subscribe',
+            {
+                'podcast': unicode(pod.id),
+                'browser': browser,
+                'device': device,
+                'os': os,
+            },
+            {
+                'hash': analyze.get_request_hash(req),
+                'ip': analyze.get_request_ip(req),
+                'ua': req.META.get('HTTP_USER_AGENT'),
+            },
+            datetime.datetime.combine(
+                datetime.date.today(),
+                datetime.time.min)
+        )
         analytics_log.write('subscribe', {
             'id': analyze.get_request_hash(req),
             'podcast': unicode(pod.id),
@@ -151,10 +189,17 @@ def feed(req, podcast_slug):
             },
         }, req=req)
 
-    resp = HttpResponse('\n'.join(c for c in content if c), content_type='application/rss+xml')
+    resp = HttpResponse(
+        '\n'.join(c for c in content if c),
+        content_type='application/rss+xml',
+        status=200 if not pod.rss_redirect else 301)
+    if pod.rss_redirect:
+        resp.setdefault('Location', pod.rss_redirect)
+
     resp.setdefault('Cache-Control', 'public, max-age=120')
     resp.setdefault('Access-Control-Allow-Origin', '*')
     resp.setdefault('Access-Control-Request-Method', 'GET')
+
     return resp
 
 

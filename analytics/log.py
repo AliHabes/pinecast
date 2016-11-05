@@ -1,8 +1,46 @@
+import datetime
 import json
 
 import requests
 import rollbar
 from django.conf import settings
+from influxdb import InfluxDBClient
+
+
+influx_databases = {
+    'subscribe': settings.INFLUXDB_DB_SUBSCRIPTION,
+    'subscription': settings.INFLUXDB_DB_SUBSCRIPTION,
+    'listen': settings.INFLUXDB_DB_LISTEN,
+}
+
+def get_influx_item(db, tags, fields, timestamp=None):
+    if not timestamp:
+        timestamp = datetime.datetime.now()
+    return {
+        'measurement': influx_databases[db],
+        'tags': tags,
+        'fields': fields,
+        'time': timestamp.isoformat() + 'Z',
+    }
+
+def write_influx(db, *args):
+    return write_influx_many(db, [get_influx_item(db, *args)])
+
+def write_influx_many(db, items):
+    influx_client = InfluxDBClient(
+        host='influx.service.pinecast.com',
+        port=443,
+        username=settings.INFLUXDB_USERNAME,
+        password=settings.INFLUXDB_PASSWORD,
+        ssl=True,
+        verify_ssl=True,
+        timeout=10)
+
+    for item in items:
+        if 'ip' in item['fields']:
+            item['fields']['country'] = _get_country(item['fields']['ip'])
+
+    return influx_client.write_points(items, database=influx_databases[db])
 
 
 def write(collection, blob, req=None):

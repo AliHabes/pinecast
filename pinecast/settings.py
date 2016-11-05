@@ -223,6 +223,13 @@ SUPPORT_URL = 'https://pinecast.zendesk.com'
 SUPPORT_EMAIL = 'support@pinecast.zendesk.com'
 SENDER_EMAIL = 'Matt@pinecast.com'
 
+
+INFLUXDB_USERNAME = os.environ.get('INFLUXDB_USERNAME')
+INFLUXDB_PASSWORD = os.environ.get('INFLUXDB_PASSWORD')
+INFLUXDB_DB_SUBSCRIPTION = os.environ.get('INFLUXDB_DB_SUBSCRIPTION', 'subscription')
+INFLUXDB_DB_LISTEN = os.environ.get('INFLUXDB_DB_SUBSCRIPTION', 'listen')
+
+
 ROLLBAR = {
     'access_token': os.environ.get('ROLLBAR_ACCESS_TOKEN'),
     'environment': 'development' if DEBUG else 'production',

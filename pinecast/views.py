@@ -16,7 +16,6 @@ from podcasts.models import Podcast, PodcastEpisode
 @csrf_exempt
 @require_POST
 def deploy_complete(req):
-
     commit = '<https://github.com/pinecast/pinecast/commit/%s|%s>' % (
         req.POST.get('head'), req.POST.get('head'))
 
@@ -58,6 +57,7 @@ def log(req):
                   '[%d/%m/%Y:%H:%M:%S +0000]']  # For cdn
 
     listens_to_log = []
+    influx_listens_to_log = []
 
     # Make sure we don't iterate over something that's not iterable
     try:
@@ -106,7 +106,32 @@ def log(req):
 
             'timestamp': ts.isoformat(),
         })
+        influx_listens_to_log.append(
+            analytics_log.get_influx_item(
+                db='listen',
+                tags={
+                    'podcast': unicode(ep.podcast.id),
+                    'episode': unicode(ep.id),
+
+                    'browser': browser,
+                    'device': device,
+                    'os': os,
+                    'source': blob.get('source'),
+                },
+                fields={
+                    'hash': analyze.get_raw_request_hash(
+                        blob.get('userAgent'),
+                        blob.get('ip'),
+                        ts
+                    ),
+                    'ip': blob.get('ip'),
+                    'ua': blob.get('userAgent'),
+                },
+                timestamp=ts,
+            )
+        )
 
     analytics_log.write_many('listen', listens_to_log)
+    analytics_log.write_influx_many('listen', influx_listens_to_log)
 
     return HttpResponse(status=204)

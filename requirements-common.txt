@@ -15,7 +15,7 @@ PyYAML==3.12
 requests==2.11.1
 rollbar==0.13.8
 stripe==1.41.1
-user-agents==0.3.2
+user-agents==1.0.1
 wsgiref==0.1.2
 
 dj-database-url==0.4.1
