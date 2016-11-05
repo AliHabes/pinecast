@@ -3,9 +3,10 @@ import datetime
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext, ugettext_lazy
 
 import payment_plans
+from pinecast.email import send_notification_email
 from pinecast.helpers import cached_method
 from payments.mixins import StripeCustomerMixin, StripeManagedAccountMixin
 
@@ -48,7 +49,7 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
     def get_stripe_description(self):
         return 'user:%d' % self.user.id
 
-    def set_plan(self, new_plan_val):
+    def set_plan(self, new_plan_val, coupon=None):
         orig_plan = self.plan
         customer = self.get_stripe_customer()
         if not customer:
@@ -72,9 +73,16 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
 
         plan_stripe_id = payment_plans.STRIPE_PLANS[new_plan_val]
 
+        was_upgrade = (
+            payment_plans.PLAN_RANKS[orig_plan] <= payment_plans.PLAN_RANKS[new_plan_val])
+
         if existing_subs:
             existing_sub = existing_subs[0]
             existing_sub.plan = plan_stripe_id
+
+            if was_upgrade and coupon:
+                existing_sub.coupon = coupon
+
             try:
                 existing_sub.save()
             except Exception as e:
@@ -82,7 +90,9 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
                 return 'card_error'
         else:
             try:
-                customer.subscriptions.create(plan=plan_stripe_id)
+                customer.subscriptions.create(
+                    coupon=coupon,
+                    plan=plan_stripe_id)
             except stripe.error.CardError:
                 return 'card_error'
             except Exception as e:
@@ -92,8 +102,6 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
         self.plan = new_plan_val
         self.save()
 
-        was_upgrade = (
-            payment_plans.PLAN_RANKS[orig_plan] <= payment_plans.PLAN_RANKS[new_plan_val])
         send_notification_email(
             self.user,
             ugettext('Your account has been %s') %

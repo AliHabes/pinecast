@@ -12,6 +12,7 @@ urlpatterns = [
 
     url(r'^upgrade$', views.upgrade, name='upgrade'),
     url(r'^upgrade/set_plan$', views.upgrade_set_plan, name='upgrade_set_plan'),
+    url(r'^upgrade/set_coupon$', views.set_coupon, name='set_coupon'),
 
     url(r'^hook$', views.hook, name='payments_webhook'),
 

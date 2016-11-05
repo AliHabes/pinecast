@@ -30,8 +30,12 @@ def upgrade(req):
     customer = us.get_stripe_customer()
 
     ctx = {
+        'active_coupon': req.session.get('coupon'),
+        'coupon_applied': 'coupon_applied' in req.GET,
+        'coupon_invalid': 'coupon_invalid' in req.GET,
         'error': req.GET.get('error'),
         'stripe_customer': customer,
+        'success': 'success' in req.GET,
     }
     return _pmrender(req, 'payments/main.html', ctx)
 
@@ -52,14 +56,28 @@ def upgrade_set_plan(req):
     new_plan_val = AVAILABLE_PLANS[new_plan]
 
     us = UserSettings.get_from_user(req.user)
-    result = us.set_plan(new_plan_val)
+    result = us.set_plan(new_plan_val, req.session.get('coupon'))
 
     if not result:
         return redirect('upgrade')
     elif result == 'card_error':
         return redirect(reverse('upgrade') + '?error=card')
     else:
+        req.session['coupon'] = None
         return redirect(reverse('upgrade') + '?success')
+
+
+@require_POST
+@login_required
+def set_coupon(req):
+    code = req.POST.get('coupon')
+    try:
+        stripe.Coupon.retrieve(code)
+    except stripe.error.InvalidRequestError:
+        return redirect(reverse('upgrade') + '?coupon_invalid')
+
+    req.session['coupon'] = code
+    return redirect(reverse('upgrade') + '?coupon_applied')
 
 
 @require_POST

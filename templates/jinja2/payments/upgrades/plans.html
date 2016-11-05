@@ -1,3 +1,24 @@
+{% if success %}
+  <div class="success">
+    {{ _('Your subscription was updated successfully!') }}
+  </div>
+{% elif coupon_applied %}
+  <div class="success">
+    {{ _('Your coupon code is applied.') }}
+  </div>
+{% elif coupon_invalid %}
+  <div class="error">
+    {{ _('That coupon code is not valid.') }}
+  </div>
+{% endif %}
+
+{% if active_coupon %}
+  <div class="active-coupon">
+    <span>{{ _('Active Coupon') }}</span>
+    <b>{{ active_coupon }}</b>
+  </div>
+{% endif %}
+
 <div class="plans row">
   <div class="plan">
     <h4>{{ _('Starter') }}</h4>
@@ -50,6 +71,20 @@
 
 </div>
 
+<form class="coupon-box" action="{{ url('set_coupon') }}" method="post">
+  <div class="coupon-teaser">
+    <a href="" data-expand-coupon="true">{{ _('Have a coupon code?') }}</a>
+  </div>
+  <div class="coupon-body" style="display: none">
+    <label>
+      <span>{{ _('Coupon Code') }}</span>
+      <input type="text" name="coupon" placeholder="coupon-code-here">
+    </label>
+    <button>{{ _('Apply') }}</button>
+  </div>
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>
+
 {% if user_settings.plan != PLANS['PLAN_DEMO'] %}
   <div class="plan-free">
     <p>
@@ -65,16 +100,24 @@
 
 <script>
   document.body.addEventListener('click', function(e) {
-    if (!e.target.getAttribute('data-plan')) {
+    var target = e.target;
+    if (target.getAttribute('data-plan')) {
+      e.preventDefault();
+      var plan = target.getAttribute('data-plan');
+
+      var form = document.getElementById('submit');
+      var type = form.querySelector('input');
+      type.value = plan;
+      form.submit();
       return;
     }
-    e.preventDefault();
-    var plan = e.target.getAttribute('data-plan');
-
-    var form = document.getElementById('submit');
-    var type = form.querySelector('input');
-    type.value = plan;
-    form.submit();
+    if (target.getAttribute('data-expand-coupon')) {
+      e.preventDefault();
+      document.querySelector('.coupon-teaser').style.display = 'none';
+      document.querySelector('.coupon-body').style.display = 'flex';
+      document.querySelector('.coupon-body input').focus();
+      return;
+    }
   })
 </script>
 <form id="submit" method="post" action="{{ url('upgrade_set_plan') }}" style="display:none">
