@@ -119,6 +119,10 @@ def log(req):
                     'source': blob.get('source'),
                 },
                 fields={
+                    'podcast_f': unicode(ep.podcast.id),
+                    'episode_f': unicode(ep.id),
+                    'source_f': blob.get('source'),
+
                     'hash': analyze.get_raw_request_hash(
                         blob.get('userAgent'),
                         blob.get('ip'),
@@ -126,6 +130,7 @@ def log(req):
                     ),
                     'ip': blob.get('ip'),
                     'ua': blob.get('userAgent'),
+                    'v': 1, # version
                 },
                 timestamp=ts,
             )

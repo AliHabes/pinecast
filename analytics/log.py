@@ -38,7 +38,11 @@ def write_influx_many(db, items):
 
     for item in items:
         if 'ip' in item['fields']:
-            item['fields']['country'] = _get_country(item['fields']['ip'])
+            country = _get_country(item['fields']['ip'])
+            if not country:
+                continue
+            item['fields']['country_f'] = country
+            item['tags']['country'] = country
 
     return influx_client.write_points(items, database=influx_databases[db])
 

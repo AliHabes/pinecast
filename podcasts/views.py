@@ -52,9 +52,15 @@ def listen(req, episode_id):
                 'source': 'embed' if req.GET.get('embed') else 'direct',
             },
             {
+                'podcast_f': unicode(ep.podcast.id),
+                'episode_f': unicode(ep.id),
+                'source_f': 'embed' if req.GET.get('embed') else 'direct',
+
                 'hash': analyze.get_request_hash(req),
                 'ip': analyze.get_request_ip(req),
                 'ua': req.META.get('HTTP_USER_AGENT'),
+
+                'v': 1, # version
             }
         )
 
@@ -169,9 +175,13 @@ def feed(req, podcast_slug):
                 'os': os,
             },
             {
+                'podcast_f': unicode(pod.id),
+
                 'hash': analyze.get_request_hash(req),
                 'ip': analyze.get_request_ip(req),
                 'ua': req.META.get('HTTP_USER_AGENT'),
+
+                'v': 1, # version
             },
             datetime.datetime.combine(
                 datetime.date.today(),

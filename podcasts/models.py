@@ -184,7 +184,7 @@ class Podcast(models.Model):
     def tip_fees_paid(self):
         return (self.tip_events.all()
                     .aggregate(
-                        models.aggregates.Sum('fee_amount')))['fee_amount__sum']
+                        models.aggregates.Sum('fee_amount')))['fee_amount__sum'] or 0
 
 
 

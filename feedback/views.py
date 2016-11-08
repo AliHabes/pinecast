@@ -4,7 +4,6 @@ from django.utils.translation import ugettext
 
 import accounts.payment_plans as plans
 import analytics.analyze as analyze
-import analytics.log as analytics_log
 from .models import Feedback
 from accounts.models import UserSettings
 from dashboard.views import _pmrender
@@ -32,16 +31,6 @@ def podcast_comment_box(req, podcast_slug):
             sender_ip=ip
         )
         f.save()
-        analytics_log.write('feedback', {
-            'podcast': unicode(pod.id),
-            'episode': None,
-            'profile': {
-                'email': req.POST.get('email'),
-                'email_host': req.POST.get('email').split('@')[1],
-                'ip': ip,
-                'ua': req.META.get('HTTP_USER_AGENT'),
-            },
-        }, req=req)
         send_notification_email(
             pod.owner,
             ugettext('[Pinecast] You got some feedback!'),
@@ -78,16 +67,6 @@ def ep_comment_box(req, podcast_slug, episode_id):
             sender_ip=ip
         )
         f.save()
-        analytics_log.write('feedback', {
-            'podcast': unicode(pod.id),
-            'episode': unicode(ep.id),
-            'profile': {
-                'email': req.POST.get('email'),
-                'email_host': req.POST.get('email').split('@')[1],
-                'ip': ip,
-                'ua': req.META.get('HTTP_USER_AGENT'),
-            },
-        }, req=req)
         send_notification_email(
             pod.owner,
             ugettext('[Pinecast] You got some feedback!'),
