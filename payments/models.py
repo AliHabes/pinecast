@@ -52,18 +52,25 @@ class RecurringTip(models.Model):
     def get_subscription(self):
         us = UserSettings.get_from_user(self.podcast.owner)
         stripe_account = us.stripe_payout_managed_account
-        return stripe.Subscription.retrieve(
-            self.stripe_subscription_id, stripe_account=stripe_account)
+        try:
+            return stripe.Subscription.retrieve(
+                self.stripe_subscription_id, stripe_account=stripe_account)
+        except stripe.error.InvalidRequestError:
+            return None
 
     def cancel(self):
         us = UserSettings.get_from_user(self.podcast.owner)
-        subscription = stripe.Subscription.retrieve(
-            self.stripe_subscription_id,
-            stripe_account=us.stripe_payout_managed_account)
-        subscription.delete()
-
-        self.deactivated = True
-        self.save()
+        try:
+            subscription = stripe.Subscription.retrieve(
+                self.stripe_subscription_id,
+                stripe_account=us.stripe_payout_managed_account)
+        except stripe.error.InvalidRequestError:
+            pass
+        else:
+            subscription.delete()
+        finally:
+            self.deactivated = True
+            self.save()
 
 
 class TipEvent(models.Model):

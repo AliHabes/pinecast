@@ -1,13 +1,17 @@
 import datetime
 import re
 
+from django.conf import settings
 from django.utils.translation import ugettext
 
 from . import query
+from .constants import influx_databases, USER_TIMEFRAMES
+from .influx import get_client
+from .util import escape, ident
 from accounts.models import UserSettings
 
 
-TIMZONE_KILLA = re.compile(r'(\d\d\d\d\-\d\d\-\d\dT\d\d:\d\d:\d\d)[+\-]\d\d:\d\d')
+TIMZONE_KILLA = re.compile(r'(\d\d\d\d\-\d\d\-\d\dT\d\d:\d\d:\d\d)(Z|[+\-]\d\d:\d\d)')
 
 DELTAS = {
     'minutely': datetime.timedelta(minutes=1),
@@ -18,21 +22,52 @@ DELTAS = {
     'quarterly': datetime.timedelta(weeks=4 * 3),
     'yearly': datetime.timedelta(weeks=52),
 }
-
-USER_TIMEFRAMES = {
-    'day': 'today',
-    'yesterday': 'yesterday',  # Should not be exposed in UI
-    'week': {'previous': {'hours': 7 * 24}},
-    'month': {'previous': {'hours': 30 * 24}},
-    'sixmonth': {'previous': {'hours': 6 * 30 * 24}},
-    'year': {'previous': {'hours': 12 * 30 * 24}},
-    'all': None,
+INTERVALS = {
+    'minutely': 'time(1m)',
+    'hourly': 'time(1h)',
+    'daily': 'time(1d)',
+    'weekly': 'time(1w)',
+    'monthly': 'time(30d)',
+    'quarterly': 'time(13w)',
+    'yearly': 'time(365d)',
 }
+
+dtnow = datetime.datetime.now
+
+def select_format(k, v):
+    if isinstance(v, bool) and v:
+        return ident(k)
+
+    if v == 'count':
+        return 'COUNT(%s)' % ident(k)
+
+    raise Exception('Unknown selector %s' % v)
+
+def where_format(k, v):
+    if isinstance(v, (unicode, str)):
+        return '%s = %s' % (ident(k), escape(v))
+
+    if isinstance(v, (list, tuple)):
+        return '(%s)' % ' OR '.join(where_format(k, val) for val in v)
+
+    raise Exception('Unknown clause type %s' % type(v))
+
+
+def _parse_date(date):
+    # We need to strip off the timezone because the times are always
+    # returned in the correct timezone for the user. Python has issues
+    # with parsing basically anything.
+
+    # 2015-07-06T00:00:00+00:00
+    stripped = TIMZONE_KILLA.match(date).group(1)
+    # 2015-07-06T00:00:00
+    return datetime.datetime.strptime(stripped, '%Y-%m-%dT%H:%M:%S')
 
 
 class Format(object):
-    def __init__(self, req, event_type, async=False):
-        self.event_type = event_type
+    def __init__(self, req, db):
+        self.db = db
+        self.event_type = influx_databases[db]
         self.req = req
         self.selection = {}
         self.criteria = {}
@@ -41,20 +76,12 @@ class Format(object):
         self.group_by = None
         self.res = None
 
-        self.async = async
-        self.async_query = None
-
     def select(self, **kwargs):
         self.selection.update(kwargs)
         return self
 
     def where(self, **kwargs):
-        for key, val in kwargs.items():
-            if isinstance(val, list):
-                self.criteria[key] = {'in': val}
-            else:
-                self.criteria[key] = val
-
+        self.criteria.update(kwargs)
         return self
 
     def group(self, by):
@@ -77,165 +104,159 @@ class Format(object):
 
     def _process(self):
         assert self.selection
-        assert not self.async_query
-        q = {
-            'select': self.selection,
-            'timezone': UserSettings.get_from_user(self.req.user).tz_offset,
-        }
+
+        select = ', '.join(
+            select_format(k, v) for
+            k, v in
+            self.selection.items())
+        where = ''
+        group_by = ''
+
+        tz = UserSettings.get_from_user(self.req.user).tz_offset
 
         if self.criteria:
-            q['filter'] = self.criteria
+            where = ' AND '.join(
+                where_format(k, v) for
+                k, v in
+                self.criteria.items()
+            )
         if self.group_by:
-            q['groupBy'] = self.group_by
-        if self.timeframe:
-            tf = USER_TIMEFRAMES.get(self.req.GET.get('timeframe', self.timeframe))
-            if tf:
-                q['timeframe'] = tf
-        if self.interval_val:
-            q['interval'] = self.interval_val
+            if isinstance(self.group_by, (list, tuple)):
+                group_by = ', '.join(ident(x) for x in self.group_by)
+            else:
+                group_by = ident(self.group_by)
 
-        self.async_query = query.query_async(self.event_type, q)
-        if not self.async:
-            self.async = query.AsyncContext()
-            Format.async_resolve_all([self])
+        if self.timeframe:
+            tf = USER_TIMEFRAMES.get(
+                self.req.GET.get('timeframe', self.timeframe),
+                lambda tz: None)(tz)
+            if tf:
+                if where:
+                    where += ' AND '
+                where += tf
+
+        if self.interval_val:
+            if group_by:
+                group_by += ', '
+            group_by += INTERVALS[self.interval_val]
+
+        query = 'SELECT %s FROM %s' % (select, ident(self.event_type))
+        if where:
+            query += ' WHERE %s' % where
+        if group_by:
+            query += ' GROUP BY %s' % group_by
+
+        query += ';'
+
+        if settings.DEBUG:
+            print query
+
+        self.res = get_client().query(query, database=self.db)
+
         return self
+
+    def _get_keys(self):
+        key = self.group_by[0] if isinstance(self.group_by, (list, tuple)) else self.group_by
+        value_key = self.selection.items()[0][1]
+        return key, value_key
+
+    def _get_tz_offset(self):
+        tz = UserSettings.get_from_user(self.req.user).tz_offset
+        return datetime.timedelta(hours=tz)
+
+    def _get_parsed_dates(self, points=None):
+        if not points:
+            points = self.res.items()[0][1]
+        tz_offset = self._get_tz_offset()
+        return (_parse_date(x['time']) - tz_offset for x in points)
+
+    def _get_date_labels(self, points=None):
+        interval_duration = DELTAS[self.interval_val]
+        sformat = '%H:%M' if interval_duration < DELTAS['daily'] else '%x'
+        return [x.strftime(sformat) for x in self._get_parsed_dates(points)]
 
     def format_country(self, label=None):
         if not self.res: self._process()
-        if not self.res or 'results' not in self.res: return []
+        if not self.res: return []
 
-        key = self.selection.keys()[0]
+        header = [[ugettext('Country'), label or ugettext('Subscribers')]]
+        key, value_key = self._get_keys()
 
-        return [[ugettext('Country'), label or ugettext('Subscribers')]] + [
-            [p[self.group_by], p[key]] for
-            p in
-            self.res['results'] if
-            p[self.group_by] and 'results' in self.res
+        return header + [
+            [tags[key], list(v)[0][value_key]] for
+            (_, tags), v in
+            self.res.items()
         ]
 
-    def format_intervals(self, labels, labeled_by=None, extra_data=None, unfiltered=False):
+    def format_interval(self, field='count'):
         if not self.interval_val: self.interval()
         if not self.res: self._process()
 
-        if not labeled_by and len(self.criteria) > 1:
-            raise Exception('You must pass `labeled_by` to explain disambiguate the criterion to pick')
-
-        if not self.res or 'results' not in self.res or not self.res['results']:
+        if not self.res:
             # TODO: come up with better error handling
             return {'labels': [''],
                     'datasets': [{'label': '', 'data': []}]}
 
-        key = self.selection.keys()[0]
-
-        interval_duration = DELTAS[self.interval_val]
-        sformat = '%H:%M' if interval_duration < DELTAS['daily'] else '%x'
-
-        processed = [Interval(x) for x in self.res['results']]
-        output_labels = [x.start.strftime(sformat) for x in processed]
-        cursor = processed[0].start
-
-        default_facet = labeled_by or self.criteria.keys()[0]
-
-        datasets = []
-        dataset_map = {}
-
-        for label_id, label in labels.items():
-            ds = {
-                'label': label,
-                'data': [],
-                'id': label_id,
-                'pointStrokeColor': '#fff'}
-            if extra_data and label_id in extra_data:
-                ds.update(extra_data[label_id])
-            datasets.append(ds)
-            dataset_map[label_id] = ds
-
-        # Process the first interval early
-        first_interval = processed.pop(0)
-        for ds_id, ds in dataset_map.items():
-            for res in first_interval.payload:
-                if res[default_facet] == ds_id or unfiltered:
-                    ds['data'].append(res.get(key, 0))
-                    break
-            else:
-                ds['data'].append(0)
-
-        cursor += interval_duration
-
-        while processed and cursor <= processed[-1].start:
-            current_interval = processed.pop(0)
-            for ds_id, ds in dataset_map.items():
-                for res in current_interval.payload:
-                    if res[default_facet] == ds_id or unfiltered:
-                        ds['data'].append(res.get(key, 0))
-                        break
-                else:
-                    ds['data'].append(0)
-
-            cursor += interval_duration
-
-        if not datasets: datasets = [{}]
-
-        datasets = query.rotating_colors(
-            datasets,
-            key='strokeColor',
-            highlight_key='pointColor')
+        points = list(self.res.get_points())
 
         return {
-            'labels': output_labels,
-            'datasets': list(datasets),
+            'labels': self._get_date_labels(points),
+            'datasets': list(query.rotating_colors(
+                [
+                    {
+                        'label': 'Series',
+                        'data': [x[field] for x in points],
+                        'pointStrokeColor': '#fff',
+                    },
+                ],
+                key='strokeColor',
+                highlight_key='pointColor',
+            )),
         }
 
-    def format_breakdown(self, groups):
+    def format_intervals(self, labels_map={}, extra_data={}):
+        assert self.group_by
+
+        if not self.interval_val: self.interval()
         if not self.res: self._process()
-        if not self.res or 'results' not in self.res: return []  # TODO: come up with better error handling
 
-        key = self.selection.keys()[0]
+        if not self.res:
+            # TODO: come up with better error handling
+            return {'labels': [''],
+                    'datasets': [{'label': '', 'data': []}]}
 
-        out = query.process_groups(
-            self.res['results'],
-            groups,
-            self.group_by if isinstance(self.group_by, str) else self.group_by[0],
-            pick=key
-        )
-        if not out:
-            return []
+        key, value_key = self._get_keys()
 
-        out = [{'label': unicode(label), 'value': value} for
-                label, value in
-                zip(out['labels'], out['dataset'])]
+        return {
+            'labels': self._get_date_labels(),
+            'datasets': list(query.rotating_colors(
+                [
+                    dict(
+                        label=labels_map.get(tags[key], tags[key]),
+                        data=[x[value_key] for x in v],
+                        pointStrokeColor='#fff',
+                        **extra_data.get(tags[key], {})
+                    ) for
+                    (_, tags), v in
+                    self.res.items()
+                ],
+                key='strokeColor',
+                highlight_key='pointColor',
+            )),
+        }
 
-        return list(query.rotating_colors(out))
+    def format_breakdown(self, groups=None):
+        if not groups: groups = {}
+        if not self.res: self._process()
+        if not self.res: return []  # TODO: come up with better error handling
 
-    @classmethod
-    def async_resolve_all(cls, instances):
-        for instance in instances:
-            if instance.async_query:
-                continue
-            instance._process()
-        results = query.query_async_resolve([x.async_query for x in instances])
-        for result, instance in zip(results, instances):
-            instance.res = result
+        key, value_key = self._get_keys()
 
-
-class Interval(object):
-    def __init__(self, data):
-        self.start = self._parse_date(data['interval']['start'])
-        self.end = self._parse_date(data['interval']['end'])
-
-        if 'results' not in data or not data['results']:
-            self.payload = []
-        elif not isinstance(data['results'], list):
-            self.payload = [data['results']]
-        else:
-            self.payload = data['results']
-
-    def _parse_date(self, date):
-        # We need to strip off the timezone because the times are always
-        # returned in the correct timezone for the user. Python has issues
-        # with parsing basically anything.
-
-        # 2015-07-06T00:00:00+00:00
-        stripped = TIMZONE_KILLA.match(date).group(1)
-        # 2015-07-06T00:00:00
-        return datetime.datetime.strptime(stripped, '%Y-%m-%dT%H:%M:%S')
+        return list(query.rotating_colors(
+            {
+                'label': groups.get(tags[key], tags[key]),
+                'value': list(v)[0][value_key],
+            } for
+            (_, tags), v in
+            self.res.items()
+        ))

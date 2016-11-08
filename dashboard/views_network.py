@@ -49,18 +49,16 @@ def network_dashboard(req, network_id):
     net_podcasts = net.podcast_set.all()
     pod_map = {str(p.id): p for p in net_podcasts}
 
-    with analytics_query.AsyncContext() as async_ctx:
-        top_episodes_query = analytics_query.get_top_episodes(
-            [str(p.id) for p in net_podcasts], async_ctx)
+    top_episodes_data = analytics_query.get_top_episodes([str(p.id) for p in net_podcasts])
 
     top_episodes = []
-    for x in sorted(top_episodes_query(), key=lambda x: -1 * x['podcast'])[:75]:
+    for ep_id, count in sorted(top_episodes_data.items(), key=lambda x: -1 * x[1])[:75]:
         try:
-            episode = PodcastEpisode.objects.get(id=x['episode'])
-        except Exception as e:
+            episode = PodcastEpisode.objects.get(id=ep_id)
+        except PodcastEpisode.DoesNotExist:
             continue
         top_episodes.append({
-            'count': x['podcast'],
+            'count': count,
             'episode': episode,
             'podcast': pod_map[str(episode.podcast_id)],
         })

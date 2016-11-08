@@ -4,8 +4,8 @@ import json
 
 import requests
 import rollbar
+from .influx import get_client
 from django.conf import settings
-from influxdb import InfluxDBClient
 
 from .analyze import get_device_type, get_request_hash, get_request_ip, get_ts_hash, is_bot
 
@@ -24,14 +24,7 @@ def write_influx(db, *args):
     return write_influx_many(db, [get_influx_item(db, *args)])
 
 def write_influx_many(db, items):
-    influx_client = InfluxDBClient(
-        host=settings.INFLUXDB_HOST,
-        port=settings.INFLUXDB_PORT,
-        username=settings.INFLUXDB_USERNAME,
-        password=settings.INFLUXDB_PASSWORD,
-        ssl=settings.INFLUXDB_SSL,
-        verify_ssl=settings.INFLUXDB_SSL,
-        timeout=10)
+    influx_client = get_client()
     try:
         return influx_client.write_points(items, database=db)
     except Exception as e:

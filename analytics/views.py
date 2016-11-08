@@ -49,79 +49,79 @@ def restrict(minimum_plan):
 
 @restrict(plans.PLAN_PRO)
 def podcast_subscriber_locations(req, pod):
-    f = (Format(req, 'subscribe')
-            .select(podcast='count')
+    f = (Format(req, 'subscription-country')
+            .select(podcast_f='count')
             .where(podcast=str(pod.id))
             .during('yesterday')
-            .group('profile.country'))
+            .group('country'))
 
     return f.format_country()
 
 
 @restrict(plans.FEATURE_MIN_GEOANALYTICS)
 def podcast_listener_locations(req, pod):
-    f = (Format(req, 'listen')
-            .select(podcast='count')
+    f = (Format(req, 'listen-country')
+            .select(podcast_f='count')
             .where(podcast=str(pod.id))
             .last_thirty()
-            .group('profile.country'))
+            .group('country'))
 
     return f.format_country(label=ugettext('Listeners'))
 
 @restrict(plans.FEATURE_MIN_GEOANALYTICS_EP)
 def episode_listener_locations(req, pod):
     ep = get_object_or_404(PodcastEpisode, podcast=pod, id=req.GET.get('episode'))
-    f = (Format(req, 'listen')
-            .select(podcast='count')
+    f = (Format(req, 'listen-country')
+            .select(podcast_f='count')
             .where(episode=str(ep.id))
-            .group('profile.country'))
+            .group('country'))
 
     return f.format_country(label=ugettext('Listeners'))
 
 
 @restrict(plans.PLAN_DEMO)
 def podcast_subscriber_history(req, pod):
-    f = (Format(req, 'subscribe')
-            .select(podcast='count')
+    f = (Format(req, 'subscription')
+            .select(podcast_f='count')
             .last_thirty()
             .where(podcast=str(pod.id)))
 
-    return f.format_intervals(labels={str(pod.id): pod.name}, unfiltered=True)
+    return f.format_interval()
 
 
 @restrict(plans.PLAN_DEMO)
 def podcast_listen_history(req, pod):
     f = (Format(req, 'listen')
-            .select(episode='count')
+            .select(episode_f='count')
             .last_thirty()
             .group('podcast')
             .where(podcast=str(pod.id)))
 
-    return f.format_intervals(labels={str(pod.id): pod.name}, unfiltered=True)
+    return f.format_interval()
 
 
 @restrict(plans.PLAN_DEMO)
 def episode_listen_history(req, pod):
     ep = get_object_or_404(PodcastEpisode, podcast=pod, id=req.GET.get('episode'))
     f = (Format(req, 'listen')
-            .select(episode='count')
+            .select(episode_f='count')
             .last_thirty()
             .where(episode=str(ep.id)))
 
-    return f.format_intervals(labels={str(ep.id): ep.title}, unfiltered=True)
+    return f.format_interval()
 
 
 SOURCE_MAP = {
     'direct': ugettext_lazy('Direct'),
     'rss': ugettext_lazy('Subscription'),
-    'embed': ugettext_lazy('Embedded Player'),
+    'embed': ugettext_lazy('Player'),
     None: ugettext_lazy('Unknown'),
 }
 
 @restrict(plans.PLAN_DEMO)
 def podcast_listen_breakdown(req, pod):
     f = (Format(req, 'listen')
-            .select(podcast='count')
+            .select(podcast_f='count')
             .group('source')
             .last_thirty()
             .where(podcast=str(pod.id)))
@@ -134,20 +134,20 @@ def podcast_listen_platform_breakdown(req, pod):
     breakdown_type = req.GET.get('breakdown_type', 'browser')
     if breakdown_type not in ['browser', 'os']: raise Http404()
 
-    f = (Format(req, 'listen')
-            .select(podcast='count')
-            .group(['profile.%s' % breakdown_type])
+    f = (Format(req, 'listen-platform')
+            .select(podcast_f='count')
+            .group(breakdown_type)
             .last_thirty()
             .where(podcast=str(pod.id)))
 
-    return f.format_breakdown(None)
+    return f.format_breakdown()
 
 
 @restrict(plans.PLAN_DEMO)
 def episode_listen_breakdown(req, pod):
     ep = get_object_or_404(PodcastEpisode, podcast=pod, id=req.GET.get('episode'))
     f = (Format(req, 'listen')
-            .select(episode='count')
+            .select(episode_f='count')
             .group('source')
             .last_thirty()
             .where(episode=str(ep.id)))
@@ -163,47 +163,42 @@ def network_listen_history(req):
     pods = net.podcast_set.all()
 
     f = (Format(req, 'listen')
-            .select(episode='count')
+            .select(episode_f='count')
             .last_thirty()
             .interval()
             .group('podcast')
             .where(podcast=[str(p.id) for p in pods]))
 
     return f.format_intervals(
-        labels={str(p.id): p.name for p in pods},
-        labeled_by='podcast',
+        labels_map={str(p.id): p.name for p in pods},
         extra_data={str(p.id): {'slug': p.slug} for p in pods})
 
 
 @login_required
 @restrict(plans.PLAN_PRO)
 def podcast_top_episodes(req, pod):
-    timeframe = req.GET.get('timeframe', None)
-    if not timeframe or timeframe not in ACCEPTABLE_TIMEFRAMES:
+    timeframe = req.GET.get('timeframe')
+    if not timeframe:
         return None
 
-    with query.AsyncContext() as async_ctx:
-        top_ep_data_query = query.get_top_episodes(
-            unicode(pod.id), async_ctx, ACCEPTABLE_TIMEFRAMES[timeframe])
-    top_ep_data = top_ep_data_query()
-
-    ep_ids = [x['episode'] for x in top_ep_data]
-    episodes = PodcastEpisode.objects.filter(id__in=ep_ids)
+    tz = UserSettings.get_from_user(req.user).tz_offset
+    top_ep_data = query.get_top_episodes(unicode(pod.id), timeframe, tz)
+    episodes = PodcastEpisode.objects.filter(id__in=top_ep_data.keys())
     mapped = {unicode(ep.id): ep for ep in episodes}
 
     # This step is necessary to filter out deleted episodes, since deleted episodes
     # are not removed from the analytics data.
-    top_ep_data = [x for x in top_ep_data if x['episode'] in mapped]
+    top_ep_data = {k: v for k, v in top_ep_data.items() if k in mapped}
 
     # Sort the top episode data descending
     return [[ugettext('Episode'), ugettext('Count')]] + [
         [
             {
-                'href': reverse('podcast_episode', podcast_slug=pod.slug, episode_id=mapped[x['episode']].id),
-                'title': mapped[x['episode']].title,
+                'href': reverse('podcast_episode', podcast_slug=pod.slug, episode_id=ep_id),
+                'title': mapped[ep_id].title,
             },
-            x['podcast'],  # The count
+            count,
         ] for
-        x in
-        list(reversed(sorted(top_ep_data, key=lambda x: x['podcast'])))[:25]
+        ep_id, count in
+        list(reversed(sorted(top_ep_data.items(), key=lambda x: x[1])))[:25]
     ]

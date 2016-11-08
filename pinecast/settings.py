@@ -229,6 +229,8 @@ INFLUXDB_PASSWORD = os.environ.get('INFLUXDB_PASSWORD')
 INFLUXDB_DB_SUBSCRIPTION = os.environ.get('INFLUXDB_DB_SUBSCRIPTION', 'subscription')
 INFLUXDB_DB_LISTEN = os.environ.get('INFLUXDB_DB_SUBSCRIPTION', 'listen')
 
+ANALYTICS_PROVIDER = 'influx'
+
 
 ROLLBAR = {
     'access_token': os.environ.get('ROLLBAR_ACCESS_TOKEN'),

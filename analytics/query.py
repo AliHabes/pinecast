@@ -1,161 +1,63 @@
-import collections
 import datetime
 import json
 
 import grequests
 from django.conf import settings
 
-
-def query_async(collection, q):
-    if 'timeframe' not in q and 'timezone' in q:
-        del q['timezone']
-    return grequests.get(
-        'https://api.getconnect.io/events/%s' % collection,
-        timeout=2,
-        params={'query': json.dumps(q)},
-        headers={'X-Project-Id': settings.GETCONNECT_IO_PID,
-                 'X-Api-Key': settings.GETCONNECT_IO_QUERY_KEY})
-
-def query_async_resolve(async_queries):
-    if isinstance(async_queries, list):
-        out = []
-        for x in grequests.map(async_queries):
-            try:
-                out.append(x.json())
-                x.close()
-            except (ValueError, AttributeError):
-                pass
-        return out
-
-    elif isinstance(async_queries, dict):
-        items = async_queries.items()
-        results = []
-        # Don't pass `.values()`. There's no guarantee that the values will be
-        # returned in the same order as `.items()`. It's also an extra
-        # unnecessary call.
-        for x in grequests.map(v for k, v in items):
-            try:
-                results.append(x.json())
-                x.close()
-            except ValueError:
-                pass
-
-        return {k: results[i] for i, (k, v) in enumerate(items)}
-
-    raise Exception('Unknown type passed to query_async_resolve')
+from .constants import USER_TIMEFRAMES
+from .influx import get_client
+from .util import escape, ident
 
 
-class AsyncContext(object):
-    def __init__(self):
-        self.pending = []
-        self.resolved = None
+def _get_lone(response, default=-1):
+    raw = response.raw
+    if not raw:
+        return default
+    return raw['series'][0]['values'][0][1]
 
-    def add(self, item, processor, default=None):
-        self.pending.append(item)
-        idx = len(self.pending) - 1
+def total_listens(podcast, episode_id=None):
+    query = 'SELECT COUNT(v) FROM "listen" WHERE podcast = \'%s\'%s;' % (
+        unicode(podcast.id),
+        ' AND episode = \'%s\'' % episode_id if episode_id else '')
 
-        return lambda: processor(self.resolve()[idx])
-
-    def resolve(self):
-        if self.resolved:
-            return self.resolved
-
-        self.resolved = []
-        for x in grequests.map(self.pending):
-            if not x:
-                self.resolved.append({})
-                continue
-            try:
-                self.resolved.append(x.json())
-                x.close()
-            except ValueError:
-                pass
-
-        return self.resolved
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        if traceback: return
-        self.resolve()
-
-
-def total_listens(podcast, async, episode_id=None):
-    q = {'select': {'podcast': 'count'},
-         'filter': {'podcast': unicode(podcast.id)}}
-    if episode_id:
-        q['filter']['episode'] = episode_id
-    data = query_async('listen', q)
     base_listens = 0 if episode_id is not None else podcast.stats_base_listens
 
-    def get_listens(data):
-        if ('results' not in data or
-            not data['results'] or
-            'podcast' not in data['results'][0]):
-            return base_listens
-
-        return data['results'][0]['podcast'] + base_listens
-
-    return async.add(data, get_listens)
+    return base_listens + _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_LISTEN), 0)
 
 
-def total_listens_this_week(podcast, async):
-    data = query_async(
-        'listen',
-        {'select': {'episode': 'count'},
-         'timeframe': {'previous': {'hours': 7 * 24}},
-         'filter': {'podcast': {'eq': unicode(podcast.id)}}})
+def total_listens_this_week(podcast, tz):
+    query = 'SELECT COUNT(v) FROM "listen" WHERE podcast = \'%s\' AND %s;' % (
+        unicode(podcast.id),
+        USER_TIMEFRAMES['week'](tz))
 
-    def get_listens(data):
-        if ('results' not in data or
-            not data['results'] or
-            'episode' not in data['results'][0]):
-            return -1
-        return data['results'][0]['episode']
-
-    return async.add(data, get_listens)
+    return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_LISTEN), 0)
 
 
-def total_subscribers(podcast, async):
-    data = query_async(
-        'subscribe',
-        {'select': {'podcast': 'count'},
-         'timeframe': 'today',
-         'filter': {'podcast': {'eq': unicode(podcast.id)}}})
+def total_subscribers(podcast):
+    query = 'SELECT COUNT(v) FROM "subscription" WHERE podcast = \'%s\' AND %s;' % (
+        unicode(podcast.id),
+        USER_TIMEFRAMES['day'](0)) # tz offset of zero because it doesn't matter which day
 
-    def get_listens(data):
-        if ('results' not in data or
-            not data['results'] or
-            'podcast' not in data['results'][0]):
-            return -1
-        return data['results'][0]['podcast']
-
-    return async.add(data, get_listens)
+    return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_SUBSCRIPTION), 0)
 
 
-def get_top_episodes(podcast, async, timeframe=None):
-    where_clause = {'in': podcast if isinstance(podcast, list) else [podcast]}
-    q = {'select': {'podcast': 'count'},
-         'groupBy': 'episode',
-         'filter': {'podcast': where_clause}}
+def get_top_episodes(podcasts, timeframe=None, tz=None):
+    if not isinstance(podcasts, (list, tuple)):
+        podcasts = [podcasts]
+
+    where_clause = ' OR '.join('podcast = %s' % escape(p) for p in podcasts)
     if timeframe:
-        q['timeframe'] = timeframe
+        where_clause = '(%s) AND %s' % (where_clause, USER_TIMEFRAMES[timeframe](tz))
 
-    data = query_async('listen', q)
+    query = 'SELECT COUNT(episode_f) FROM "listen" WHERE %s GROUP BY episode;' % where_clause
 
-    return async.add(data, lambda d: d['results'] if 'results' in d else [])
+    result = get_client().query(query, database=settings.INFLUXDB_DB_LISTEN)
 
-
-def process_groups(groups, label_mapping=None, label_key=None, pick=None):
-    if not groups: return []
-
-    if not label_mapping: label_mapping = collections.defaultdict(collections.defaultdict)
-
-    labels = [label_mapping.get(x[label_key], x[label_key]) for x in groups]
-    values = groups if not pick else [x[pick] for x in groups]
-
-    return {'labels': labels, 'dataset': values}
+    return {
+        tags['episode']: list(v)[0]['count'] for
+        (_, tags), v in
+        result.items()
+    }
 
 
 def rotating_colors(sequence, key='color', highlight_key='highlight'):

@@ -110,24 +110,23 @@ MILESTONES = [1, 100, 250, 500, 1000, 2000, 5000, 7500, 10000, 15000, 20000,
 def podcast_dashboard(req, podcast_slug):
     pod = get_podcast(req, podcast_slug)
 
-    with analytics_query.AsyncContext() as async_ctx:
-        total_listens = analytics_query.total_listens(pod, async_ctx)
-        total_listens_this_week = analytics_query.total_listens_this_week(pod, async_ctx)
-        subscribers = analytics_query.total_subscribers(pod, async_ctx)
+    tz = UserSettings.get_from_user(req.user).tz_offset
 
-    listens = total_listens()
+    total_listens = analytics_query.total_listens(pod)
+    total_listens_this_week = analytics_query.total_listens_this_week(pod, tz)
+    subscribers = analytics_query.total_subscribers(pod)
 
     data = {
         'podcast': pod,
         'episodes': pod.podcastepisode_set.order_by('-publish'),
         'analytics': {
-            'total_listens': listens,
-            'total_listens_this_week': total_listens_this_week(),
-            'subscribers': subscribers(),
+            'total_listens': total_listens,
+            'total_listens_this_week': total_listens_this_week,
+            'subscribers': subscribers,
         },
-        'next_milestone': next(x for x in MILESTONES if x > listens),
-        'previous_milestone': [x for x in MILESTONES if x <= listens][-1] if listens else 0,
-        'hit_first_milestone': listens > MILESTONES[1],  # The first "real" milestone
+        'next_milestone': next(x for x in MILESTONES if x > total_listens),
+        'previous_milestone': [x for x in MILESTONES if x <= total_listens][-1] if total_listens else 0,
+        'hit_first_milestone': total_listens > MILESTONES[1],  # The first "real" milestone
         'is_still_importing': pod.is_still_importing(),
 
         'site': None,
@@ -299,7 +298,7 @@ def podcast_new_ep(req, podcast_slug):
     except Exception as e:
         ctx['error'] = True
         ctx['default'] = req.POST
-        return  _pmrender(req, 'dashboard/episode/page_new.html', ctx)
+        return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
     return redirect('podcast_dashboard', podcast_slug=pod.slug)
 
 
@@ -362,14 +361,12 @@ def podcast_episode(req, podcast_slug, episode_id):
     pod = get_podcast(req, podcast_slug)
     ep = get_object_or_404(PodcastEpisode, id=episode_id, podcast=pod)
 
-    with analytics_query.AsyncContext() as async_ctx:
-        total_listens = analytics_query.total_listens(
-            pod, async_ctx, episode_id=str(ep.id))
+    total_listens = analytics_query.total_listens(pod, episode_id=str(ep.id))
 
     data = {
         'podcast': pod,
         'episode': ep,
-        'analytics': {'total_listens': total_listens()},
+        'analytics': {'total_listens': total_listens},
         'feedback': Feedback.objects.filter(podcast=pod, episode=ep).order_by('-created'),
     }
     return _pmrender(req, 'dashboard/episode/page_episode.html', data)
