@@ -44,7 +44,11 @@ def write_influx_many(db, items):
             item['fields']['country_f'] = country
             item['tags']['country'] = country
 
-    return influx_client.write_points(items, database=influx_databases[db])
+    try:
+        return influx_client.write_points(items, database=influx_databases[db])
+    except Exception as e:
+        rollbar.report_message('Problem delivering logs to influx: %s' % e, 'error')
+        return None
 
 
 def write(collection, blob, req=None):
