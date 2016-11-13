@@ -10,6 +10,6 @@ class TrailingSlashRedirect(object):
         if path.endswith('/') and is_valid_path(path[:-1]):
             hostname = req.META.get('HTTP_HOST')
             return HttpResponsePermanentRedirect(
-                '%s//%s%s' % (scheme,hostname, path[:-1]))
+                '%s//%s%s' % (scheme, hostname, path[:-1]))
 
         return None

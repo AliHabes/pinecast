@@ -10,12 +10,6 @@ from influxdb import InfluxDBClient
 from .analyze import get_device_type, get_request_hash, get_request_ip, is_bot
 
 
-influx_databases = {
-    'subscribe': settings.INFLUXDB_DB_SUBSCRIPTION,
-    'subscription': settings.INFLUXDB_DB_SUBSCRIPTION,
-    'listen': settings.INFLUXDB_DB_LISTEN,
-}
-
 def get_influx_item(measurement, tags, fields, timestamp=None):
     if not timestamp:
         timestamp = datetime.datetime.now()
@@ -172,11 +166,9 @@ def get_listen_obj(ep, source, req=None, ip=None, ua=None, timestamp=None):
 
 
 def commit_listens(listen_objs):
-    gc_listens = [x[0] for x in listen_objs]
-    write_gc_many('listen', gc_listens)
-
-    points = [i for _, y in listen_objs for i in y]
-    write_influx_many(settings.INFLUXDB_DB_LISTEN, points)
+    write_gc_many('listen', [x[0] for x in listen_objs])
+    write_influx_many(
+        settings.INFLUXDB_DB_LISTEN, [i for _, y in listen_objs for i in y])
 
 
 def write_subscription(req, podcast):

@@ -56,9 +56,10 @@ def log(req):
             ua=blob.get('userAgent'),
             timestamp=ts)
 
-        if lo: listens_to_log.append(lo)
+        if lo:
+            listens_to_log.append(lo)
 
     print 'Logging %d listen records' % len(listens_to_log)
-    analytics_log.commit_listens('listen', listens_to_log)
+    analytics_log.commit_listens(listens_to_log)
 
     return HttpResponse(status=204)

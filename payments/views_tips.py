@@ -114,7 +114,7 @@ def _send_one_time_tip(req, podcast, owner_us, amount):
         ugettext('Thanks for leaving a tip!'),
         ugettext('Your tip was sent: %s received $%0.2f. Thanks for supporting your '
                  'favorite content creators!') %
-            (podcast.name, float(amount) / 100),
+                (podcast.name, float(amount) / 100),
         email=email)
     send_notification_email(
         podcast.owner,
@@ -151,10 +151,9 @@ def _auth_subscription(req, podcast, amount):
             'To finish the process and activate your subscription, click the '
             'link below. The link in this email will expire after one day.\n\n'
             'If you did not request this, you can ignore this email.' %
-                (podcast.name, float(amount) / 100)),
+            (podcast.name, float(amount) / 100)),
         reverse('tip_jar_confirm_sub', podcast_slug=podcast.slug) +
-            '?email=%s&token=%s&amount=%d' %
-                (quote(email), quote(token), amount))
+        '?email=%s&token=%s&amount=%d' % (quote(email), quote(token), amount))
 
     return {'success': True, 'status': 'pending'}
 
@@ -222,7 +221,7 @@ def _finish_sub(req, pod, amount, email, token):
             ugettext('Your subscription was updated.'),
             ugettext('Your subscription to %s was updated to $%0.2f. Thanks '
                      'for supporting your favorite content creators!') %
-                (pod.name, float(amount) / 100),
+                    (pod.name, float(amount) / 100),
             email=email)
         return True
     except RecurringTip.DoesNotExist:
