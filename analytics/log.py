@@ -171,13 +171,16 @@ def commit_listens(listen_objs):
         settings.INFLUXDB_DB_LISTEN, [i for _, y in listen_objs for i in y])
 
 
-def write_subscription(req, podcast):
+def write_subscription(req, podcast, ts=None, dry_run=False):
     if is_bot(req=req): return
 
     ip = get_request_ip(req)
     ua = req.META.get('HTTP_USER_AGENT')
 
-    pod_id = unicode(podcast.id)
+    if isinstance(podcast, (str, unicode)):
+        pod_id = podcast
+    else:
+        pod_id = unicode(podcast.id)
 
     browser, device, os = get_device_type(req=req, ua=ua)
     country = _get_country(ip, req)
@@ -194,9 +197,8 @@ def write_subscription(req, podcast):
             'os': os,
         },
     }
-    write_gc_many('subscribe', [gc_subscription])
 
-    influx_ts = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+    influx_ts = ts or datetime.datetime.combine(datetime.date.today(), datetime.time.min)
 
     base_tags = {
         'podcast': pod_id,
@@ -233,4 +235,8 @@ def write_subscription(req, podcast):
             )
         )
 
+    if dry_run:
+        return
+
+    write_gc_many('subscribe', [gc_subscription])
     write_influx_many(settings.INFLUXDB_DB_SUBSCRIPTION, points)

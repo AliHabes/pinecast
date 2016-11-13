@@ -241,7 +241,7 @@ ROLLBAR = {
 }
 
 
-DISABLE_GETCONNECT = False
+DISABLE_GETCONNECT = os.environ.get('DISABLE_GETCONNECT', 'false') == 'true'
 
 
 try:

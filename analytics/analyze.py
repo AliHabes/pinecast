@@ -20,7 +20,7 @@ linux_oss = (
 )
 
 def get_device_type(req=None, ua=None):
-    if req:
+    if req and not hasattr(req, '__is_fake__'):
         # TODO: clean this up
         ua = req.META.get('HTTP_USER_AGENT', 'Unknown')
         parsed = _parse_req(req)
@@ -69,7 +69,8 @@ def is_bot(req=None, ua=None):
 
 def _parse_req(req):
     if not hasattr(req, '__parsed_ua'):
-        setattr(req, '__parsed_ua', parse(req.META.get('HTTP_USER_AGENT', 'Unknown')))
+        ua = req.META.get('HTTP_USER_AGENT', 'Unknown') or 'Unknown'
+        setattr(req, '__parsed_ua', parse(ua))
     return getattr(req, '__parsed_ua')
 
 
