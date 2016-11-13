@@ -1,4 +1,3 @@
-import datetime
 import time
 from email.Utils import formatdate
 from xml.sax.saxutils import escape, quoteattr
@@ -8,7 +7,6 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 
 import accounts.payment_plans as plans
-import analytics.analyze as analyze
 import analytics.log as analytics_log
 from .models import Podcast, PodcastEpisode
 from accounts.models import UserSettings
@@ -25,44 +23,11 @@ def _asset(url):
 
 def listen(req, episode_id):
     ep = get_object_or_404(PodcastEpisode, id=episode_id)
-    if not analyze.is_bot(req) and req.method == 'GET':
-        browser, device, os = analyze.get_device_type(req)
-        analytics_log.write('listen', {
-            'podcast': unicode(ep.podcast.id),
-            'episode': unicode(ep.id),
-            'source': 'embed' if req.GET.get('embed') else 'direct',
-            'profile': {
-                'ip': analyze.get_request_ip(req),
-                'ua': req.META.get('HTTP_USER_AGENT'),
-                'browser': browser,
-                'device': device,
-                'os': os,
-            },
-        }, req=req)
-
-        analytics_log.write_influx(
-            'listen',
-            {
-                'podcast': unicode(ep.podcast.id),
-                'episode': unicode(ep.id),
-
-                'browser': browser,
-                'device': device,
-                'os': os,
-                'source': 'embed' if req.GET.get('embed') else 'direct',
-            },
-            {
-                'podcast_f': unicode(ep.podcast.id),
-                'episode_f': unicode(ep.id),
-                'source_f': 'embed' if req.GET.get('embed') else 'direct',
-
-                'hash': analyze.get_request_hash(req),
-                'ip': analyze.get_request_ip(req),
-                'ua': req.META.get('HTTP_USER_AGENT'),
-
-                'v': 1, # version
-            }
-        )
+    if req.method == 'GET':
+        analytics_log.write_listen(
+            ep=ep,
+            source='embed' if req.GET.get('embed') else 'direct',
+            req=req)
 
     return redirect(_asset(ep.audio_url))
 
@@ -164,40 +129,8 @@ def feed(req, podcast_slug):
         else:
             content.append('<!-- This feed will be truncated at 10 items because the owner is not a paid customer. -->')
 
-    if not analyze.is_bot(req):
-        browser, device, os = analyze.get_device_type(req)
-        analytics_log.write_influx(
-            'subscribe',
-            {
-                'podcast': unicode(pod.id),
-                'browser': browser,
-                'device': device,
-                'os': os,
-            },
-            {
-                'podcast_f': unicode(pod.id),
-
-                'hash': analyze.get_request_hash(req),
-                'ip': analyze.get_request_ip(req),
-                'ua': req.META.get('HTTP_USER_AGENT'),
-
-                'v': 1, # version
-            },
-            datetime.datetime.combine(
-                datetime.date.today(),
-                datetime.time.min)
-        )
-        analytics_log.write('subscribe', {
-            'id': analyze.get_request_hash(req),
-            'podcast': unicode(pod.id),
-            'profile': {
-                'ip': analyze.get_request_ip(req),
-                'ua': req.META.get('HTTP_USER_AGENT'),
-                'browser': browser,
-                'device': device,
-                'os': os,
-            },
-        }, req=req)
+    # Write the log of this to the analytics back-end(s)
+    analytics_log.write_subscription(req, pod)
 
     resp = HttpResponse(
         '\n'.join(c for c in content if c),

@@ -1,46 +1,18 @@
 import datetime
 import json
 
-import requests
 import rollbar
 from django.conf import settings
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 
-import analytics.analyze as analyze
 import analytics.log as analytics_log
-from podcasts.models import Podcast, PodcastEpisode
+from podcasts.models import PodcastEpisode
 
 
-@csrf_exempt
-@require_POST
-def deploy_complete(req):
-    commit = '<https://github.com/pinecast/pinecast/commit/%s|%s>' % (
-        req.POST.get('head'), req.POST.get('head'))
-
-    payload = {
-        'text': '''
-            Hey guys! I'm Pinecast version %s. I was just born! :hatching_chick:
-You have %s to thank for pushing %s to production.
-To learn about what's new, check out #pinecast :two_hearts:
-        '''.strip() % (req.POST.get('release'), req.POST.get('user'), commit),
-        'username': 'newborn-pinecast',
-        'icon_emoji': ':cat2:',
-    }
-
-    print requests.post(
-        settings.DEPLOY_SLACKBOT_URL,
-        data={'payload': json.dumps(payload)})
-
-    return HttpResponse(status=204)
-
-
-class FakeReq(object):
-    def __init__(self, blob):
-        self.META = {'HTTP_USER_AGENT': blob['userAgent'],
-                     'REMOTE_ADDR': blob['ip']}
-
+ts_formats = ['[%d/%b/%Y:%H:%M:%S %z]',
+              '[%d/%b/%Y:%H:%M:%S +0000]',
+              '[%d/%m/%Y:%H:%M:%S +0000]']  # For cdn
 
 @csrf_exempt
 def log(req):
@@ -48,28 +20,17 @@ def log(req):
         return HttpResponse(status=400)
 
     try:
-        parsed = json.loads(req.POST.get('payload'))
+        parsed = json.loads(req.POST['payload'])
     except Exception:
         return HttpResponse(status=400)
-
-    ts_formats = ['[%d/%b/%Y:%H:%M:%S %z]',
-                  '[%d/%b/%Y:%H:%M:%S +0000]',
-                  '[%d/%m/%Y:%H:%M:%S +0000]']  # For cdn
-
-    listens_to_log = []
-    influx_listens_to_log = []
 
     # Make sure we don't iterate over something that's not iterable
-    try:
-        assert list(parsed)
-    except Exception:
+    if not isinstance(parsed, list):
         return HttpResponse(status=400)
 
-    for blob in parsed:
-        fr = FakeReq(blob)
-        if analyze.is_bot(fr):
-            continue
+    listens_to_log = []
 
+    for blob in parsed:
         try:
             ep = PodcastEpisode.objects.get(id=blob['episode'])
         except PodcastEpisode.DoesNotExist:
@@ -83,60 +44,21 @@ def log(req):
                 break
             except ValueError:
                 continue
-
-        # If we couldn't parse the timestamp, whatever.
-        if not ts:
+        else:
+            # If we couldn't parse the timestamp, whatever.
             rollbar.report_message('Got unparseable date: %s' % raw_ts, 'error')
             continue
 
-        browser, device, os = analyze.get_device_type(fr)
-        print 'Logging record of listen for %s' % unicode(ep.id)
+        lo = analytics_log.get_listen_obj(
+            ep=ep,
+            source=blob.get('source'),
+            ip=blob.get('ip'),
+            ua=blob.get('userAgent'),
+            timestamp=ts)
 
-        listens_to_log.append({
-            'podcast': unicode(ep.podcast.id),
-            'episode': unicode(ep.id),
-            'source': blob.get('source'),
-            'profile': {
-                'ip': blob.get('ip'),
-                'ua': blob.get('userAgent'),
-                'browser': browser,
-                'device': device,
-                'os': os,
-            },
+        if lo: listens_to_log.append(lo)
 
-            'timestamp': ts.isoformat(),
-        })
-        influx_listens_to_log.append(
-            analytics_log.get_influx_item(
-                db='listen',
-                tags={
-                    'podcast': unicode(ep.podcast.id),
-                    'episode': unicode(ep.id),
-
-                    'browser': browser,
-                    'device': device,
-                    'os': os,
-                    'source': blob.get('source'),
-                },
-                fields={
-                    'podcast_f': unicode(ep.podcast.id),
-                    'episode_f': unicode(ep.id),
-                    'source_f': blob.get('source'),
-
-                    'hash': analyze.get_raw_request_hash(
-                        blob.get('userAgent'),
-                        blob.get('ip'),
-                        ts
-                    ),
-                    'ip': blob.get('ip'),
-                    'ua': blob.get('userAgent'),
-                    'v': 1, # version
-                },
-                timestamp=ts,
-            )
-        )
-
-    analytics_log.write_many('listen', listens_to_log)
-    analytics_log.write_influx_many('listen', influx_listens_to_log)
+    print 'Logging %d listen records' % len(listens_to_log)
+    analytics_log.commit_listens('listen', listens_to_log)
 
     return HttpResponse(status=204)

@@ -33,7 +33,6 @@ urlpatterns = (
         url(r'^logout', logout_view, name='logout'),
         url(r'^payments/', include(payments.urls)),
 
-        url(r'^services/deploy_complete$', views.deploy_complete),
         url(r'^services/log$', views.log),
 
         url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript_catalog'),

@@ -241,6 +241,9 @@ ROLLBAR = {
 }
 
 
+DISABLE_GETCONNECT = False
+
+
 try:
     from settings_local import *
 except ImportError:
