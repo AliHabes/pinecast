@@ -21,6 +21,8 @@ linux_oss = (
 
 def get_device_type(req=None, ua=None):
     if req:
+        # TODO: clean this up
+        ua = req.META.get('HTTP_USER_AGENT', 'Unknown')
         parsed = _parse_req(req)
     else:
         parsed = parse(ua or 'Unknown')
@@ -30,7 +32,6 @@ def get_device_type(req=None, ua=None):
         'device': parsed.device.family,
         'os': parsed.os.family,
     }
-    ua = req.META.get('HTTP_USER_AGENT', 'Unknown')
     sb = settled['browser']
     if 'iTunes' in ua:
         settled['browser'] = 'itunes'
