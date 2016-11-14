@@ -53,11 +53,23 @@ class Command(BaseCommand):
 
         lobjs = []
         ignored = 0
+        cache_hits = 0
+
+        country_cache = {}
 
         with open(options.get('source')) as source:
             for i, line in enumerate(source):
                 parsed = json.loads(line)
+
+                was_unset = False
                 try:
+                    if not parsed['profile']['country'] and parsed['profile']['ip'] in country_cache:
+                        parsed['profile']['country'] = country_cache[parsed['profile']['ip']]
+                        cache_hits += 1
+                    elif not parsed['profile']['country']:
+                        was_unset = True
+                        self.stdout.write('Country needs to be fetched...')
+
                     fake_req = FakeReq(
                         ua=parsed['profile']['ua'] or 'Unknown',
                         ip=parsed['profile']['ip'],
@@ -66,8 +78,6 @@ class Command(BaseCommand):
                     fake_ep = FakeEp(parsed['episode'], parsed['podcast'])
                     source = parsed['source']
 
-                    if not parsed['profile']['country']:
-                        self.stdout.write('Country needs to be fetched...')
                 except Exception as e:
                     self.stderr.write('(%d): %s' % (i, str(e)))
                     continue
@@ -86,9 +96,15 @@ class Command(BaseCommand):
                     continue
                 lobjs.append((None, result[1]))
 
+                if was_unset:
+                    country_cache[result[0]['profile']['ip']] = result[0]['profile']['country']
+
                 if i % 500 == 0:
                     if ignored:
                         self.stdout.write('Ignored %d records so far' % ignored)
+                    if cache_hits:
+                        self.stdout.write('%d country cache hits' % cache_hits)
+
                     if not dry_run:
                         commit_listens(lobjs)
                     lobjs = []
