@@ -26,11 +26,11 @@ def write_influx(db, *args):
 def write_influx_many(db, items):
     influx_client = InfluxDBClient(
         host=settings.INFLUXDB_HOST,
-        port=443,
+        port=settings.INFLUXDB_PORT,
         username=settings.INFLUXDB_USERNAME,
         password=settings.INFLUXDB_PASSWORD,
-        ssl=True,
-        verify_ssl=True,
+        ssl=settings.INFLUXDB_SSL,
+        verify_ssl=settings.INFLUXDB_SSL,
         timeout=10)
     try:
         return influx_client.write_points(items, database=db)

@@ -241,6 +241,8 @@ ROLLBAR = {
 }
 
 INFLUXDB_HOST = 'influx.service.pinecast.com'
+INFLUXDB_PORT = 443
+INFLUXDB_SSL = True
 
 DISABLE_GETCONNECT = os.environ.get('DISABLE_GETCONNECT', 'false') == 'true'
 
