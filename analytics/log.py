@@ -172,7 +172,10 @@ def commit_listens(listen_objs):
 
 
 def write_subscription(req, podcast, ts=None, dry_run=False):
-    if is_bot(req=req): return
+    if is_bot(req=req):
+        if settings.DEBUG:
+            print 'Ignoring bot: %s' % req.META.get('HTTP_USER_AGENT')
+        return
 
     ip = get_request_ip(req)
     ua = req.META.get('HTTP_USER_AGENT', 'Unknown') or 'Unknown'

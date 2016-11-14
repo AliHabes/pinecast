@@ -8,6 +8,7 @@ bot_browsers = (
     'Apache-HttpClient',
     'FacebookBot',
     'CFNetwork',
+    'okhttp',
 )
 linux_oss = (
     'Fedora',
@@ -43,8 +44,13 @@ def get_device_type(req=None, ua=None):
         settled['browser'] = 'beyondpod'
     elif 'Overcast' in ua:
         settled['browser'] = 'overcast'
+    elif 'Downcast' in ua:
+        settled['browser'] = 'downcast'
+    elif 'DoggCatcher' in ua:
+        settled['browser'] = 'doggcatcher'
     elif any(x in sb for x in bot_browsers):
         settled['browser'] = 'server'
+        settled['os'] = 'Other'
     elif 'Chrome' in sb or 'Chromium' in sb:
         settled['browser'] = 'chrome'
     elif 'Firefox' in sb or 'Iceweasel' in sb or 'SeaMonkey' in sb:
