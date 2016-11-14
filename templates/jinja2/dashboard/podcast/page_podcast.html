@@ -6,7 +6,7 @@
 <section class="subheader">
   <div>
     <hgroup>
-      <h1>{{ podcast.name }}</h1>
+      <h1 title="{{ podcast.id }}">{{ podcast.name }}</h1>
       <h2>
         {% if is_still_importing %}
           {{ _('This podcast is still being imported') }}
