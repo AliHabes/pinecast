@@ -131,8 +131,8 @@ def podcast_listen_breakdown(req, pod):
 
 @restrict(plans.PLAN_STARTER)
 def podcast_listen_platform_breakdown(req, pod):
-    breakdown_type = req.GET.get('breakdown_type', 'device')
-    if breakdown_type not in ['device', 'browser', 'os']: raise Http404()
+    breakdown_type = req.GET.get('breakdown_type', 'browser')
+    if breakdown_type not in ['browser', 'os']: raise Http404()
 
     f = (Format(req, 'listen')
             .select(podcast='count')
