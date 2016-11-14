@@ -175,7 +175,7 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
     if is_bot(req=req): return
 
     ip = get_request_ip(req)
-    ua = req.META.get('HTTP_USER_AGENT')
+    ua = req.META.get('HTTP_USER_AGENT', 'Unknown') or 'Unknown'
 
     if isinstance(podcast, (str, unicode)):
         pod_id = podcast
