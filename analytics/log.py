@@ -7,7 +7,7 @@ import rollbar
 from django.conf import settings
 from influxdb import InfluxDBClient
 
-from .analyze import get_device_type, get_request_hash, get_request_ip, is_bot
+from .analyze import get_device_type, get_request_hash, get_request_ip, get_ts_hash, is_bot
 
 
 def get_influx_item(measurement, tags, fields, timestamp=None):
@@ -202,6 +202,7 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
     }
 
     influx_ts = ts or datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+    hashed_influx_ts = influx_ts + datetime.timedelta(microseconds=get_ts_hash(ip, ua, influx_ts))
 
     base_tags = {
         'podcast': pod_id,
@@ -222,7 +223,7 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
                 **base_tags
             ),
             fields=base_fields,
-            timestamp=influx_ts,
+            timestamp=hashed_influx_ts,
         ),
     ]
     if country:
@@ -234,7 +235,7 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
                     **base_tags
                 ),
                 fields=base_fields,
-                timestamp=influx_ts,
+                timestamp=hashed_influx_ts,
             )
         )
 
@@ -242,4 +243,10 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
         return
 
     write_gc_many('subscribe', [gc_subscription])
-    write_influx_many(settings.INFLUXDB_DB_SUBSCRIPTION, points)
+    result = write_influx_many(settings.INFLUXDB_DB_SUBSCRIPTION, points)
+    if not result:
+        if settings.DEBUG:
+            print 'Error ingesting data to InfluxDB'
+        else:
+            rollbar.report_message(
+                'Unable to ingest subscription points to influx', 'error')

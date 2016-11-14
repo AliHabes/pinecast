@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import datetime
 
 from user_agents import parse
@@ -99,3 +100,8 @@ def get_request_hash(req):
 
 def get_raw_request_hash(ua, ip, ts):
     return base64.b64encode('%s:%s:%s' % (ts.isoformat(), ip, ua))
+
+def get_ts_hash(ip, ua, ts):
+    h = hashlib.sha1(','.join([ip, ua, ts.isoformat()])).hexdigest()
+    # This allows one hour of timestamp variability
+    return int(h, 16) % (1000000 * 60 * 60)
