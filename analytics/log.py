@@ -90,7 +90,7 @@ def get_listen_obj(ep, source, req=None, ip=None, ua=None, timestamp=None):
     if is_bot(req=req, ua=ua): return None
 
     if not ip: ip = get_request_ip(req)
-    if not ua: ua = req.META.get('HTTP_USER_AGENT')
+    if not ua: ua = req.META.get('HTTP_USER_AGENT', 'Unknown') or 'Unknown'
     if not timestamp: timestamp = datetime.datetime.now()
 
     ep_id = unicode(ep.id)
