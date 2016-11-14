@@ -240,6 +240,7 @@ ROLLBAR = {
     'root': os.getcwd(),
 }
 
+INFLUXDB_HOST = 'influx.service.pinecast.com'
 
 DISABLE_GETCONNECT = os.environ.get('DISABLE_GETCONNECT', 'false') == 'true'
 

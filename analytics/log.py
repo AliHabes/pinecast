@@ -25,7 +25,7 @@ def write_influx(db, *args):
 
 def write_influx_many(db, items):
     influx_client = InfluxDBClient(
-        host='influx.service.pinecast.com',
+        host=settings.INFLUXDB_HOST,
         port=443,
         username=settings.INFLUXDB_USERNAME,
         password=settings.INFLUXDB_PASSWORD,
