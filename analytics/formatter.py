@@ -65,9 +65,9 @@ def _parse_date(date):
 
 
 class Format(object):
-    def __init__(self, req, db):
-        self.db = db
-        self.event_type = influx_databases[db]
+    def __init__(self, req, event_type):
+        self.db = influx_databases[event_type]
+        self.event_type = event_type
         self.req = req
         self.selection = {}
         self.criteria = {}
