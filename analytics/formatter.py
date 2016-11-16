@@ -168,7 +168,7 @@ class Format(object):
         if not points:
             points = self.res.items()[0][1]
         tz_offset = self._get_tz_offset()
-        return (_parse_date(x['time']) - tz_offset for x in points)
+        return (_parse_date(x['time']) + tz_offset for x in points)
 
     def _get_date_labels(self, points=None):
         interval_duration = DELTAS[self.interval_val]
