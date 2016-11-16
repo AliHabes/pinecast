@@ -45,7 +45,7 @@ def write_gc_many(collection, blobs):
             headers={'X-Project-Id': settings.GETCONNECT_IO_PID,
                      'X-Api-Key': settings.GETCONNECT_IO_PUSH_KEY})
     except Exception:
-        rollbar.report_message('Analytics POST timeout: %s' % url, 'error')
+        rollbar.report_message('Analytics POST timeout', 'error')
         return
 
     # 409 is a duplicate ID error, which is expected
