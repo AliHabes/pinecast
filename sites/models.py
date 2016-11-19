@@ -8,51 +8,6 @@ from django.utils.translation import ugettext_lazy
 from podcasts.models import Podcast
 
 
-BANNED_SLUGS = set([
-    'about',
-    'admin',
-    'api',
-    'apps',
-    'asset-cdn',
-    'asset-cdn-cf',
-    'beta',
-    'blog',
-    'careers',
-    'cdn',
-    'chat',
-    'community',
-    'dmca',
-    'download',
-    'feed',
-    'feedback',
-    'feeds',
-    'forum',
-    'forums',
-    'ftp',
-    'help',
-    'host',
-    'jobs',
-    'kb',
-    'kits',
-    'knowledgebase',
-    'live',
-    'm',
-    'mail',
-    'media',
-    'mobile',
-    'next',
-    'pop',
-    'search',
-    'smtp',
-    'status',
-    'store',
-    'support',
-    'vpn',
-    'webmail',
-    'wiki',
-    'www',
-])
-
 GA_VALIDATOR = RegexValidator(r'^[0-9a-zA-Z\-]*$', ugettext_lazy('Only GA IDs are accepted'))
 
 ITUNES_ID_EXTRACTOR = re.compile(r'id(\w+)')
