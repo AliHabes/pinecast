@@ -94,6 +94,48 @@
       value="{{ default.get('stitcher_url', site.stitcher_url or '') }}">
   </label>
 
+  {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_CNAME) %}
+    <hr>
+
+    <strong>{{ _('Custom Domain Name') }}</strong>
+
+    <aside class="aside--secure">
+      <b>{{ _('DNS Settings Instructions') }}</b>
+      <ul>
+        <li><a href="https://pinecast.zendesk.com/hc/en-us/articles/235192028-How-to-use-a-custom-domain-name-with-Cloudflare">{{ _('Cloudflare') }}</a></li>
+        <li><a href="https://pinecast.zendesk.com/hc/en-us/articles/235414727-How-to-use-a-custom-domain-name-with-GoDaddy">{{ _('GoDaddy') }}</a></li>
+        <li><a href="https://pinecast.zendesk.com/hc/en-us/articles/235192088-How-to-use-a-custom-domain-name-with-Namecheap">{{ _('Namecheap') }}</a></li>
+        <li><a href="https://pinecast.zendesk.com/hc/en-us/articles/235414767-How-to-use-a-custom-domain-name-with-another-service">{{ _('Other Services') }}</a></li>
+      </ul>
+    </aside>
+
+    <p>
+      {% trans %}
+        If you have purchased your own domain name, you can enter it here.
+        After you've configured your DNS settings with your registrar, your
+        site will be available at this domain name.
+      {% endtrans %}
+    </p>
+    <p>
+      {% trans slug=podcast.slug %}
+        Leaving this field blank will make your site available at <samp>http://{{ slug }}.pinecast.co</samp>.
+      {% endtrans %}
+    </p>
+
+    <label>
+      <span>{{ _('Domain Name') }}</span>
+      <div class="segment-input">
+        <span>http://</span>
+        <input type="url"
+          name="custom_cname"
+          placeholder="theadventure.zone"
+          maxlength="64"
+          value="{{ default.get('custom_cname', site.custom_cname or '') }}">
+      </div>
+    </label>
+
+  {% endif %}
+
   {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_BLOG) %}
     <hr>
 

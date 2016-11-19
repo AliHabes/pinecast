@@ -60,6 +60,7 @@ def edit_site(req, podcast_slug):
         site.stitcher_url = req.POST.get('stitcher_url')
         site.show_itunes_banner = req.POST.get('show_itunes_banner') == 'true'
         site.custom_css = req.POST.get('custom_css')
+        site.custom_cname = req.POST.get('custom_cname')
 
         us = UserSettings.get_from_user(site.podcast.owner)
         if payment_plans.minimum(us.plan, payment_plans.FEATURE_MIN_BLOG):

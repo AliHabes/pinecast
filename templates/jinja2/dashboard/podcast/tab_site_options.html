@@ -4,8 +4,20 @@
     <input class="col"
       readonly
       type="url"
-      value="http://{{ site.podcast.slug }}.pinecast.co">
-    <a class="btn" href="http://{{ site.podcast.slug }}.pinecast.co" style="flex: 0 0 150px; margin: 0 0 0 15px;">
+      {% if site.custom_cname %}
+        value="http://{{ site.custom_cname }}">
+      {% else %}
+        value="http://{{ site.podcast.slug }}.pinecast.co">
+      {% endif %}
+    <a
+      class="btn"
+      {% if site.custom_cname %}
+        href="http://{{ site.custom_cname }}"
+      {% else %}
+        href="http://{{ site.podcast.slug }}.pinecast.co"
+      {% endif %}
+      style="flex: 0 0 150px; margin: 0 0 0 15px;"
+    >
       {{ _('Visit Site') }}
     </a>
   </div>
