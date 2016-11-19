@@ -12,7 +12,7 @@ from podcasts.models import Podcast
 SUBDOMAIN_HOSTS = ['.pinecast.co', '.pinecast.dev']
 
 
-class NotProError(Exception):
+class NotCNAMEReadyException(Exception):
     pass
 
 class SubdomainMiddleware(object):
@@ -30,9 +30,9 @@ class SubdomainMiddleware(object):
                 site = Site.objects.get(custom_cname__iexact=pc_forward)
                 us = UserSettings.get_from_user(site.podcast.owner)
                 if not minimum(us.plan, FEATURE_MIN_CNAME):
-                    raise NotProError()
+                    raise NotCNAMEReadyException()
                 return self._resolve(req, site.podcast.slug)
-            except (Site.DoesNotExist, NotProError):
+            except (Site.DoesNotExist, NotCNAMEReadyException):
                 pass
 
         pieces = domain.split('.')
@@ -54,7 +54,7 @@ class SubdomainMiddleware(object):
                 '%s://%s%s' % (scheme, site.custom_cname, req.get_full_path()),
                 permanent=True)
 
-        return self._resolve(req, pod.slug, req.get_full_path())
+        return self._resolve(req, pod.slug)
 
     def _resolve(self, req, podcast_slug):
         path = req.get_full_path()
