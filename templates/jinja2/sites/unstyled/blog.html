@@ -1,0 +1,30 @@
+{% extends 'sites/unstyled/base.html' %}
+
+{% block main %}
+
+  {% for post in pager %}
+    <article class="blog-post">
+      <h1><a href="{{ url('site_post', podcast_slug=site.podcast.slug, post_slug=post.slug) }}">{{ post.title }}</a></h1>
+      <div>
+        {{ post.body|markdown|sanitize|safe }}
+      </div>
+    </article>
+  {% else %}
+    <div class="empty-state">
+      <span>{{ _('There is nothing here yet.') }}</span>
+    </div>
+  {% endfor %}
+
+  {% if pager.has_other_pages() %}
+    <div class="pagination">
+      {% if pager.has_next() %}
+        <a href="{{ url('site_home', podcast_slug=site.podcast.slug) }}?page={{ pager.next_page_number() }}"><span>{{ _('Back in time') }}</span></a>
+      {% endif %}
+      {% if pager.has_next() and pager.has_previous() %}<span>&bull;</span>{% endif %}
+      {% if pager.has_previous() %}
+        <a href="{{ url('site_home', podcast_slug=site.podcast.slug) }}?page={{ pager.previous_page_number() }}"><span>{{ _('Onwards to the future') }}</span></a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+{% endblock %}

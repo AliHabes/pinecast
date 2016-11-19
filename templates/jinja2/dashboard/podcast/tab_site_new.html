@@ -33,9 +33,20 @@
     <span>{{ _('iTunes URL') }}</span>
     <input type="url"
       name="itunes_url"
+      oninput="var x = document.querySelector('[name=show_itunes_banner]');var h = /id\w+/.exec(this.value);x.disabled = !h;x.checked = !!h;"
       placeholder="https://itunes.apple.com/la/podcast/almost-better-than-dragons/id981540916?mt=2"
       value="{{ default.get('itunes_url') }}">
   </label>
+
+  <label class="checkbox">
+    <input type="checkbox"
+      {{ 'checked' if default.get('show_itunes_banner') else '' }}
+      {{ 'disabled' if not default.get('itunes_url') else '' }}
+      name="show_itunes_banner"
+      value="true">
+    <span>{{ _('Show iTunes banner') }}</span>
+  </label>
+
 
   <label>
     <span>{{ _('Stitcher Radio URL') }}</span>

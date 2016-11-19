@@ -72,8 +72,18 @@
     <span>{{ _('iTunes URL') }}</span>
     <input type="url"
       name="itunes_url"
+      oninput="var x = document.querySelector('[name=show_itunes_banner]');var h = /id\w+/.exec(this.value);x.disabled = !h;x.checked = !!h;"
       placeholder="https://itunes.apple.com/la/podcast/almost-better-than-dragons/id981540916?mt=2"
       value="{{ default.get('itunes_url', site.itunes_url or '') }}">
+  </label>
+
+  <label class="checkbox">
+    <input type="checkbox"
+      {{ 'checked' if default.get('show_itunes_banner', site.show_itunes_banner) else '' }}
+      {{ 'disabled' if not default.get('itunes_url', site.itunes_url) else '' }}
+      name="show_itunes_banner"
+      value="true">
+    <span>{{ _('Show iTunes banner') }}</span>
   </label>
 
   <label>
@@ -82,6 +92,53 @@
       name="stitcher_url"
       placeholder="http://www.stitcher.com/podcast/this-american-life"
       value="{{ default.get('stitcher_url', site.stitcher_url or '') }}">
+  </label>
+
+  {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_BLOG) %}
+    <hr>
+
+    <strong>{{ _('Disqus Comments') }}</strong>
+
+    <p>
+      {% trans disqus_url='https://disqus.com/' %}
+        You can enable comments on your site blog by adding your Disqus subdomain
+        URL. After signing up for <a href="{{ disqus_url }}">Disqus</a>, you'll
+        choose a subdomain that looks like
+        <samp>https://my-subdomain.disqus.com</samp>. Enter that here, and
+        we'll automatically wire up comments on your blog.
+      {% endtrans %}
+    </p>
+
+    <label>
+      <span>{{ _('Disqus Subdomain') }}</span>
+      <div class="segment-input">
+        <span>http://</span>
+        <input type="text"
+          name="disqus_url"
+          placeholder="my-subdomain"
+          maxlength="64"
+          pattern="[\w-]+"
+          value="{{ default.get('disqus_url', site.disqus_url or '') }}">
+        <span>.disqus.com</span>
+      </div>
+    </label>
+
+  {% endif %}
+
+  <hr>
+
+  <aside>
+    <b>{{ _('What is custom CSS?') }}</b>
+    <p>
+      {% trans css_url='https://developer.mozilla.org/en-US/docs/Web/CSS' %}
+        You can use <a href="{{ css_url }}">CSS</a> to add a custom look and feel to an existing or unstyled site theme.
+      {% endtrans %}
+    </p>
+  </aside>
+
+  <label>
+    <span>{{ _('Custom CSS') }}</span>
+    <textarea name="custom_css">{{ default.get('custom_css', site.custom_css or '') }}</textarea>
   </label>
 
   <hr>
@@ -115,6 +172,26 @@
     data-name="logo-url"
     data-type="image"
     data-podcast="$none"></div>
+
+
+  {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITE_FAVICON) %}
+
+    <strong>{{ _('Favicon') }}</strong>
+
+    <p>{{ _('Favicons are the icon shown in the URL bar. We recommend a PNG image at 64x64px in size.') }}</p>
+    <div class="upload-placeholder"
+      data-optional="true"
+      data-no-itunes-size-check="true"
+      data-default-url="{{ default.get('favicon-url', sign(site.favicon_url) if site.favicon_url else '') }}"
+      data-default-name="{{ default.get('favicon-url-name') }}"
+      data-default-size="{{ default.get('favicon-url-size') }}"
+      data-default-type="{{ default.get('favicon-url-type') }}"
+      data-accept="image/*"
+      data-name="favicon-url"
+      data-type="image"
+      data-podcast="$none"></div>
+
+  {% endif %}
 
   <menu class="toolbar">
     <button class="btn" type="submit">{{ _('Update Site') }}</button>

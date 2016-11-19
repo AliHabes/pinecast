@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^episode/(?P<episode_id>[\w-]+)$', views.site_episode, name='site_episode'),
     url(r'^robots.txt$', lambda req, podcast_slug: HttpResponse('Sitemap: sitemap.xml\n')),
     url(r'^sitemap.xml$', views.sitemap, name='site_sitemap'),
+    url(r'^favicon.ico$', views.favicon, name='site_favicon'),
 ]

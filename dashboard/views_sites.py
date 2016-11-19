@@ -39,8 +39,8 @@ def new_site(req, podcast_slug):
             logo_url=signer.unsign(req.POST.get('logo-url')) if req.POST.get('logo-url') else None,
             analytics_id=req.POST.get('analytics_id'),
             itunes_url=req.POST.get('itunes_url'),
-            stitcher_url=req.POST.get('stitcher_url')
-        )
+            stitcher_url=req.POST.get('stitcher_url'),
+            show_itunes_banner=req.POST.get('show_itunes_banner') == 'true')
         site.save()
     except Exception as e:
         return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?error=true#site')
@@ -58,6 +58,15 @@ def edit_site(req, podcast_slug):
         site.analytics_id = req.POST.get('analytics_id')
         site.itunes_url = req.POST.get('itunes_url')
         site.stitcher_url = req.POST.get('stitcher_url')
+        site.show_itunes_banner = req.POST.get('show_itunes_banner') == 'true'
+        site.custom_css = req.POST.get('custom_css')
+
+        us = UserSettings.get_from_user(site.podcast.owner)
+        if payment_plans.minimum(us.plan, payment_plans.FEATURE_MIN_BLOG):
+            site.disqus_url = req.POST.get('disqus_url')
+        if payment_plans.minimum(us.plan, payment_plans.FEATURE_MIN_SITE_FAVICON):
+            site.favicon_url = signer.unsign(req.POST.get('favicon-url')) if req.POST.get('favicon-url') else None
+
         site.save()
     except Exception as e:
         return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?error=true#settings,site-options')
@@ -121,8 +130,8 @@ def add_blog_post(req, podcast_slug):
             title=req.POST.get('title'),
             slug=req.POST.get('slug'),
             body=req.POST.get('body'),
-            publish=adjusted_publish
-        )
+            publish=adjusted_publish,
+            disable_comments=req.POST.get('disable_comments') == 'true')
         post.save()
     except Exception as e:
         return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?error=sblog#site,blog')
@@ -143,6 +152,7 @@ def edit_blog_post(req, podcast_slug, post_slug):
         post.slug = req.POST.get('slug')
         post.body = req.POST.get('body')
         post.publish = adjusted_publish
+        post.disable_comments = req.POST.get('disable_comments') == 'true'
         post.save()
     except Exception as e:
         data.update(error=True, default=req.POST)

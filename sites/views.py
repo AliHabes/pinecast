@@ -7,6 +7,8 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from . import models
+from accounts.models import UserSettings
+from accounts.payment_plans import FEATURE_MIN_SITE_FAVICON, minimum
 from podcasts.models import Podcast, PodcastEpisode
 from pinecast.helpers import get_object_or_404, reverse
 
@@ -148,3 +150,16 @@ def sitemap(req, podcast_slug):
     output += '</urlset>'
 
     return HttpResponse(output, content_type='application/xml')
+
+def favicon(req, podcast_slug):
+    pod = get_object_or_404(Podcast, slug=podcast_slug)
+    us = UserSettings.get_from_user(pod.owner)
+    if not minimum(us.plan, FEATURE_MIN_SITE_FAVICON):
+        return redirect('https://pinecast.com/static/img/favicon.png')
+
+    site = get_object_or_404(models.Site, podcast=pod)
+
+    if not site.favicon_url:
+        return redirect('https://pinecast.com/static/img/favicon.png')
+
+    return redirect(site.favicon_url)

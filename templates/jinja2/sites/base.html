@@ -7,16 +7,28 @@
     {% if site.siteblogpost_set.all().count() %}
       <link rel="alternate" type="application/rss+xml" title="{{ _('Blog RSS Feed') }}" href="{{ url('blog_rss', podcast_slug=site.podcast.slug) }}">
     {% endif %}
-    <link type="image/png" rel="icon" href="https://pinecast.com/static/img/favicon.png">
+    {% if site.favicon_url %}
+      <link type="image/png" rel="icon" href="{{ site.favicon_url }}">
+    {% else %}
+      <link type="image/png" rel="icon" href="https://pinecast.com/static/img/favicon.png">
+    {% endif %}
+    {% if site.custom_css %}
+      <style>{{ site.custom_css }}</style>
+    {% endif %}
+    {% set itunes_banner = site.get_banner_id() %}
+    {% if itunes_banner %}
+      <meta name="apple-itunes-app" content="app-id={{ itunes_banner }}">
+    {% endif %}
   </head>
   <body>
     {% if minimum_plan(site.podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
       <aside class="leave-feedback">
         <a href="{% block feedbackurl %}https://pinecast.com{{ url_global('podcast_comment_box', podcast_slug=site.podcast.slug) }}{% endblock %}">
-          {{ _('Leave a note in the comment box') }}
+          <span>{{ _('Leave a note in the comment box') }}</span>
         </a>
       </aside>
       <style>
+      {% if site.theme != 'unstyled' %}
       .leave-feedback {
         bottom: 0;
         padding: 0 15px 15px 0;
@@ -50,10 +62,21 @@
           position: static;
         }
       }
+      {% endif %}
       </style>
     {% endif %}
     {% block body %}{% endblock %}
     {% block afterbody %}{% endblock %}
+    {% if site.disqus_url %}
+      <script>
+      (function() {
+      var d = document, s = d.createElement('script');
+      s.src = '//{{ site.disqus_url }}.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+      })();
+      </script>
+    {% endif %}
     {% if site.analytics_id %}
       <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

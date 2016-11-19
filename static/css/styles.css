@@ -1069,6 +1069,9 @@ menu.toolbar-right li {
     text-align: left;
     white-space: nowrap;
 }
+.form-block .panel:not(.inline-form) label > input[type=checkbox] {
+    margin-left: 0;
+}
 
 .form-block .select,
 .form-block form label input,
@@ -1087,6 +1090,15 @@ menu.toolbar-right li {
 .form-block form label input[type=checkbox],
 .form-block .select {
     padding: 0;
+}
+.form-block form label input[type=checkbox],
+.form-block form label input[type=checkbox] + span {
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+.form-block form label input[type=checkbox]:disabled,
+.form-block form label input[type=checkbox]:disabled + span {
+    opacity: 0.5;
 }
 .form-block form:not(.inline-form) label textarea {
     line-height: 2em;
@@ -1131,6 +1143,7 @@ menu.toolbar-right li {
     font-family: inherit;
     font-weight: 500px;
     padding: 0 4px;
+    white-space: nowrap;
 }
 
 .form-block form label input[type=checkbox] {
@@ -1226,6 +1239,15 @@ menu.toolbar-right li {
 }
 .form-block .flair label input[type=checkbox]:checked + span:before {
     left: 2px;
+}
+
+.form-block label > .segment-input {
+    display: flex;
+    flex: 1 1 0%;
+}
+.form-block label > .segment-input input {
+    flex: 1 1;
+    margin: 0 5px;
 }
 
 

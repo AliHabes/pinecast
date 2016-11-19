@@ -15,6 +15,14 @@
     <span>{{ _('Publish On') }}</span>
     <input type="datetime-local" name="publish" required>
   </label>
+
+  {% if site.disqus_url %}
+  <label class="checkbox">
+    <input type="checkbox" name="disable_comments" value="true">
+    <span>{{ _('Disable Comments?') }}</span>
+  </label>
+  {% endif %}
+
   <label class="segment-full markdwon-editor-small">
     <span>{{ _('Body') }}</span>
     <textarea name="body" class="markdown-editor"></textarea>
