@@ -415,7 +415,7 @@ ol, ul, dl {
     display: block;
     font-size: 14px;
     font-weight: 600;
-    line-height: 1.5em
+    line-height: 1.5em;
     margin-bottom: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
