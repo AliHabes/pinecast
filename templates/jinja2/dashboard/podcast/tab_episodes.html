@@ -10,7 +10,7 @@
       <tr>
         <th class="primary">{{ _('Episode Name') }}</th>
         {% if is_pro %}
-          <th style="text-align: center;">
+          <th class="hide-on-mobile" style="text-align: center;">
             {{ _('30d Listens') }}
             <i class="pro-tag"></i>
           </th>
@@ -25,7 +25,7 @@
             <a href="{{ url('podcast_episode', podcast_slug=podcast.slug, episode_id=str(ep.id)) }}">{{ ep.title }}</a>
           </td>
           {% if is_pro %}
-            <td style="text-align: center;">
+            <td class="hide-on-mobile" style="text-align: center;">
               <svg width="90" height="22" style="display: inline-block; vertical-align: middle;">
                 <defs>
                   <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
