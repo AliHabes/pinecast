@@ -2132,9 +2132,13 @@ main > header h2 {
     border: 2px solid #36a;
     border-radius: 2px;
     color: #36a;
+    display: inline-block;
     font-size: 10px;
     font-style: normal;
+    height: 2em;
+    line-height: 1em;
     padding: 2px 5px;
+    vertical-align: middle;
 }
 .pro-tag:before {
     content: "Pro";

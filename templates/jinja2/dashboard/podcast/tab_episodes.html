@@ -4,10 +4,17 @@
     <a class="btn" href="{{ url('new_episode', podcast_slug=podcast.slug)}}">{{ _('Upload One Now') }}</a>
   </div>
 {% else %}
+  {% set is_pro = minimum_plan(user_settings, PLANS.PLAN_PRO) %}
   <table class="card">
     <thead>
       <tr>
         <th class="primary">{{ _('Episode Name') }}</th>
+        {% if is_pro %}
+          <th style="text-align: center;">
+            {{ _('30d Listens') }}
+            <i class="pro-tag"></i>
+          </th>
+        {% endif %}
         <th>{{ _('Published') }}</th>
       </tr>
     </thead>
@@ -17,6 +24,24 @@
           <td class="primary">
             <a href="{{ url('podcast_episode', podcast_slug=podcast.slug, episode_id=str(ep.id)) }}">{{ ep.title }}</a>
           </td>
+          {% if is_pro %}
+            <td style="text-align: center;">
+              <svg width="90" height="22" style="display: inline-block; vertical-align: middle;">
+                <defs>
+                  <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="30%" stop-color="#eee" />
+                    <stop offset="100%" stop-color="#5395D3" />
+                  </linearGradient>
+                </defs>
+                <polyline
+                  fill="none"
+                  points="{{ sparklines[str(ep.id)]|sparkline(3, 20) }}"
+                  stroke="url(#grad)"
+                  stroke-width="2"
+                />
+              </svg>
+            </td>
+          {% endif %}
           {% if ep.publish > now() %}
             <td class="future-publish">
           {% else %}

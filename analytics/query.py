@@ -59,6 +59,18 @@ def get_top_episodes(podcasts, timeframe=None, tz=None):
         result.items()
     }
 
+def get_episode_sparklines(podcast, tz=None):
+    where_clause = "podcast = '%s' AND %s" % (str(podcast.id), USER_TIMEFRAMES['month'](tz))
+    query = 'SELECT COUNT(v) FROM "listen" WHERE %s GROUP BY episode, time(1d);' % where_clause
+
+    result = get_client().query(query, database=settings.INFLUXDB_DB_LISTEN)
+
+    return {
+        tags['episode']: (x['count'] for x in v) for
+        (_, tags), v in
+        result.items()
+    }
+
 
 def rotating_colors(sequence, key='color', highlight_key='highlight'):
     for x, c in zip(sequence, _colors_forever()):

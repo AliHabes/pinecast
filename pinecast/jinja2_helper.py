@@ -32,6 +32,8 @@ def environment(**options):
         'float': float,
         'int': int,
         'len': len,
+        'min': min,
+        'max': max,
         'now': lambda: datetime.datetime.now(),
         'sorted': sorted,
         'str': str,
@@ -102,6 +104,7 @@ def environment(**options):
     env.filters['pretty_date'] = pretty_date
     env.filters['sanitize'] = helpers.sanitize
     env.filters['replace'] = string.replace
+    env.filters['sparkline'] = sparkline
     return env
 
 
@@ -216,3 +219,11 @@ def safe_json(data):
             '%s:%s' % (safe_json(key), safe_json(val)) for key, val in data.items()))
     safe_data = str(jinja2.escape(data))
     return jinja2.Markup(json.dumps(safe_data))
+
+def sparkline(data, spacing=1, height=20):
+    data = list(data) or [0 for _ in range(31)]
+    spark_min = min(data)
+    spark_max = max(data)
+    spark_range = spark_max - spark_min or 1
+    sadj = ((i - spark_min) / spark_range for i in data)
+    return ' '.join('%d,%d' % (i * spacing, (1 - y) * height) for i, y in enumerate(sadj))

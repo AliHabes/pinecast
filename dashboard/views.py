@@ -149,6 +149,10 @@ def podcast_dashboard(req, podcast_slug):
         data['feedback_episodes'] = all_feedback.exclude(episode=None).annotate(
             Count('episode', distinct=True))
 
+    if payment_plans.minimum(owner_uset.plan, payment_plans.PLAN_PRO):
+        sparkline_data = analytics_query.get_episode_sparklines(pod, tz)
+        data['sparklines'] = sparkline_data
+
     return _pmrender(req, 'dashboard/podcast/page_podcast.html', data)
 
 @login_required
