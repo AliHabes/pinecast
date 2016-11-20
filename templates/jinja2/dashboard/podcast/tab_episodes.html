@@ -4,7 +4,7 @@
     <a class="btn" href="{{ url('new_episode', podcast_slug=podcast.slug)}}">{{ _('Upload One Now') }}</a>
   </div>
 {% else %}
-  {% set is_pro = minimum_plan(user_settings, PLANS.PLAN_PRO) %}
+  {% set is_pro = minimum_plan(podcast.owner, PLANS.PLAN_PRO) %}
   <table class="card">
     <thead>
       <tr>
