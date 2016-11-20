@@ -117,8 +117,8 @@
       {% endtrans %}
     </p>
     <p>
-      {% trans slug=podcast.slug %}
-        Leaving this field blank will make your site available at <samp>http://{{ slug }}.pinecast.co</samp>.
+      {% trans url=site.get_subdomain() %}
+        Leaving this field blank will make your site available at <samp>{{ url }}</samp>.
       {% endtrans %}
     </p>
 
@@ -126,10 +126,11 @@
       <span>{{ _('Domain Name') }}</span>
       <div class="segment-input">
         <span>http://</span>
-        <input type="url"
+        <input type="text"
           name="custom_cname"
-          placeholder="theadventure.zone"
           maxlength="64"
+          pattern="[\w\-\.]+"
+          placeholder="theadventure.zone"
           value="{{ default.get('custom_cname', site.custom_cname or '') }}">
       </div>
     </label>
@@ -139,7 +140,10 @@
   {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_BLOG) %}
     <hr>
 
-    <strong>{{ _('Disqus Comments') }}</strong>
+    <strong>
+      {{ _('Disqus Comments') }}
+      <i class="pro-tag"></i>
+    </strong>
 
     <p>
       {% trans disqus_url='https://disqus.com/' %}
@@ -218,7 +222,10 @@
 
   {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITE_FAVICON) %}
 
-    <strong>{{ _('Favicon') }}</strong>
+    <strong>
+      {{ _('Favicon') }}
+      {% if PLANS.FEATURE_MIN_SITE_FAVICON == PLANS.PLAN_PRO %}<i class="pro-tag"></i>{% endif %}
+    </strong>
 
     <p>{{ _('Favicons are the icon shown in the URL bar. We recommend a PNG image at 64x64px in size.') }}</p>
     <div class="upload-placeholder"

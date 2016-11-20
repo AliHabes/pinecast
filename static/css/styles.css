@@ -415,6 +415,7 @@ ol, ul, dl {
     display: block;
     font-size: 14px;
     font-weight: 600;
+    line-height: 1.5em
     margin-bottom: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2124,4 +2125,18 @@ main > header h2 {
     font-size: 30px;
     font-weight: 400;
     line-height: 40px;
+}
+
+
+.pro-tag {
+    border: 2px solid #36a;
+    border-radius: 2px;
+    color: #36a;
+    font-size: 10px;
+    font-style: normal;
+    padding: 2px 5px;
+}
+.pro-tag:before {
+    content: "Pro";
+    text-decoration: none !important;
 }

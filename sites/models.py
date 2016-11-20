@@ -5,7 +5,10 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy
 
+from accounts.models import UserSettings
+from accounts.payment_plans import FEATURE_MIN_SITES, minimum
 from podcasts.models import Podcast
+from pinecast.helpers import cached_method
 
 
 GA_VALIDATOR = RegexValidator(r'^[0-9a-zA-Z\-]*$', ugettext_lazy('Only GA IDs are accepted'))
@@ -42,6 +45,19 @@ class Site(models.Model):
 
     analytics_id = models.CharField(blank=True, null=True, max_length=32, validators=[GA_VALIDATOR])
 
+    @cached_method
+    def get_domain(self):
+        if not self.custom_cname:
+            return self.get_subdomain()
+        us = UserSettings.get_from_user(self.podcast.owner)
+        if not minimum(us.plan, FEATURE_MIN_SITES):
+            return self.get_subdomain()
+
+        return 'http://%s' % self.custom_cname
+
+    @cached_method
+    def get_subdomain(self):
+        return 'http://%s.pinecast.co' % self.podcast.slug
 
     def get_cover_style(self, bgcolor=None):
         if self.cover_image_url:
