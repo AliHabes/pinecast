@@ -24,7 +24,6 @@ class Site(models.Model):
         ('zen', ugettext_lazy('Zen')),
         ('unstyled', ugettext_lazy('Unstyled')),
     )
-    SITE_THEMES_MAP = {k: v for k, v in SITE_THEMES}
 
     podcast = models.OneToOneField(Podcast)
     theme = models.CharField(choices=SITE_THEMES, max_length=16)

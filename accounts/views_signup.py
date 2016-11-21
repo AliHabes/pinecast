@@ -1,6 +1,5 @@
 import uuid
 
-import requests
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.utils.translation import ugettext

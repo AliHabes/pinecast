@@ -11,6 +11,7 @@ from .stripe_lib import stripe
 from accounts.payment_plans import PLAN_DEMO, PLAN_TIP_LIMITS
 from accounts.models import UserSettings
 from dashboard.views import _pmrender
+from notifications.models import NotificationHook
 from pinecast.email import (CONFIRMATION_PARAM,
                             send_anon_confirmation_email as send_email,
                             send_notification_email,
@@ -123,6 +124,12 @@ def _send_one_time_tip(req, podcast, owner_us, amount):
                  'thanking them for their generosity.') % (
             podcast.name, float(amount) / 100, tip_user.email_address))
 
+    NotificationHook.trigger_notification(
+        podcast=podcast,
+        trigger_type='tip',
+        data={'tipper': tip_user.email_address,
+              'amount': amount})
+
     return {'success': True}
 
 
@@ -210,11 +217,7 @@ def _finish_sub(req, pod, amount, email, token):
         sub.amount = amount
         sub.save()
 
-        # Updating total_tips is done with the wb hook.
-
-        # if amount > old_amount:
-        #     pod.total_tips += amount - old_amount
-        #     pod.save()
+        # Updating total_tips is done with the web hook.
 
         send_notification_email(
             None,
@@ -259,15 +262,6 @@ def _finish_sub(req, pod, amount, email, token):
 
     # We don't update total_tips or create a tip event here. That happens when
     # the web hook from Stripe tells us that the payment succeeded.
-
-    # tip_event = TipEvent(
-    #     tipper=tip_user,
-    #     podcast=pod,
-    #     amount=amount,
-    #     recurring_tip=sub)
-    # tip_event.save()
-    # pod.total_tips += amount
-    # pod.save()
 
     send_notification_email(
         pod.owner,

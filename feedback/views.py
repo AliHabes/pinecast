@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render
 from django.utils.translation import ugettext
@@ -7,6 +8,7 @@ import analytics.analyze as analyze
 from .models import Feedback
 from accounts.models import UserSettings
 from dashboard.views import _pmrender
+from notifications.models import NotificationHook
 from pinecast.email import send_notification_email
 from pinecast.helpers import get_object_or_404, reverse, validate_recaptcha
 from podcasts.models import Podcast, PodcastEpisode
@@ -39,6 +41,11 @@ def podcast_comment_box(req, podcast_slug):
             (pod.name,
              reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#tab-feedback')
         )
+
+        NotificationHook.trigger_notification(
+            podcast=pod,
+            trigger_type='feedback',
+            data={'content': req.POST.get('message')})
     except Exception:
         return _pmrender(req, 'feedback/comment_podcast.html',
                          {'podcast': pod, 'error': True, 'default': req.POST})
@@ -79,6 +86,10 @@ def ep_comment_box(req, podcast_slug, episode_id):
                      episode_id=str(ep.id)) +
              '#tab-feedback')
         )
+        NotificationHook.trigger_notification(
+            podcast=pod,
+            trigger_type='feedback',
+            data={'episode': ep, 'content': req.POST.get('message')})
     except Exception:
         return _pmrender(req, 'feedback/comment_episode.html',
                          {'podcast': pod, 'episode': ep, 'error': True, 'default': req.POST})
@@ -87,6 +98,8 @@ def ep_comment_box(req, podcast_slug, episode_id):
 
 
 def _validate_recaptcha(req):
+    if settings.DEBUG:
+        return True
     response = req.POST.get('g-recaptcha-response')
     ip = analyze.get_request_ip(req)
     return validate_recaptcha(response, ip)

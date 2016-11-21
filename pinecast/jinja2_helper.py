@@ -32,6 +32,7 @@ def environment(**options):
         'float': float,
         'int': int,
         'len': len,
+        'list': list,
         'min': min,
         'max': max,
         'now': lambda: datetime.datetime.now(),

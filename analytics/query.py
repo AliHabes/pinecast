@@ -16,11 +16,15 @@ def _get_lone(response, default=-1):
     return raw['series'][0]['values'][0][1]
 
 def total_listens(podcast, episode_id=None):
+    podcast_is_str = isinstance(podcast, (str, unicode))
     query = 'SELECT COUNT(v) FROM "listen" WHERE podcast = \'%s\'%s;' % (
-        unicode(podcast.id),
+        podcast if podcast_is_str else unicode(podcast.id),
         ' AND episode = \'%s\'' % episode_id if episode_id else '')
 
-    base_listens = 0 if episode_id is not None else podcast.stats_base_listens
+    if podcast_is_str:
+        base_listens = 0
+    else:
+        base_listens = 0 if episode_id is not None else podcast.stats_base_listens
 
     return base_listens + _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_LISTEN), 0)
 

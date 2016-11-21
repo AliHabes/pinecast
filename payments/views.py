@@ -16,6 +16,7 @@ from .models import RecurringTip, TipEvent
 from .stripe_lib import stripe
 from accounts.models import UserSettings
 from dashboard.views import _pmrender
+from notifications.models import NotificationHook
 from pinecast.email import CONFIRMATION_PARAM, send_notification_email
 from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import Podcast
@@ -207,6 +208,12 @@ def hook(req):
                      'subscription to the show. You should send them an email '
                      'thanking them for their generosity.') %
                 (pod.name, float(amount) / 100, email))
+
+        NotificationHook.trigger_notification(
+            podcast=pod,
+            trigger_type='tip',
+            data={'tipper': sub.tipper.email_address,
+                  'amount': amount})
 
         return {'success': 'emails sent, tip event processed'}
 

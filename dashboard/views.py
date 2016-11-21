@@ -23,6 +23,7 @@ import pinecast.constants as constants
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
 from feedback.models import Feedback, EpisodeFeedbackPrompt
+from notifications.models import NotificationHook
 from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import (CATEGORIES, Podcast, PodcastCategory,
                              PodcastEpisode)
@@ -101,11 +102,6 @@ def dashboard(req):
     return _pmrender(req, 'dashboard/dashboard.html', ctx)
 
 
-MILESTONES = [1, 100, 250, 500, 1000, 2000, 5000, 7500, 10000, 15000, 20000,
-              50000, 100000, 150000, 250000, 500000, 1000000, 2000000, 5000000,
-              10000000, float('inf')]
-
-
 @login_required
 def podcast_dashboard(req, podcast_slug):
     pod = get_podcast(req, podcast_slug)
@@ -124,9 +120,9 @@ def podcast_dashboard(req, podcast_slug):
             'total_listens_this_week': total_listens_this_week,
             'subscribers': subscribers,
         },
-        'next_milestone': next(x for x in MILESTONES if x > total_listens),
-        'previous_milestone': [x for x in MILESTONES if x <= total_listens][-1] if total_listens else 0,
-        'hit_first_milestone': total_listens > MILESTONES[1],  # The first "real" milestone
+        'next_milestone': next(x for x in constants.MILESTONES if x > total_listens),
+        'previous_milestone': [x for x in constants.MILESTONES if x <= total_listens][-1] if total_listens else 0,
+        'hit_first_milestone': total_listens > constants.MILESTONES[1],  # The first "real" milestone
         'is_still_importing': pod.is_still_importing(),
 
         'site': None,
@@ -134,6 +130,9 @@ def podcast_dashboard(req, podcast_slug):
         'LOCALES': constants.locales,
         'PODCAST_CATEGORIES': json.dumps(list(CATEGORIES)),
         'SITE_THEMES': Site.SITE_THEMES,
+
+        'N_DESTINATIONS': NotificationHook.DESTINATIONS,
+        'N_TRIGGERS': NotificationHook.TRIGGERS,
     }
 
     try:
@@ -152,6 +151,9 @@ def podcast_dashboard(req, podcast_slug):
     if payment_plans.minimum(owner_uset.plan, payment_plans.PLAN_PRO):
         sparkline_data = analytics_query.get_episode_sparklines(pod, tz)
         data['sparklines'] = sparkline_data
+
+    if payment_plans.minimum(owner_uset.plan, payment_plans.FEATURE_MIN_NOTIFICATIONS):
+        data['notifications'] = NotificationHook.objects.filter(podcast=pod)
 
     return _pmrender(req, 'dashboard/podcast/page_podcast.html', data)
 

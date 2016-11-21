@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy
 
+MILESTONES = [1, 100, 250, 500, 1000, 2000, 5000, 7500, 10000, 15000, 20000,
+              50000, 100000, 150000, 250000, 500000, 1000000, 2000000, 5000000,
+              10000000, float('inf')]
 
 # This is the list of iOS locales. Probably not complete but good enough.
 # https://gist.github.com/jacobbubu/1836273

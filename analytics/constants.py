@@ -13,6 +13,7 @@ influx_databases = {
     'listen': settings.INFLUXDB_DB_LISTEN,
     'listen-country': settings.INFLUXDB_DB_LISTEN,
     'listen-platform': settings.INFLUXDB_DB_LISTEN,
+    'notification': settings.INFLUXDB_DB_NOTIFICATION,
 }
 
 def dtnow(tz):

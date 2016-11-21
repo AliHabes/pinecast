@@ -1,0 +1,137 @@
+<strong>
+  {{ _('Notifications')}}
+  <i class="pro-tag"></i>
+</strong>
+
+<p>
+  {% trans %}
+    Notifications allow you to receive alerts when certain events occur with
+    your podcast.
+  {% endtrans %}
+</p>
+
+<hr>
+
+{% set notifications = list(podcast.notifications.all()) %}
+
+{% if notifications %}
+  <strong>{{ _('Existing Notifications') }}</strong>
+
+  <table style="margin-bottom: 40px">
+    <thead>
+      <tr>
+        <th>{{ _('Notify') }}</th>
+        <th>{{ _('When') }}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for notification in notifications %}
+        <tr>
+          <td>
+            <abbr title="{{ notification.destination }}">
+              {{ notification.get_destination_text() }}
+            </abbr>
+          </td>
+          <td>
+            {{ notification.get_trigger_text() }}
+          </td>
+          <td>
+            <form action="{{ url('delete_notification') }}" method="post" style="padding: 0">
+              <button class="btn btn--tiny" type="submit">
+                <i class="icon-trash-empty" aria-label="{{ _('Remove notification') }}"></i>
+              </button>
+
+              <input type="hidden" name="podcast" value="{{ podcast.id }}">
+              <input type="hidden" name="id" value="{{ notification.id }}">
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+{% if len(notifications) < 30 %}
+
+  <strong>{{ _('New Notification') }}</strong>
+
+  <p>
+    {% trans %}
+      Notifications have two fundamental parts: a trigger and a destination. The
+      trigger is what causes the notification to get sent. The destination is
+      how the notifications is sent, and where it is sent to.
+    {% endtrans %}
+  </p>
+
+  <form action="{{ url('new_notification') }}" method="post">
+    <div class="panel">
+      <label class="segment-full">
+        <span>{{ _('Trigger') }}</span>
+        <div class="select">
+          <select name="trigger" onchange="document.querySelector('.trigger-threshold').style.display = this.value === 'listen_threshold' ? 'flex' : 'none';">
+            {% for val, label in N_TRIGGERS %}
+              <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </label>
+      <label class="segment-full trigger-threshold" style="display: none">
+        <span>{{ _('Threshold') }}</span>
+        <input type="number" min="1" name="threshold" value="1">
+      </label>
+    </div>
+
+    <label>
+      <span>{{ _('Destination') }}</span>
+      <div class="select">
+        <select name="destination_type">
+          {% for val, label in N_DESTINATIONS %}
+            <option value="{{ val }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </label>
+
+    <div class="n-dest-webhook n-dest">
+      <label>
+        <span>{{ _('Webhook URL') }}</span>
+        <input type="url" name="destination_webhook" required placeholder="https://my.great.service/webhook" maxlength="512">
+      </label>
+    </div>
+    <div class="n-dest-slack n-dest" style="display: none">
+      <label>
+        <span>{{ _('Slack Hook URL') }}</span>
+        <input type="url" name="destination_slack" placeholder="https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX" maxlength="512">
+      </label>
+    </div>
+    <div class="n-dest-email n-dest" style="display: none">
+      <label>
+        <span>{{ _('Email Address') }}</span>
+        <input type="email" name="destination_email" placeholder="pj@replyall.limo" maxlength="512">
+      </label>
+    </div>
+
+    <menu class="toolbar">
+      <button class="btn" type="submit">{{ _('Save Notification') }}</button>
+    </menu>
+
+    <input type="hidden" name="podcast" value="{{ podcast.id }}">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+  </form>
+
+  <script>
+    document.querySelector('[name=destination_type]').addEventListener('change', function(e) {
+      var value = e.target.value;
+      Array.prototype.slice.call(document.querySelectorAll('.n-dest')).forEach(function(dest) {
+        dest.style.display = 'none';
+      });
+      Array.prototype.slice.call(document.querySelectorAll('.n-dest input')).forEach(function(inp) {
+        inp.required = false;
+      });
+      document.querySelector('.n-dest-' + value).style.display = 'block';
+      document.querySelector('.n-dest-' + value + ' input').required = true;
+    });
+  </script>
+{% endif %}

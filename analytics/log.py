@@ -4,10 +4,12 @@ import json
 
 import requests
 import rollbar
-from .influx import get_client
 from django.conf import settings
 
 from .analyze import get_device_type, get_request_hash, get_request_ip, get_ts_hash, is_bot
+from .influx import get_client
+from .query import total_listens
+from notifications.models import NotificationHook
 
 
 def get_influx_item(measurement, tags, fields, timestamp=None):
@@ -18,10 +20,11 @@ def get_influx_item(measurement, tags, fields, timestamp=None):
         'tags': tags,
         'fields': dict(v=1, **fields),
         'time': timestamp.isoformat() + 'Z',
+        'ts_raw': timestamp,
     }
 
 def write_influx(db, *args):
-    return write_influx_many(db, [get_influx_item(db, *args)])
+    return write_influx_many(db, [get_influx_item(*args)])
 
 def write_influx_many(db, items):
     influx_client = get_client()
@@ -122,6 +125,7 @@ def get_listen_obj(ep, source, req=None, ip=None, ua=None, timestamp=None):
         'l_id': hashlib.sha1(','.join([ip, ua, timestamp.isoformat()])).hexdigest(),
     }
     points = [
+        # commit_listens below relies on the main listen to be first in this array
         get_influx_item(
             measurement='listen',
             tags=dict(
@@ -158,10 +162,85 @@ def get_listen_obj(ep, source, req=None, ip=None, ua=None, timestamp=None):
     return gc_listen, points
 
 
+LISTEN_HOOKS = ['first_listen', 'listen_threshold', 'growth_milestone']
+
 def commit_listens(listen_objs):
+    if not listen_objs:
+        return
+    podcasts = set(x[0]['tags']['podcast'] for _, x in listen_objs)
+    hooks = list(NotificationHook.objects.filter(
+                podcast_id__in=list(podcasts),
+                trigger__in=LISTEN_HOOKS))
+    podcasts_with_hooks = set(str(h.podcast_id) for h in hooks)
+    episodes = set(
+        (x[0]['tags']['podcast'], x[0]['tags']['episode']) for
+        _, x in
+        listen_objs if
+        x[0]['tags']['podcast'] in podcasts_with_hooks)
+
+    pod_listens_before = {p: total_listens(p) for p in podcasts_with_hooks}
+    ep_listens_before = {e: (p, total_listens(p, e)) for p, e in episodes}
+
     write_gc_many('listen', [x[0] for x in listen_objs])
     write_influx_many(
         settings.INFLUXDB_DB_LISTEN, [i for _, y in listen_objs for i in y])
+
+    if not podcasts_with_hooks:
+        return
+
+    notifications = {p: [n for n in hooks if str(n.podcast_id) == p] for p in podcasts_with_hooks}
+
+    from podcasts.models import PodcastEpisode
+    ep_cache = {}
+    def get_ep(ep_id):
+        if ep_id in ep_cache:
+            return ep_cache.get(ep_id)
+        else:
+            ep = PodcastEpisode.objects.get(id=ep_id)
+            ep_cache[ep_id] = ep
+            return ep
+
+    def notify_all(notifications, body={}):
+        if not notifications:
+            return
+        for notification in notifications:
+            notification.execute(body)
+
+    # Handle first_listen notifications
+    if any(hook.trigger == 'first_listen' for hook in hooks):
+        for ep_id, (pod_id, count) in ep_listens_before.items():
+            if count:
+                continue
+            matching_hooks = [h for h in notifications[pod_id] if h.trigger == 'first_listen']
+            if not matching_hooks:
+                continue
+            notify_all(matching_hooks, {'episode': get_ep(ep_id)})
+
+    # Handle listen_threshold
+    if any(hook.trigger == 'listen_threshold' for hook in hooks):
+        for ep_id, (pod_id, count) in ep_listens_before.items():
+            matching_hooks = [h for h in notifications[pod_id] if h.trigger == 'listen_threshold']
+            if not matching_hooks:
+                continue
+            new_count = total_listens(pod_id, ep_id)
+            notify_all(
+                [h for h in matching_hooks if h.test_condition(count, new_count)],
+                {'episode': get_ep(ep_id)})
+
+    # Handle growth_milestone
+    print hooks
+    if any(hook.trigger == 'growth_milestone' for hook in hooks):
+        for pod_id, count in pod_listens_before.items():
+            print pod_id, count
+            matching_hooks = [h for h in notifications[pod_id] if h.trigger == 'growth_milestone']
+            if not matching_hooks:
+                print 'nmh'
+                continue
+            new_count = total_listens(pod_id)
+            print new_count
+            notify_all(
+                [h for h in matching_hooks if h.test_condition(count, new_count)],
+                {'listens': new_count, 'before_listens': count})
 
 
 def write_subscription(req, podcast, ts=None, dry_run=False):
@@ -243,3 +322,19 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
         else:
             rollbar.report_message(
                 'Unable to ingest subscription points to influx', 'error')
+
+
+def write_notification(notification, failed):
+    write_influx(
+        settings.INFLUXDB_DB_NOTIFICATION,
+        'notification',
+        {
+            'podcast': str(notification.podcast.id),
+            'notification': str(notification.id),
+            'destination_type': notification.destination_type,
+            'trigger': notification.trigger,
+        },
+        {
+            'notification_f': str(notification.id),
+            'failed': failed,
+        })

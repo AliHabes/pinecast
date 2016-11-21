@@ -4,6 +4,11 @@
       <li class="selected">
         <a href="" data-tab=".tab-details">{{ _('Details') }}</a>
       </li>
+      {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_NOTIFICATIONS) %}
+        <li>
+          <a href="" data-tab=".tab-notifications">{{ _('Notifications') }}</a>
+        </li>
+      {% endif %}
       {% if site and minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITES) %}
         <li>
           <a href="" data-tab=".tab-site-options">{{ _('Site') }}</a>
@@ -23,6 +28,12 @@
 <div class="tab-details form-block">
   {% include "dashboard/podcast/tab_settings_edit.html" %}
 </div>
+
+{% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_NOTIFICATIONS) %}
+  <div class="tab-notifications form-block" style="display: none">
+    {% include "dashboard/podcast/tab_settings_notifications.html" %}
+  </div>
+{% endif %}
 
 {% if site %}
   <div class="tab-site-options form-block" style="display: none">

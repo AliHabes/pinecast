@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'analytics',
     'dashboard',
     'feedback',
+    'notifications',
     'payments',
     'podcasts',
     'sites',
@@ -228,6 +229,7 @@ INFLUXDB_USERNAME = os.environ.get('INFLUXDB_USERNAME')
 INFLUXDB_PASSWORD = os.environ.get('INFLUXDB_PASSWORD')
 INFLUXDB_DB_SUBSCRIPTION = os.environ.get('INFLUXDB_DB_SUBSCRIPTION', 'subscription')
 INFLUXDB_DB_LISTEN = os.environ.get('INFLUXDB_DB_SUBSCRIPTION', 'listen')
+INFLUXDB_DB_NOTIFICATION = os.environ.get('INFLUXDB_DB_NOTIFICATION', 'notification')
 
 ANALYTICS_PROVIDER = 'influx'
 

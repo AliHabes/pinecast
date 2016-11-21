@@ -8,6 +8,7 @@ from django.views.i18n import JavaScriptCatalog
 import analytics.urls
 import dashboard.urls
 import feedback.urls
+import notifications.urls
 import payments.urls
 from . import views
 from accounts.urls import urlpatterns as account_urlpatterns
@@ -30,9 +31,10 @@ urlpatterns = (
         url(r'^analytics/', include(analytics.urls)),
         url(r'^dashboard', include(dashboard.urls)),
         url(r'^feedback/', include(feedback.urls)),
-        url(r'^logout', logout_view, name='logout'),
+        url(r'^notifications/', include(notifications.urls)),
         url(r'^payments/', include(payments.urls)),
 
+        url(r'^logout$', logout_view, name='logout'),
         url(r'^services/log$', views.log),
 
         url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript_catalog'),
