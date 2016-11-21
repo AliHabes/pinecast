@@ -1,28 +1,28 @@
-{% if podcast.owner == user %}
-  <div class="tabs-inline tabs dynamic" data-hash-pos="1">
-    <ul>
-      <li class="selected">
-        <a href="" data-tab=".tab-details">{{ _('Details') }}</a>
+<div class="tabs-inline tabs dynamic" data-hash-pos="1">
+  <ul>
+    <li class="selected">
+      <a href="" data-tab=".tab-details">{{ _('Details') }}</a>
+    </li>
+    {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_NOTIFICATIONS) %}
+      <li>
+        <a href="" data-tab=".tab-notifications">{{ _('Notifications') }}</a>
       </li>
-      {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_NOTIFICATIONS) %}
-        <li>
-          <a href="" data-tab=".tab-notifications">{{ _('Notifications') }}</a>
-        </li>
-      {% endif %}
-      {% if site and minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITES) %}
-        <li>
-          <a href="" data-tab=".tab-site-options">{{ _('Site') }}</a>
-        </li>
-        <li class="tab--danger">
-          <a href="" data-tab=".tab-site-delete">{{ _('Delete Site') }}</a>
-        </li>
-      {% endif %}
+    {% endif %}
+    {% if site and minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITES) %}
+      <li>
+        <a href="" data-tab=".tab-site-options">{{ _('Site') }}</a>
+      </li>
+      <li class="tab--danger">
+        <a href="" data-tab=".tab-site-delete">{{ _('Delete Site') }}</a>
+      </li>
+    {% endif %}
+    {% if podcast.owner == user %}
       <li class="tab--danger">
         <a href="" data-tab=".tab-delete">{{ _('Delete Podcast') }}</a>
       </li>
-    </ul>
-  </div>
-{% endif %}
+    {% endif %}
+  </ul>
+</div>
 
 
 <div class="tab-details form-block">
@@ -35,7 +35,7 @@
   </div>
 {% endif %}
 
-{% if site %}
+{% if site and minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITES) %}
   <div class="tab-site-options form-block" style="display: none">
     {% include "dashboard/podcast/tab_settings_site_edit.html" %}
   </div>
@@ -44,6 +44,8 @@
   </div>
 {% endif %}
 
-<div class="tab-delete form-block" style="display: none">
-  {% include "dashboard/podcast/tab_settings_delete.html" %}
-</div>
+{% if podcast.owner == user %}
+  <div class="tab-delete form-block" style="display: none">
+    {% include "dashboard/podcast/tab_settings_delete.html" %}
+  </div>
+{% endif %}
