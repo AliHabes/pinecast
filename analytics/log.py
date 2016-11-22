@@ -225,19 +225,15 @@ def commit_listens(listen_objs):
             new_count = total_listens(pod_id, ep_id)
             notify_all(
                 [h for h in matching_hooks if h.test_condition(count, new_count)],
-                {'episode': get_ep(ep_id)})
+                {'episode': get_ep(ep_id), 'listens': new_count})
 
     # Handle growth_milestone
-    print hooks
     if any(hook.trigger == 'growth_milestone' for hook in hooks):
         for pod_id, count in pod_listens_before.items():
-            print pod_id, count
             matching_hooks = [h for h in notifications[pod_id] if h.trigger == 'growth_milestone']
             if not matching_hooks:
-                print 'nmh'
                 continue
             new_count = total_listens(pod_id)
-            print new_count
             notify_all(
                 [h for h in matching_hooks if h.test_condition(count, new_count)],
                 {'listens': new_count, 'before_listens': count})
@@ -324,7 +320,7 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
                 'Unable to ingest subscription points to influx', 'error')
 
 
-def write_notification(notification, failed):
+def write_notification(notification, failed, is_test=False):
     write_influx(
         settings.INFLUXDB_DB_NOTIFICATION,
         'notification',
@@ -337,4 +333,5 @@ def write_notification(notification, failed):
         {
             'notification_f': str(notification.id),
             'failed': failed,
+            'is_test': 'true' if is_test else 'false',
         })

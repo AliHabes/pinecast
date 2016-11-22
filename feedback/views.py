@@ -45,7 +45,7 @@ def podcast_comment_box(req, podcast_slug):
         NotificationHook.trigger_notification(
             podcast=pod,
             trigger_type='feedback',
-            data={'content': req.POST.get('message')})
+            data={'content': req.POST.get('message'), 'sender': req.POST.get('email')})
     except Exception:
         return _pmrender(req, 'feedback/comment_podcast.html',
                          {'podcast': pod, 'error': True, 'default': req.POST})
@@ -89,7 +89,7 @@ def ep_comment_box(req, podcast_slug, episode_id):
         NotificationHook.trigger_notification(
             podcast=pod,
             trigger_type='feedback',
-            data={'episode': ep, 'content': req.POST.get('message')})
+            data={'episode': ep, 'content': req.POST.get('message'), 'sender': req.POST.get('email')})
     except Exception:
         return _pmrender(req, 'feedback/comment_episode.html',
                          {'podcast': pod, 'episode': ep, 'error': True, 'default': req.POST})

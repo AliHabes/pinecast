@@ -10,6 +10,12 @@
   {% endtrans %}
 </p>
 
+{% if notification_sent %}
+  <div class="success">
+    {{ _('The test notification was sent') }}
+  </div>
+{% endif %}
+
 <hr>
 
 {% set notifications = list(podcast.notifications.all()) %}
@@ -37,9 +43,19 @@
             {{ notification.get_trigger_text() }}
           </td>
           <td>
-            <form action="{{ url('delete_notification') }}" method="post" style="padding: 0">
-              <button class="btn btn--tiny" type="submit">
+            <form action="{{ url('delete_notification') }}" method="post" style="display: inline-block; padding: 0">
+              <button class="btn btn--tiny btn--danger" type="submit">
                 <i class="icon-trash-empty" aria-label="{{ _('Remove notification') }}"></i>
+              </button>
+
+              <input type="hidden" name="podcast" value="{{ podcast.id }}">
+              <input type="hidden" name="id" value="{{ notification.id }}">
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            </form>
+
+            <form action="{{ url('test_notification') }}" method="post" style="display: inline-block; padding: 0">
+              <button class="btn btn--tiny" type="submit">
+                <i class="icon-paper-plane" aria-label="{{ _('Test notification') }}"></i>
               </button>
 
               <input type="hidden" name="podcast" value="{{ podcast.id }}">

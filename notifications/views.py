@@ -60,3 +60,13 @@ def delete_notification(req):
     notification.delete()
 
     return redirect(reverse('podcast_dashboard', podcast_slug=podcast.slug) + '#settings,notifications')
+
+@require_POST
+@login_required
+def test_notification(req):
+    podcast = _get_podcast(req, id=req.POST.get('podcast'))
+    notification = get_object_or_404(NotificationHook, podcast=podcast, id=req.POST.get('id'))
+
+    notification.send_test()
+
+    return redirect(reverse('podcast_dashboard', podcast_slug=podcast.slug) + '?notification_sent=true#settings,notifications')

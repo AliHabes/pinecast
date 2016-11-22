@@ -35,7 +35,7 @@ def environment(**options):
         'list': list,
         'min': min,
         'max': max,
-        'now': lambda: datetime.datetime.now(),
+        'now': lambda hours=0: datetime.datetime.now() + datetime.timedelta(hours=hours),
         'sorted': sorted,
         'str': str,
         'url': helpers.reverse,
@@ -102,7 +102,7 @@ def environment(**options):
     env.filters['json'] = json.dumps
     env.filters['safe_json'] = safe_json
     env.filters['markdown'] = gfm.markdown
-    env.filters['pretty_date'] = pretty_date
+    env.filters['pretty_date'] = helpers.pretty_date
     env.filters['sanitize'] = helpers.sanitize
     env.filters['replace'] = string.replace
     env.filters['sparkline'] = sparkline
@@ -132,78 +132,6 @@ def minimum_plan(user_settings, plan):
 def gravatar(s, size=40):
     dig = hashlib.md5(s).hexdigest()
     return 'https://www.gravatar.com/avatar/%s?s=%d' % (dig, size)
-
-
-def pretty_date(time=None):
-    """
-    Get a datetime object or a int() Epoch timestamp and return a
-    pretty string like 'an hour ago', 'Yesterday', '3 months ago',
-    'just now', etc
-    """
-    now = datetime.datetime.utcnow()
-    if type(time) is int:
-        diff = now - datetime.datetime.fromtimestamp(time)
-    elif isinstance(time, datetime.datetime):
-        diff = now - time
-    elif isinstance(time, datetime.date):
-        diff = now - datetime.datetime.combine(
-            time, datetime.datetime.min.time())
-    elif not time:
-        diff = now - now
-    second_diff = diff.seconds
-    day_diff = diff.days
-
-    if day_diff < 0:
-        day_diff *= -1
-        day_diff -= 1
-        second_diff *= -1
-        second_diff += 86400
-        if day_diff < 1:
-            if second_diff < 10:
-                return ugettext('imminently')
-            if second_diff < 60:
-                return ungettext('{n} second from now', '{n} seconds from now', second_diff).format(n=second_diff)
-            if second_diff < 120:
-                return ugettext('in a minute')
-            if second_diff < 3600:
-                return ungettext('{n} minute from now', '{n} minutes from now', second_diff / 60).format(n=second_diff / 60)
-            if second_diff < 7200:
-                return ugettext('in an hour')
-            if second_diff < 86400:
-                return ungettext('{n} hour from now', '{n} hours from now', second_diff / 3600).format(n=second_diff / 3600)
-        day_diff += 1
-        if day_diff == 1:
-            return ugettext('tomorrow')
-        if day_diff < 7:
-            return ungettext('{n} day from now', '{n} days from now', day_diff).format(n=day_diff)
-        if day_diff < 31:
-            return ungettext('{n} week from now', '{n} weeks from now', day_diff / 7).format(n=day_diff / 7)
-        if day_diff < 365:
-            return ungettext('{n} month from now', '{n} months from now', day_diff / 30).format(n=day_diff / 30)
-        return ungettext('{n} year from now', '{n} years from now', day_diff / 365).format(n=day_diff / 365)
-
-    if day_diff == 0:
-        if second_diff < 10:
-            return ugettext('just now')
-        if second_diff < 60:
-            return ungettext('{n} second ago', '{n} seconds ago', second_diff).format(n=second_diff)
-        if second_diff < 120:
-            return ugettext('a minute ago')
-        if second_diff < 3600:
-            return ungettext('{n} minute ago', '{n} minutes ago', second_diff / 60).format(n=second_diff / 60)
-        if second_diff < 7200:
-            return ugettext('an hour ago')
-        if second_diff < 86400:
-            return ungettext('{n} hour ago', '{n} hours ago', second_diff / 3600).format(n=second_diff / 3600)
-    if day_diff == 1:
-        return ugettext('yesterday')
-    if day_diff < 7:
-        return ungettext('{n} day ago', '{n} days ago', day_diff).format(n=day_diff)
-    if day_diff < 31:
-        return ungettext('{n} week ago', '{n} weeks ago', day_diff / 7).format(n=day_diff / 7)
-    if day_diff < 365:
-        return ungettext('{n} month ago', '{n} months ago', day_diff / 30).format(n=day_diff / 30)
-    return ungettext('{n} year ago', '{n} years ago', day_diff / 365).format(n=day_diff / 365)
 
 
 def safe_json(data):

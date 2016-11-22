@@ -154,6 +154,8 @@ def podcast_dashboard(req, podcast_slug):
 
     if payment_plans.minimum(owner_uset.plan, payment_plans.FEATURE_MIN_NOTIFICATIONS):
         data['notifications'] = NotificationHook.objects.filter(podcast=pod)
+        if req.GET.get('notification_sent'):
+            data['notification_sent'] = True
 
     return _pmrender(req, 'dashboard/podcast/page_podcast.html', data)
 

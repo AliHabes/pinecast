@@ -67,7 +67,10 @@
       <div class="select">
         <select name="timezone">
           {% for tz in timezones %}
-            <option value="{{ tz }}" {{ ' selected' if user_settings.tz_offset == tz else '' }}>{{ tz|format_tz }}</option>
+            <option value="{{ tz }}" {{ ' selected' if user_settings.tz_offset == tz else '' }}>
+              {{ tz|format_tz }}
+              ({{ _('currently %s') % now(tz).strftime('%I:%M %p') }})
+            </option>
           {% endfor %}
         </select>
       </div>
