@@ -39,6 +39,8 @@ def feed(req, podcast_slug):
     episodes = pod.get_episodes()
     is_demo = UserSettings.get_from_user(pod.owner).plan == plans.PLAN_DEMO
 
+    channel_explicit_tag = '<itunes:explicit>%s</itunes:explicit>' % ('yes' if pod.is_explicit else 'no')
+
     for ep in episodes:
         ep_url = _asset(ep.audio_url + '?x-source=rss&x-episode=%s' % str(ep.id))
 
@@ -48,6 +50,8 @@ def feed(req, podcast_slug):
         if ep.explicit_override != PodcastEpisode.EXPLICIT_OVERRIDE_CHOICE_NONE:
             explicit_tag = '<itunes:explicit>%s</itunes:explicit>' % (
                 'yes' if ep.explicit_override == PodcastEpisode.EXPLICIT_OVERRIDE_CHOICE_EXPLICIT else 'clean')
+        else:
+            explicit_tag = channel_explicit_tag
 
         items.append('\n'.join([
             '<item>',
@@ -111,7 +115,7 @@ def feed(req, podcast_slug):
         '<itunes:name>%s</itunes:name>' % escape(pod.author_name),
         '<itunes:email>%s</itunes:email>' % escape(pod.owner.email),
         '</itunes:owner>',
-        '<itunes:explicit>%s</itunes:explicit>' % ('yes' if pod.is_explicit else 'no'),
+        channel_explicit_tag,
         '<itunes:image href=%s />' % quoteattr(_asset(pod.cover_image)),
         '<image>',
         '<title>%s</title>' % escape(pod.name),
