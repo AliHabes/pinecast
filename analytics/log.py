@@ -32,6 +32,7 @@ def write_influx(db, *args):
 
 def write_influx_many(db, items):
     influx_client = get_client()
+    return influx_client.write_points(items, database=db)
     try:
         return influx_client.write_points(items, database=db)
     except Exception as e:
