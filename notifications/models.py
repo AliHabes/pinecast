@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 
 import datetime
 import json
@@ -112,8 +113,8 @@ class NotificationHook(models.Model):
                 failed = True
 
         if settings.DEBUG:
-            print('Attempted to send %s webhook by %s (failed: %s)' % (
-                self.trigger, self.destination_type, failed))
+            print(('Attempted to send %s webhook by %s (failed: %s)' % (
+                self.trigger, self.destination_type, failed)))
         from analytics.log import write_notification
         write_notification(self, failed, data.get('test', False))
 

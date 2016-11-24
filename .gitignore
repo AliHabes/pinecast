@@ -7,3 +7,4 @@ desktop.ini
 db.sqlite3
 venv
 settings_local.py
+*.bak

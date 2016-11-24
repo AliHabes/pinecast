@@ -160,7 +160,7 @@ class Format(object):
 
     def _get_keys(self):
         key = self.group_by[0] if isinstance(self.group_by, (list, tuple)) else self.group_by
-        value_key = self.selection.items()[0][1]
+        value_key = list(self.selection.items())[0][1]
         return key, value_key
 
     def _get_tz_offset(self):
@@ -169,7 +169,7 @@ class Format(object):
 
     def _get_parsed_dates(self, points=None):
         if not points:
-            points = self.res.items()[0][1]
+            points = list(self.res.items())[0][1]
         tz_offset = self._get_tz_offset()
         return (_parse_date(x['time']) + tz_offset for x in points)
 

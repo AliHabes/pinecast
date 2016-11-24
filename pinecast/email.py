@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from __future__ import print_function
 
 import hashlib
 import uuid
@@ -19,7 +20,7 @@ CONFIRMATION_PARAM = '__ctx'
 
 def _send_mail(to, subject, body, email_format='Text'):
     if settings.DEBUG:
-        print(to, subject, body)
+        print((to, subject, body))
     session = Session(aws_access_key_id=settings.SES_ACCESS_ID,
                       aws_secret_access_key=settings.SES_SECRET_KEY,
                       region_name='us-east-1')

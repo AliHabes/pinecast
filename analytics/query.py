@@ -9,6 +9,7 @@ from django.conf import settings
 from .constants import USER_TIMEFRAMES
 from .influx import get_client
 from .util import escape, ident
+from six.moves import zip
 
 
 def _get_lone(response, default=-1):

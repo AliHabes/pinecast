@@ -186,7 +186,7 @@ def podcast_top_episodes(req, pod):
 
     tz = UserSettings.get_from_user(req.user).tz_offset
     top_ep_data = query.get_top_episodes(str(pod.id), timeframe, tz)
-    episodes = PodcastEpisode.objects.filter(id__in=top_ep_data.keys())
+    episodes = PodcastEpisode.objects.filter(id__in=list(top_ep_data.keys()))
     mapped = {str(ep.id): ep for ep in episodes}
 
     # This step is necessary to filter out deleted episodes, since deleted episodes

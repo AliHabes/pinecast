@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from __future__ import print_function
 
 import datetime
 import hashlib
@@ -245,7 +246,7 @@ def commit_listens(listen_objs):
 def write_subscription(req, podcast, ts=None, dry_run=False):
     if is_bot(req=req):
         if settings.DEBUG:
-            print('Ignoring bot: %s' % req.META.get('HTTP_USER_AGENT'))
+            print(('Ignoring bot: %s' % req.META.get('HTTP_USER_AGENT')))
         return
 
     ip = get_request_ip(req)
