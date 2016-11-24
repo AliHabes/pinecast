@@ -9,7 +9,7 @@ A premium podcast hosting service
 
 ### Minimum Requirements
 
-- Python 2.7
+- Python 3.5 (though Python 2.7 should work in theory)
 - *nix or Cygwin
 - `virtualenv` must be set up
 

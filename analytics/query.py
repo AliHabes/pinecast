@@ -138,4 +138,4 @@ def _colorscale(hexstr, scalefactor):
     g = max(0, min(g * scalefactor, 255))
     b = max(0, min(b * scalefactor, 255))
 
-    return "#%02x%02x%02x" % (r, g, b)
+    return "#%02x%02x%02x" % (int(r), int(g), int(b))
