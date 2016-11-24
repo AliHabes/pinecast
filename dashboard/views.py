@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import base64
 import collections
 import datetime
@@ -517,5 +519,5 @@ def get_episodes(req):
          'podcastSlug': ep.podcast.slug,
          'publish': (ep.publish + tz_delta).strftime('%Y-%m-%dT%H:%M:%S')} for
         ep in
-        sorted(query, cmp=lambda a, b: cmp(a.publish, b.publish))
+        sorted(query, key=lambda x: x.publish)
     ]

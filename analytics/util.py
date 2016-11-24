@@ -1,7 +1,12 @@
+from __future__ import absolute_import
+
+from types import StringTypes
+
+
 def escape(val):
-    if isinstance(val, (str, unicode)):
+    if isinstance(val, StringTypes):
         return "'%s'" % val.replace("'", "\\'")
-    elif isinstance(val, (int, float, long)):
+    elif isinstance(val, (int, float)):
         return str(val)
 
     raise Exception('Unknown type %s' % type(val))

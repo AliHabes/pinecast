@@ -1,4 +1,7 @@
+from __future__ import absolute_import
+
 from email.Utils import parsedate
+from types import StringTypes
 
 from django.utils.translation import ugettext
 
@@ -60,7 +63,7 @@ def get_details(req, parsed):
             continue
 
         duration = first_tag_text(node, 'itunes:duration', '0:00')
-        dur_tup = map(int, duration.split(':'))
+        dur_tup = list(map(int, duration.split(':')))
         if len(dur_tup) == 1:
             dur_seconds = dur_tup[0]
         elif len(dur_tup) == 2:
@@ -93,7 +96,7 @@ def parse_date_format(date):
 
 def first_tag_text(dom, tag, default=None):
     node = get_first_tag(dom, tag, default)
-    if isinstance(node, (str, unicode)):
+    if isinstance(node, StringTypes):
         return node
 
     text = []
@@ -106,7 +109,7 @@ def first_tag_text(dom, tag, default=None):
 
 def first_tag_attr(dom, tag, attribute, default=''):
     node = get_first_tag(dom, tag, default)
-    if isinstance(node, (str, unicode)): return default
+    if isinstance(node, StringTypes): return default
     val = node.getAttribute(attribute)
     if not val:
         if default: return default

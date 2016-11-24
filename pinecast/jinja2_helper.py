@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from __future__ import division
+
 import datetime
 import hashlib
 import json
@@ -12,7 +15,7 @@ from django.utils.translation import ugettext, ugettext_lazy, ungettext
 from jinja2 import Environment, evalcontextfilter
 
 import accounts.payment_plans as payment_plans
-import helpers
+from . import helpers
 from accounts.models import UserSettings
 
 
@@ -139,7 +142,7 @@ def safe_json(data):
         return 'null'
     elif isinstance(data, bool):
         return 'true' if data else 'false'
-    elif isinstance(data, (int, long, float)):
+    elif isinstance(data, (int, float)):
         return str(data)
     elif isinstance(data, (tuple, list)):
         return jinja2.Markup('[%s]' % ','.join(safe_json(x) for x in data))

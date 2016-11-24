@@ -1,5 +1,9 @@
+from __future__ import absolute_import
+from __future__ import division
+
 import datetime
 from functools import wraps
+from types import StringTypes
 
 import bleach
 import django.core.urlresolvers
@@ -16,7 +20,7 @@ def json_response(*args, **jr_kwargs):
         @wraps(view)
         def func(*args, **kwargs):
             resp = view(*args, **kwargs)
-            if not isinstance(resp, (dict, list, bool, str, unicode, int, float, long)):
+            if not isinstance(resp, (dict, list, bool, int, float) + StringTypes):
                 # Handle HttpResponse/HttpResponseBadRequest/etc
                 return resp
             return JsonResponse(resp, safe=jr_kwargs.get('safe', True))
@@ -117,21 +121,21 @@ def pretty_date(time=None):
             if second_diff < 120:
                 return ugettext('in a minute')
             if second_diff < 3600:
-                return ungettext('{n} minute from now', '{n} minutes from now', second_diff / 60).format(n=second_diff / 60)
+                return ungettext('{n} minute from now', '{n} minutes from now', second_diff // 60).format(n=second_diff // 60)
             if second_diff < 7200:
                 return ugettext('in an hour')
             if second_diff < 86400:
-                return ungettext('{n} hour from now', '{n} hours from now', second_diff / 3600).format(n=second_diff / 3600)
+                return ungettext('{n} hour from now', '{n} hours from now', second_diff // 3600).format(n=second_diff // 3600)
         day_diff += 1
         if day_diff == 1:
             return ugettext('tomorrow')
         if day_diff < 7:
             return ungettext('{n} day from now', '{n} days from now', day_diff).format(n=day_diff)
         if day_diff < 31:
-            return ungettext('{n} week from now', '{n} weeks from now', day_diff / 7).format(n=day_diff / 7)
+            return ungettext('{n} week from now', '{n} weeks from now', day_diff // 7).format(n=day_diff // 7)
         if day_diff < 365:
-            return ungettext('{n} month from now', '{n} months from now', day_diff / 30).format(n=day_diff / 30)
-        return ungettext('{n} year from now', '{n} years from now', day_diff / 365).format(n=day_diff / 365)
+            return ungettext('{n} month from now', '{n} months from now', day_diff // 30).format(n=day_diff // 30)
+        return ungettext('{n} year from now', '{n} years from now', day_diff // 365).format(n=day_diff // 365)
 
     if day_diff == 0:
         if second_diff < 10:
@@ -141,17 +145,17 @@ def pretty_date(time=None):
         if second_diff < 120:
             return ugettext('a minute ago')
         if second_diff < 3600:
-            return ungettext('{n} minute ago', '{n} minutes ago', second_diff / 60).format(n=second_diff / 60)
+            return ungettext('{n} minute ago', '{n} minutes ago', second_diff // 60).format(n=second_diff // 60)
         if second_diff < 7200:
             return ugettext('an hour ago')
         if second_diff < 86400:
-            return ungettext('{n} hour ago', '{n} hours ago', second_diff / 3600).format(n=second_diff / 3600)
+            return ungettext('{n} hour ago', '{n} hours ago', second_diff // 3600).format(n=second_diff // 3600)
     if day_diff == 1:
         return ugettext('yesterday')
     if day_diff < 7:
         return ungettext('{n} day ago', '{n} days ago', day_diff).format(n=day_diff)
     if day_diff < 31:
-        return ungettext('{n} week ago', '{n} weeks ago', day_diff / 7).format(n=day_diff / 7)
+        return ungettext('{n} week ago', '{n} weeks ago', day_diff // 7).format(n=day_diff // 7)
     if day_diff < 365:
-        return ungettext('{n} month ago', '{n} months ago', day_diff / 30).format(n=day_diff / 30)
-    return ungettext('{n} year ago', '{n} years ago', day_diff / 365).format(n=day_diff / 365)
+        return ungettext('{n} month ago', '{n} months ago', day_diff // 30).format(n=day_diff // 30)
+    return ungettext('{n} year ago', '{n} years ago', day_diff // 365).format(n=day_diff // 365)

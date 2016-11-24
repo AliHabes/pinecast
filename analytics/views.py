@@ -1,5 +1,8 @@
+from __future__ import absolute_import
+
 import datetime
 from functools import wraps
+from types import StringTypes
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden, JsonResponse
@@ -7,8 +10,8 @@ from django.shortcuts import render
 from django.utils.translation import ugettext, ugettext_lazy
 
 import accounts.payment_plans as plans
-from formatter import Format
 from . import query
+from .formatter import Format
 from accounts.models import Network, UserSettings
 from dashboard.views import get_podcast
 from pinecast.helpers import get_object_or_404, json_response, reverse
@@ -39,7 +42,7 @@ def restrict(minimum_plan):
                 return HttpResponseForbidden()
 
             resp = view(req, pod, *args[1:], **kwargs)
-            if not isinstance(resp, (dict, list, bool, str, unicode, int, float)) and resp is not None:
+            if not isinstance(resp, (dict, list, bool, int, float) + StringTypes) and resp is not None:
                 # Handle HttpResponse/HttpResponseBadRequest/etc
                 return resp
             return JsonResponse(resp, safe=False)
@@ -182,9 +185,9 @@ def podcast_top_episodes(req, pod):
         return None
 
     tz = UserSettings.get_from_user(req.user).tz_offset
-    top_ep_data = query.get_top_episodes(unicode(pod.id), timeframe, tz)
+    top_ep_data = query.get_top_episodes(str(pod.id), timeframe, tz)
     episodes = PodcastEpisode.objects.filter(id__in=top_ep_data.keys())
-    mapped = {unicode(ep.id): ep for ep in episodes}
+    mapped = {str(ep.id): ep for ep in episodes}
 
     # This step is necessary to filter out deleted episodes, since deleted episodes
     # are not removed from the analytics data.

@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from __future__ import division
+
 from urllib import quote
 
 import rollbar

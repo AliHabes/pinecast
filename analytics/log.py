@@ -1,6 +1,9 @@
+from __future__ import absolute_import
+
 import datetime
 import hashlib
 import json
+from types import StringTypes
 
 import requests
 import rollbar
@@ -89,8 +92,8 @@ def get_listen_obj(ep, source, req=None, ip=None, ua=None, timestamp=None):
     if not ua: ua = req.META.get('HTTP_USER_AGENT', 'Unknown') or 'Unknown'
     if not timestamp: timestamp = datetime.datetime.now()
 
-    ep_id = unicode(ep.id)
-    pod_id = unicode(ep.podcast.id)
+    ep_id = str(ep.id)
+    pod_id = str(ep.podcast.id)
 
     browser, device, os = get_device_type(req=req, ua=ua)
     country = _get_country(ip, req)
@@ -242,16 +245,16 @@ def commit_listens(listen_objs):
 def write_subscription(req, podcast, ts=None, dry_run=False):
     if is_bot(req=req):
         if settings.DEBUG:
-            print 'Ignoring bot: %s' % req.META.get('HTTP_USER_AGENT')
+            print('Ignoring bot: %s' % req.META.get('HTTP_USER_AGENT'))
         return
 
     ip = get_request_ip(req)
     ua = req.META.get('HTTP_USER_AGENT', 'Unknown') or 'Unknown'
 
-    if isinstance(podcast, (str, unicode)):
+    if isinstance(podcast, StringTypes):
         pod_id = podcast
     else:
-        pod_id = unicode(podcast.id)
+        pod_id = str(podcast.id)
 
     browser, device, os = get_device_type(req=req, ua=ua)
     country = _get_country(ip, req)
@@ -314,7 +317,7 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
     result = write_influx_many(settings.INFLUXDB_DB_SUBSCRIPTION, points)
     if not result:
         if settings.DEBUG:
-            print 'Error ingesting data to InfluxDB'
+            print('Error ingesting data to InfluxDB')
         else:
             rollbar.report_message(
                 'Unable to ingest subscription points to influx', 'error')

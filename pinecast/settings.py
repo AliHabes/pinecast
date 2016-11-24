@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 """
 Django settings for pinecast project.
 
@@ -150,11 +152,11 @@ try:
     import dj_database_url
     prod_db = dj_database_url.config()
     assert prod_db, 'No DB config found...'
-    print 'Using prod database'
+    print('Using prod database')
     DATABASES['default'] = prod_db
     DATABASES['default']['CONN_MAX_AGE'] = 500
 except Exception:
-    print 'Using SQLite db'
+    print('Using SQLite db')
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
@@ -252,7 +254,7 @@ DISABLE_GETCONNECT = os.environ.get('DISABLE_GETCONNECT', 'false') == 'true'
 
 
 try:
-    from settings_local import *
+    from .settings_local import *
 except ImportError:
     pass
 

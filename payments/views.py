@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from __future__ import division
+
 import json
 
 import iso8601
@@ -11,7 +14,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 import accounts.payment_plans as payment_plans
-import views_tips
 from .models import RecurringTip, TipEvent
 from .stripe_lib import stripe
 from accounts.models import UserSettings

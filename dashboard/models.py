@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 import uuid
 
@@ -5,7 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext
 
-import importer_worker
+from . import importer_worker
 from podcasts.models import Podcast, PodcastEpisode
 
 
@@ -33,7 +35,7 @@ class AssetImportRequest(models.Model):
 
     @classmethod
     def get_token(cls):
-        return unicode(uuid.uuid4())
+        return str(uuid.uuid4())
 
     def get_json_payload(self):
         return {

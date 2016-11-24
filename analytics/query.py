@@ -1,5 +1,8 @@
+from __future__ import absolute_import
+
 import datetime
 import json
+from types import StringTypes
 
 from django.conf import settings
 
@@ -15,9 +18,9 @@ def _get_lone(response, default=-1):
     return raw['series'][0]['values'][0][1]
 
 def total_listens(podcast, episode_id=None):
-    podcast_is_str = isinstance(podcast, (str, unicode))
+    podcast_is_str = isinstance(podcast, StringTypes)
     query = 'SELECT COUNT(v) FROM "listen" WHERE podcast = \'%s\'%s;' % (
-        podcast if podcast_is_str else unicode(podcast.id),
+        podcast if podcast_is_str else str(podcast.id),
         ' AND episode = \'%s\'' % episode_id if episode_id else '')
 
     if podcast_is_str:
@@ -30,7 +33,7 @@ def total_listens(podcast, episode_id=None):
 
 def total_listens_this_week(podcast, tz):
     query = 'SELECT COUNT(v) FROM "listen" WHERE podcast = \'%s\' AND %s;' % (
-        unicode(podcast.id),
+        str(podcast.id),
         USER_TIMEFRAMES['week'](tz))
 
     return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_LISTEN), 0)
@@ -38,7 +41,7 @@ def total_listens_this_week(podcast, tz):
 
 def total_subscribers(podcast):
     query = 'SELECT COUNT(v) FROM "subscription" WHERE podcast = \'%s\' AND %s;' % (
-        unicode(podcast.id),
+        str(podcast.id),
         USER_TIMEFRAMES['day'](0)) # tz offset of zero because it doesn't matter which day
 
     return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_SUBSCRIPTION), 0)

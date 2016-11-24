@@ -1,5 +1,8 @@
+from __future__ import absolute_import
+
 import datetime
 import re
+from types import StringTypes
 
 from django.conf import settings
 from django.utils.translation import ugettext
@@ -44,7 +47,7 @@ def select_format(k, v):
     raise Exception('Unknown selector %s' % v)
 
 def where_format(k, v):
-    if isinstance(v, (unicode, str)):
+    if isinstance(v, StringTypes):
         return '%s = %s' % (ident(k), escape(v))
 
     if isinstance(v, (list, tuple)):
@@ -148,8 +151,8 @@ class Format(object):
 
         query += ';'
 
-        if settings.DEBUG:
-            print query
+        # if settings.DEBUG:
+        #     print(query)
 
         self.res = get_client().query(query, database=self.db)
 

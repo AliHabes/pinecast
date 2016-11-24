@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.core.urlresolvers import is_valid_path
 from django.http import HttpResponsePermanentRedirect

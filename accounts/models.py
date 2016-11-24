@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 
 from django.contrib.auth.models import User
@@ -5,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext, ugettext_lazy
 
-import payment_plans
+from . import payment_plans
 from pinecast.email import send_notification_email
 from pinecast.helpers import cached_method
 from payments.mixins import StripeCustomerMixin, StripeManagedAccountMixin

@@ -1,9 +1,11 @@
+from __future__ import absolute_import
+
 from functools import wraps
 
 from django.http import HttpResponseForbidden
 
-import payment_plans
-from models import UserSettings
+from . import payment_plans
+from .models import UserSettings
 
 
 def restrict_minimum_plan(minimum_plan):

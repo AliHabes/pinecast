@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 
 import gfm
@@ -12,8 +14,6 @@ from accounts.payment_plans import FEATURE_MIN_SITE_FAVICON, minimum
 from podcasts.models import Podcast, PodcastEpisode
 from pinecast.helpers import get_object_or_404, reverse
 
-import urls_internal
-
 
 SITE_EPISODES_PER_PAGE = 5
 
@@ -21,6 +21,7 @@ SITE_EPISODES_PER_PAGE = 5
 def _subdomain_reverse(*args, **kwargs):
     if 'podcast_slug' in kwargs:
         del kwargs['podcast_slug']
+    from . import urls_internal
     return reverse(urlconf=urls_internal, *args, **kwargs)
 
 def _srender(req, site, template, data=None):
@@ -122,7 +123,7 @@ def sitemap(req, podcast_slug):
     '''
 
     pages = pod.podcastepisode_set.all().count()
-    for i in xrange(pages):
+    for i in range(pages):
         output += '''
         <url>
             <loc>{url}</loc>

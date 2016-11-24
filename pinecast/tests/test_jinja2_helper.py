@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from nose.tools import eq_
 
 from ..jinja2_helper import safe_json
@@ -10,7 +12,7 @@ def test_safe_json():
     eq_(str(safe_json(None)), 'null')
     eq_(str(safe_json(1)), '1')
     eq_(str(safe_json(1.5)), '1.5')
-    eq_(str(safe_json(long(100))), '100')
+    # eq_(str(safe_json(long(100))), '100')
     eq_(str(safe_json(True)), 'true')
     eq_(str(safe_json(False)), 'false')
 

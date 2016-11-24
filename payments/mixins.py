@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+
 import datetime
 
-from stripe_lib import stripe
+from .stripe_lib import stripe
 
 
 class StripeCustomerMixin(object):
