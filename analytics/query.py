@@ -1,7 +1,6 @@
 import datetime
 import json
 
-import grequests
 from django.conf import settings
 
 from .constants import USER_TIMEFRAMES
