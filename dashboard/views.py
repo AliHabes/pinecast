@@ -438,10 +438,10 @@ def get_upload_url(req, podcast_slug, type):
             ['content-length-range', 0, max_size],
         ],
     }
-    encoded_policy = base64.b64encode(json.dumps(policy))
+    encoded_policy = base64.b64encode(json.dumps(policy).encode('utf-8'))
 
     destination_url = 'https://%s.s3.amazonaws.com/%s' % (settings.S3_BUCKET, path)
-    signed_dest_url = signer.sign(destination_url)
+    signed_dest_url = signer.sign(destination_url.encode('utf-8'))
     return {
         'url': 'https://%s.s3.amazonaws.com/' % settings.S3_BUCKET,
         'method': 'post',
@@ -451,12 +451,12 @@ def get_upload_url(req, podcast_slug, type):
             'acl': 'public-read',
             'Content-Type': mime_type,
             'AWSAccessKeyId': settings.S3_ACCESS_ID,
-            'Policy': encoded_policy,
+            'Policy': encoded_policy.decode('ascii'),
             'Signature': base64.b64encode(hmac.new(settings.S3_SECRET_KEY.encode(),
-                                                   encoded_policy.encode('utf8'),
-                                                   hashlib.sha1).digest()),
+                                                   encoded_policy,
+                                                   hashlib.sha1).digest()).decode('ascii'),
         },
-        'destination_url': signed_dest_url,
+        'destination_url': signed_dest_url.decode('utf-8'),
     }
 
 
