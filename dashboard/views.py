@@ -417,7 +417,7 @@ def get_upload_url(req, podcast_slug, type):
 
     uid = str(uuid.uuid4())
     path = '%s%s/%s' % (basepath, uid, req.GET.get('name'))
-    encoded_path = '%s%s/%s' % (basepath, uid, urllib.pathname2url(req.GET.get('name')))
+    encoded_path = '%s%s/%s' % (basepath, uid, urllib.request.pathname2url(req.GET.get('name')))
 
     mime_type = req.GET.get('type')
 
