@@ -89,7 +89,7 @@ def validate_confirmation(req, max_age=settings.EMAIL_CONFIRMATION_MAX_AGE):
     signed = req.GET.get(CONFIRMATION_PARAM)
     try:
         signature = signer.unsign(signed, max_age=max_age)
-        return hashlib.sha1(trimmed_path).hexdigest() == signature
+        return hashlib.sha1(trimmed_path.encode('utf-8')).hexdigest() == signature
     except itsdangerous.BadTimeSignature:
         return False
 
@@ -110,7 +110,7 @@ def get_signed_url(url):
     else:
         signed_url = '%s?' % url
 
-    token = hashlib.sha1(url).hexdigest()
+    token = hashlib.sha1(url.encode('utf-8')).hexdigest()
     signed_url += '%s=%s' % (CONFIRMATION_PARAM, signer.sign(token))
     return signed_url
 

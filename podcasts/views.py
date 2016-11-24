@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import time
-from email.Utils import formatdate
+from email.utils import formatdate
 from xml.sax.saxutils import escape, quoteattr
 
 from django.conf import settings

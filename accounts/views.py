@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import re
-from urllib import quote as urlencode
+from urllib.parse import quote as urlencode
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login

@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import datetime
 from functools import wraps
-from types import StringTypes
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden, JsonResponse
@@ -15,6 +14,7 @@ from .formatter import Format
 from accounts.models import Network, UserSettings
 from dashboard.views import get_podcast
 from pinecast.helpers import get_object_or_404, json_response, reverse
+from pinecast.types import StringTypes
 from podcasts.models import Podcast, PodcastEpisode
 
 

@@ -1,9 +1,10 @@
 from __future__ import absolute_import
 
-from email.Utils import parsedate
-from types import StringTypes
+from email.utils import parsedate
 
 from django.utils.translation import ugettext
+
+from pinecast.types import StringTypes
 
 
 def handle_format_exceptions(func):

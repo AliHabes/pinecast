@@ -4,7 +4,6 @@ from __future__ import division
 import datetime
 import hashlib
 import json
-import string
 
 import gfm
 import jinja2
@@ -107,7 +106,7 @@ def environment(**options):
     env.filters['markdown'] = gfm.markdown
     env.filters['pretty_date'] = helpers.pretty_date
     env.filters['sanitize'] = helpers.sanitize
-    env.filters['replace'] = string.replace
+    env.filters['replace'] = lambda s: s.replace
     env.filters['sparkline'] = sparkline
     return env
 
@@ -133,7 +132,7 @@ def minimum_plan(user_settings, plan):
 
 
 def gravatar(s, size=40):
-    dig = hashlib.md5(s).hexdigest()
+    dig = hashlib.md5(s.encode('utf-8')).hexdigest()
     return 'https://www.gravatar.com/avatar/%s?s=%d' % (dig, size)
 
 

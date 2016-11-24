@@ -2,14 +2,14 @@ from __future__ import absolute_import
 
 import datetime
 import json
-from types import StringTypes
 
 from django.conf import settings
+from six.moves import zip
 
 from .constants import USER_TIMEFRAMES
 from .influx import get_client
 from .util import escape, ident
-from six.moves import zip
+from pinecast.types import StringTypes
 
 
 def _get_lone(response, default=-1):

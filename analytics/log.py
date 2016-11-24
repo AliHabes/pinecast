@@ -4,7 +4,6 @@ from __future__ import print_function
 import datetime
 import hashlib
 import json
-from types import StringTypes
 
 import requests
 import rollbar
@@ -14,6 +13,7 @@ from .analyze import get_device_type, get_request_hash, get_request_ip, get_ts_h
 from .influx import get_client
 from .query import total_listens
 from notifications.models import NotificationHook
+from pinecast.types import StringTypes
 
 
 def get_influx_item(measurement, tags, fields, timestamp=None):
@@ -126,7 +126,7 @@ def get_listen_obj(ep, source, req=None, ip=None, ua=None, timestamp=None):
         'ip': ip,
         'ua': ua,
 
-        'l_id': hashlib.sha1(','.join([ip, ua, timestamp.isoformat()])).hexdigest(),
+        'l_id': hashlib.sha1(','.join([ip, ua, timestamp.isoformat()]).encode('utf-8')).hexdigest(),
     }
     points = [
         # commit_listens below relies on the main listen to be first in this array
@@ -283,7 +283,7 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
         'podcast_f': pod_id,
         'ip': ip,
         'ua': ua,
-        'l_id': hashlib.sha1(','.join([ip, ua, influx_ts.isoformat()])).hexdigest(),
+        'l_id': hashlib.sha1(','.join([ip, ua, influx_ts.isoformat()]).encode('utf-8')).hexdigest(),
     }
 
     points = [

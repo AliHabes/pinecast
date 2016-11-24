@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 
-from urllib import quote
+from urllib.parse import quote
 
 import rollbar
 from django.http import HttpResponse

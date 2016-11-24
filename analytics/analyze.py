@@ -101,9 +101,9 @@ def get_request_hash(req):
     return get_raw_request_hash(ua, ip, datetime.date.today())
 
 def get_raw_request_hash(ua, ip, ts):
-    return base64.b64encode('%s:%s:%s' % (ts.isoformat(), ip, ua))
+    return base64.b64encode(('%s:%s:%s' % (ts.isoformat(), ip, ua)).encode('utf-8'))
 
 def get_ts_hash(ip, ua, ts):
-    h = hashlib.sha1(','.join([ip, ua, ts.isoformat()])).hexdigest()
+    h = hashlib.sha1(','.join([ip, ua, ts.isoformat()]).encode('utf-8')).hexdigest()
     # This allows one hour of timestamp variability
     return int(h, 16) % (1000000 * 60 * 60)

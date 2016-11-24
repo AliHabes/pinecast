@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import datetime
 import re
-from types import StringTypes
 
 from django.conf import settings
 from django.utils.translation import ugettext
@@ -12,6 +11,7 @@ from .constants import influx_databases, USER_TIMEFRAMES
 from .influx import get_client
 from .util import escape, ident
 from accounts.models import UserSettings
+from pinecast.types import StringTypes
 
 
 TIMZONE_KILLA = re.compile(r'(\d\d\d\d\-\d\d\-\d\dT\d\d:\d\d:\d\d)(Z|[+\-]\d\d:\d\d)')

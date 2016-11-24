@@ -3,7 +3,6 @@ from __future__ import division
 
 import datetime
 from functools import wraps
-from types import StringTypes
 
 import bleach
 import django.core.urlresolvers
@@ -13,6 +12,8 @@ from django.core.urlresolvers import reverse as reverse_django
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404 as dj_get_object_or_404
 from django.utils.translation import ugettext, ungettext
+
+from pinecast.types import StringTypes
 
 
 def json_response(*args, **jr_kwargs):

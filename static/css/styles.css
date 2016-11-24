@@ -2100,6 +2100,7 @@ main > header h2 {
 .coupon-body {
     align-items: flex-end;
     display: flex;
+    margin-bottom: 30px;
 }
 .coupon-body label {
     flex: 1 1;

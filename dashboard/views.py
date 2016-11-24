@@ -47,7 +47,7 @@ def _pmrender(req, template, data=None):
 
     data.setdefault('settings', settings)
     data.setdefault('default', DefaultEmptyDict())
-    data['sign'] = lambda x: signer.sign(x) if x else x
+    data['sign'] = lambda x: signer.sign(x.encode('utf-8')) if x else x
     if not req.user.is_anonymous():
         data.setdefault('user', req.user)
 
