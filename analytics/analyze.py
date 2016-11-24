@@ -101,7 +101,7 @@ def get_request_hash(req):
     return get_raw_request_hash(ua, ip, datetime.date.today())
 
 def get_raw_request_hash(ua, ip, ts):
-    return base64.b64encode(('%s:%s:%s' % (ts.isoformat(), ip, ua)).encode('utf-8'))
+    return base64.b64encode(('%s:%s:%s' % (ts.isoformat(), ip, ua)).encode('utf-8')).decode('ascii')
 
 def get_ts_hash(ip, ua, ts):
     h = hashlib.sha1(','.join([ip, ua, ts.isoformat()]).encode('utf-8')).hexdigest()
