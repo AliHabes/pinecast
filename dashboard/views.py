@@ -7,7 +7,7 @@ import hashlib
 import hmac
 import json
 import time
-import urllib
+import urllib.request
 import uuid
 
 import itsdangerous
