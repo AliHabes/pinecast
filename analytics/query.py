@@ -4,7 +4,6 @@ import datetime
 import json
 
 from django.conf import settings
-from six.moves import zip
 
 from .constants import USER_TIMEFRAMES
 from .influx import get_client
