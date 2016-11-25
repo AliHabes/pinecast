@@ -162,7 +162,7 @@ def set_tip_cashout(req):
 @json_response
 def hook(req):
     try:
-        body = json.loads(req.body)
+        body = json.loads(req.body.decode('utf-8'))
     except Exception as e:
         rollbar.report_message(
             'Error parsing Stripe hook JSON: %s' % str(e), 'warn')
