@@ -172,7 +172,7 @@ def import_progress(req, podcast_slug):
 @json_response
 @restrict_minimum_plan(plans.FEATURE_MIN_IMPORTER)
 def get_request_token(req):
-    return {'token': signer.sign(str(uuid.uuid4()))}
+    return {'token': signer.sign(str(uuid.uuid4())).decode('utf-8')}
 
 
 @json_response
