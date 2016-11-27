@@ -73,7 +73,9 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
                     tip.cancel()
 
             self.plan = payment_plans.PLAN_DEMO
-            self.coupon_code = None
+            if self.coupon_code:
+                stripe.Coupon.retrieve(self.coupon_code).delete()
+                self.coupon_code = None
             self.save()
             return True
 

@@ -10,6 +10,10 @@
   <div class="error">
     {{ _('That coupon code is not valid.') }}
   </div>
+{% elif coupon_unavailable %}
+  <div class="error">
+    {{ _('That coupon code is not available because you are not a new customer. If you believe this to be in error, please contact support@pinecast.zendesk.com.') }}
+  </div>
 {% endif %}
 
 {% if active_coupon %}

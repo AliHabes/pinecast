@@ -66,6 +66,8 @@ def sanitize(data):
 
 
 def validate_recaptcha(response, ip):
+    if settings.DEBUG:
+        return True
     result = requests.post(
         'https://www.google.com/recaptcha/api/siteverify',
         data={'response': response,

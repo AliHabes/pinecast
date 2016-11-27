@@ -37,6 +37,7 @@ def upgrade(req):
         'active_coupon': req.session.get('coupon'),
         'coupon_applied': 'coupon_applied' in req.GET,
         'coupon_invalid': 'coupon_invalid' in req.GET,
+        'coupon_unavailable': 'coupon_unavailable' in req.GET,
         'error': req.GET.get('error'),
         'stripe_customer': customer,
         'success': 'success' in req.GET,
@@ -76,9 +77,22 @@ def upgrade_set_plan(req):
 def set_coupon(req):
     code = req.POST.get('coupon')
     try:
-        stripe.Coupon.retrieve(code)
+        coupon = stripe.Coupon.retrieve(code)
     except stripe.error.InvalidRequestError:
         return redirect(reverse('upgrade') + '?coupon_invalid')
+
+    if 'owner_id' in coupon.metadata:
+        us = UserSettings.get_from_user(req.user)
+        if us.plan != payment_plans.PLAN_DEMO:
+            return redirect(reverse('upgrade') + '?coupon_unavailable')
+
+        try:
+            cust = us.get_stripe_customer()
+        except Exception:
+            pass
+        else:
+            if len(stripe.Invoice.list(customer=cust.id, limit=1).data):
+                return redirect(reverse('upgrade') + '?coupon_unavailable')
 
     req.session['coupon'] = code
     return redirect(reverse('upgrade') + '?coupon_applied')
@@ -93,7 +107,7 @@ def set_payment_method_redir(req):
     if req.POST.get('next_url') == 'upgrade':
         next_url = reverse('upgrade')
     else:
-        next_url = reverse('dashboard')
+        next_url = reverse('dashboard') + '?success=csuc#settings'
 
     try:
         if customer:
@@ -107,7 +121,7 @@ def set_payment_method_redir(req):
         rollbar.report_message(str(e), 'error')
         return redirect(next_url + '?error=cerr#settings')
 
-    return redirect(next_url + '?success=csuc#settings')
+    return redirect(next_url)
 
 
 @require_POST
@@ -253,8 +267,8 @@ def hook(req):
             if invoice_amount < min_charge:
                 min_charge = invoice_amount
 
-        # if valid_charges != 2:
-        #     return {'success': 'did not have two successful invoices'}
+        if valid_charges != 2:
+            return {'success': 'did not have two successful invoices'}
 
         try:
             owner_cust = coupon_owner.get_stripe_customer()
