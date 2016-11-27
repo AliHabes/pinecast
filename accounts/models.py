@@ -11,6 +11,7 @@ from . import payment_plans
 from pinecast.email import send_notification_email
 from pinecast.helpers import cached_method
 from payments.mixins import StripeCustomerMixin, StripeManagedAccountMixin
+from payments.stripe_lib import stripe
 
 
 class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model):
