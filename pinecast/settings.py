@@ -254,6 +254,10 @@ INFLUXDB_SSL = True
 DISABLE_GETCONNECT = os.environ.get('DISABLE_GETCONNECT', 'false') == 'true'
 
 
+REFERRAL_DISCOUNT = 40  # percent off
+REFERRAL_DISCOUNT_DURATION = 4  # months
+
+
 try:
     from .settings_local import *
 except ImportError:

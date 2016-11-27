@@ -24,6 +24,8 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
     stripe_customer_id = models.CharField(max_length=128, blank=True, null=True)
     stripe_payout_managed_account = models.CharField(max_length=128, blank=True, null=True)
 
+    coupon_code = models.CharField(max_length=16, null=True, unique=True)
+
     def clean(self):
         if self.tz_offset < -12 or self.tz_offset > 14:
             raise ValidationError('Timezone offset must be between -12 and 14, inclusive')
@@ -71,6 +73,7 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
                     tip.cancel()
 
             self.plan = payment_plans.PLAN_DEMO
+            self.coupon_code = None
             self.save()
             return True
 

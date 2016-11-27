@@ -414,7 +414,7 @@ CATEGORIES = set([
 
 class PodcastCategory(models.Model):
     category = models.CharField(max_length=128,
-                                choices=[(x, x) for x in CATEGORIES])
+                                choices=[(x, x) for x in sorted(CATEGORIES)])
     podcast = models.ForeignKey(Podcast)
 
     def __unicode__(self):

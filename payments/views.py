@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 
 import json
+import time
 
 import iso8601
 import rollbar
@@ -180,7 +181,7 @@ def hook(req):
 
 
     if body['type'] == 'invoice.payment_succeeded' and body.get('user_id'):
-        sub = _get_subscription(body)
+        sub = _get_tip_subscription(body)
         if not sub: return {'warning': 'subscription unrecognized'}
 
         amount = int(body['data']['object']['total'])
@@ -219,6 +220,67 @@ def hook(req):
 
         return {'success': 'emails sent, tip event processed'}
 
+    elif body['type'] == 'invoice.payment_succeeded':
+        sub = stripe.Subscription.retrieve(body['data']['object']['subscription'])
+        if not sub.discount:
+            return {'success': 'ignoring undiscounted subscription'}
+
+        coupon_code = sub.discount.coupon.id
+        try:
+            coupon_owner = UserSettings.objects.get(coupon_code=coupon_code)
+        except UserSettings.DoesNotExist:
+            return {'success': 'coupon not owned by referrer'}
+
+        if coupon_owner.plan == payment_plans.PLAN_DEMO or coupon_owner.plan == payment_plans.PLAN_COMMUNITY:
+            return {'success': 'coupon owned by free user'}
+
+        min_charge = float('inf')
+        valid_charges = 0
+
+        # We limit this to three. If it goes over or under, we can ignore the charge.
+        invoices = stripe.Invoice.list(customer=sub.customer, limit=3)
+        if len(invoices.data) < 2:
+            return {'success': 'did not reach two invoices yet'}
+
+        for invoice in invoices.data:
+            if not invoice.paid:
+                continue
+            valid_charges += 1
+
+            invoice_amount = 0
+            for line in invoice.lines.data:
+                invoice_amount += line.amount
+            if invoice_amount < min_charge:
+                min_charge = invoice_amount
+
+        # if valid_charges != 2:
+        #     return {'success': 'did not have two successful invoices'}
+
+        try:
+            owner_cust = coupon_owner.get_stripe_customer()
+        except Exception as e:
+            rollbar.report_message('Error fetching coupon owner stripe customer: %s' % str(e), 'error')
+            return {'success': 'coupon owner does not exist'}
+        else:
+            if not owner_cust:
+                rollbar.report_message('Coupon owner did not have valid stripe customer', 'error')
+                return {'success': 'coupon owner does not exist'}
+
+        amount = min_charge * 2
+
+        # Negative amounts are credits
+        owner_cust.account_balance -= amount
+        owner_cust.save()
+
+        send_notification_email(
+            coupon_owner.user,
+            ugettext('You have referral credit!'),
+            ugettext('One of your referrals has crossed their two-month mark '
+                     'as a paying customer. Your account has been credited '
+                     '$%.2f.') % (float(amount) / 100))
+
+        return {'success': 'user credited'}
+
     elif body['type'] == 'invoice.payment_failed':
         if body.get('user_id'):
             return _handle_failed_tip_sub(body)
@@ -228,7 +290,7 @@ def hook(req):
     return {'success': 'ignored'}
 
 
-def _get_subscription(event_body):
+def _get_tip_subscription(event_body):
     sub_id = event_body['data']['object']['subscription']
     try:
         return RecurringTip.objects.get(stripe_subscription_id=sub_id)
@@ -239,7 +301,7 @@ def _get_subscription(event_body):
 
 
 def _handle_failed_tip_sub(body):
-    sub = _get_subscription(body)
+    sub = _get_tip_subscription(body)
     if not sub: return {'warning': 'subscription unrecognized'}
 
     closed = body['data']['object']['closed']

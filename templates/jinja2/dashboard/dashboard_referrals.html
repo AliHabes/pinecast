@@ -1,0 +1,45 @@
+<div class="form-block" style="margin-top: 40px">
+  <strong>{{ _('Earn credit towards your subscription') }}</strong>
+  <p>
+    {% trans %}
+      Refer your fellow podcasters to Pinecast and earn credit towards the cost of your subscription while giving them a discount.
+    {% endtrans %}
+  </p>
+  <p>
+    {% trans %}
+      After your referrals have signed up for a paid plan for two months, you'll earn two months' cost of their subscription (before discount). If they signed up with the Starter plan, that's $10. If they signed up with the Pro plan, that's $100! You can refer an unlimited number of podcasters.
+    {% endtrans %}
+  </p>
+
+  <p style="font-size: 0.75em; line-height: 1.2em; margin-top: 2em">
+    {% trans %}
+      Credit amounts are based on the lowest-tier plan that the referral was billed with in their first two months. Pinecast reserves the right to refuse referral payout for fraud and other types of abuse. Cancelled and resumed referrals are not eligible for referral credit. Downgrading to a free plan disqualifies any pending referral credits. Please contact Pinecast support with questions.
+    {% endtrans %}
+  </p>
+
+  <hr>
+
+  <strong>{{ _('Start referring podcasters') }}</strong>
+  {% if coupon %}
+    <p>
+      {% trans discount=coupon.percent_off, duration=coupon.duration_in_months %}
+        You're ready to go! Share the code below with your podcaster friends. They'll get <b>{{ discount }}% off</b> for <b>{{ duration }} months</b>.
+      {% endtrans %}
+    </p>
+
+    <div style="text-align: center; font-size: 3em; font-family: monospace">
+      {{ coupon.id }}
+    </div>
+  {% else %}
+
+    <p>
+      {{ _('To begin, create a referral code. Your referrals will use this as their coupon code when upgrading to a paid plan.') }}
+    </p>
+
+    <form action="{{ url('new_referral_code') }}" method="post">
+      <button class="btn" type="submit">{{ _('Create Referral Code') }}</button>
+      <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    </form>
+  {% endif %}
+
+</div>

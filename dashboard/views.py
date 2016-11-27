@@ -26,6 +26,7 @@ from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
 from feedback.models import Feedback, EpisodeFeedbackPrompt
 from notifications.models import NotificationHook
+from payments.stripe_lib import stripe
 from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import (CATEGORIES, Podcast, PodcastCategory,
                              PodcastEpisode)
@@ -103,6 +104,15 @@ def dashboard(req):
         'success': req.GET.get('success'),
         'error': req.GET.get('error'),
     }
+
+    us = UserSettings.get_from_user(req.user)
+    if us.coupon_code:
+        try:
+            ctx['coupon'] = stripe.Coupon.retrieve(us.coupon_code)
+        except Exception as e:
+            if settings.DEBUG:
+                raise e
+
     return _pmrender(req, 'dashboard/dashboard.html', ctx)
 
 

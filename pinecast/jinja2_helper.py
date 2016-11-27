@@ -52,6 +52,7 @@ def environment(**options):
         'PLAN_NAMES': payment_plans.PLANS_MAP,
         'PLANS': payment_plans.PLANS_RAW,
         'PLAN_MAX_FILE_SIZE': payment_plans.MAX_FILE_SIZE,
+        'is_paid_plan': lambda p: p != payment_plans.PLAN_DEMO and p != payment_plans.PLAN_COMMUNITY,
 
         'SUPPORT_URL': settings.SUPPORT_URL,
         'RECAPTCHA_KEY': settings.RECAPTCHA_KEY,

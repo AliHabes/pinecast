@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import re
+import uuid
 from urllib.parse import quote as urlencode
 
 from django.conf import settings
@@ -12,7 +13,9 @@ from django.utils.translation import ugettext
 from django.views.decorators.http import require_POST
 
 from .models import UserSettings
+from .payment_plans import PLAN_COMMUNITY, PLAN_DEMO
 from dashboard.views import _pmrender
+from payments.stripe_lib import stripe
 from pinecast.email import get_expired_page, get_signed_url, request_must_be_confirmed, send_confirmation_email, send_notification_email
 from pinecast.helpers import get_object_or_404, reverse
 from pinecast.signatures import signer
@@ -193,3 +196,28 @@ def user_settings_page_changeemail_finalize(req):
     user.email = req.GET.get('email')
     user.save()
     return redirect(reverse('dashboard') + '?success=emf#settings')
+
+
+@login_required
+@require_POST
+def new_referral_code(req):
+    us = UserSettings.get_from_user(req.user)
+    if us.plan == PLAN_DEMO or us.plan == PLAN_COMMUNITY:
+        return redirect('dashboard')
+
+    # Ignore users that already have codes
+    if us.coupon_code:
+        return redirect('dashboard')
+
+    code = 'r-' + str(uuid.uuid4())[-6:]
+    coupon = stripe.Coupon.create(
+        id=code,
+        percent_off=settings.REFERRAL_DISCOUNT,
+        duration='repeating',
+        duration_in_months=settings.REFERRAL_DISCOUNT_DURATION,
+        metadata={'owner_id': req.user.id})
+
+    us.coupon_code = code
+    us.save()
+
+    return redirect(reverse('dashboard') + '#referrals')
