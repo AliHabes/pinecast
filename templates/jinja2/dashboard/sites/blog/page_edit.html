@@ -20,9 +20,9 @@
     <input type="text" name="slug" required pattern="[\w-]+" value="{{ default.get('slug', post.slug) }}">
   </label>
 
-  <label>
-    <span>{{ _('Publish On') }}</span>
-    <input type="datetime-local" name="publish" required value="{{ default.get('publish', (post.publish + tz_delta).strftime('%Y-%m-%dT%H:%M')) }}">
+  <label class="markdwon-editor-small">
+    <span>{{ _('Body') }}</span>
+    <textarea class="markdown-editor" name="body">{{ default.get('body', post.body) }}</textarea>
   </label>
 
   {% if site.disqus_url %}
@@ -32,10 +32,15 @@
   </label>
   {% endif %}
 
-  <label class="markdwon-editor-small">
-    <span>{{ _('Body') }}</span>
-    <textarea class="markdown-editor" name="body">{{ default.get('body', post.body) }}</textarea>
-  </label>
+  <div
+    class="input-datetime segment-full panel"
+    data-name="publish"
+    data-default-value="{{ default.get('publish', post.publish.strftime('%Y-%m-%dT%H:%M')) }}"
+    data-label-now="{{ _('Publish Now') }}"
+    data-label-datetime="{{ _('Publish At...') }}"
+    data-label-date="{{ _('Publish Date') }}"
+    data-label-time="{{ _('Publish Time') }}"
+  ></div>
 
   <menu class="toolbar">
     <button>{{ _('Save Post') }}</button>

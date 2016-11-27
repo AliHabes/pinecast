@@ -144,16 +144,14 @@
     {% endif %}
   </p>
 
-  <div class="panel">
-    <label class="segment-full">
-      <span>{{ _('Publish On') }}</span>
-      <input type="datetime-local"
-        name="publish"
-        required
-        value="{{ default.get('publish') }}">
-      <button class="btn publish-now btn-neutral" type="button">{{ _('Now') }}</button>
-    </label>
-  </div>
+  <div
+    class="input-datetime"
+    data-name="publish"
+    data-label-now="{{ _('Publish Now') }}"
+    data-label-datetime="{{ _('Publish At...') }}"
+    data-label-date="{{ _('Publish Date') }}"
+    data-label-time="{{ _('Publish Time') }}"
+  ></div>
 
   <hr>
 

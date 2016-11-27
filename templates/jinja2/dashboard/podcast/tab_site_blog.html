@@ -11,9 +11,10 @@
     <span>{{ _('Slug') }}</span>
     <input type="text" name="slug" required pattern="[\w-]+">
   </label>
-  <label class="segment-full">
-    <span>{{ _('Publish On') }}</span>
-    <input type="datetime-local" name="publish" required>
+
+  <label class="segment-full markdwon-editor-small">
+    <span>{{ _('Body') }}</span>
+    <textarea name="body" class="markdown-editor"></textarea>
   </label>
 
   {% if site.disqus_url %}
@@ -23,10 +24,14 @@
   </label>
   {% endif %}
 
-  <label class="segment-full markdwon-editor-small">
-    <span>{{ _('Body') }}</span>
-    <textarea name="body" class="markdown-editor"></textarea>
-  </label>
+  <div
+    class="input-datetime segment-full panel"
+    data-name="publish"
+    data-label-now="{{ _('Publish Now') }}"
+    data-label-datetime="{{ _('Publish At...') }}"
+    data-label-date="{{ _('Publish Date') }}"
+    data-label-time="{{ _('Publish Time') }}"
+  ></div>
 
   <menu class="toolbar">
     <button class="btn" type="submit">{{ _('Add Post') }}</button>
@@ -58,7 +63,11 @@
           <td class="primary">
             <a href="{{ url('site_blog_post', podcast_slug=site.podcast.slug, post_slug=p.slug) }}">{{ p.title }}</a>
           </td>
-          <td>{{ p.publish|pretty_date }}</td>
+          <td>
+            <abbr title="{{ (p.publish + tz_delta).isoformat() }}">
+              {{ p.publish|pretty_date }}
+            </abbr>
+          </td>
         </tr>
       {% endfor %}
     </tbody>

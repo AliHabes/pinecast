@@ -15,17 +15,15 @@
       <h2>
         {{ episode.subtitle }}
         {% if episode.subtitle %}&bull;{% endif %}
-        <span title="{{ (episode.publish + tz_delta).strftime('%c') }}">
-          {% if episode.is_published() %}
-            {% trans published=episode.publish|pretty_date %}
-              Published {{ published }}
-            {% endtrans %}
-          {% else %}
-            {% trans published=episode.publish|pretty_date %}
-              Scheduled to publish {{ published }}
-            {% endtrans %}
-          {% endif %}
-        </span>
+        {% if episode.is_published() %}
+          {% trans published=episode.publish|pretty_date, ts=(episode.publish + tz_delta).strftime('%c') %}
+            Published <abbr title="{{ ts }}">{{ published }}</abbr>
+          {% endtrans %}
+        {% else %}
+          {% trans published=episode.publish|pretty_date, ts=(episode.publish + tz_delta).strftime('%c') %}
+            Scheduled to publish <abbr title="{{ ts }}">{{ published }}</abbr>
+          {% endtrans %}
+        {% endif %}
       </h2>
     </hgroup>
   </div>

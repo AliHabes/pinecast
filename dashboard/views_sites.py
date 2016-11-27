@@ -126,14 +126,13 @@ def add_blog_post(req, podcast_slug):
         raise Http404()
 
     try:
-        naive_publish = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M') # 2015-07-09T12:00
-        adjusted_publish = naive_publish - UserSettings.get_from_user(req.user).get_tz_delta()
+        publis_parsed = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M:00.000Z')
         post = SiteBlogPost(
             site=site,
             title=req.POST.get('title'),
             slug=req.POST.get('slug'),
             body=req.POST.get('body'),
-            publish=adjusted_publish,
+            publish=publis_parsed,
             disable_comments=req.POST.get('disable_comments') == 'true')
         post.save()
     except Exception as e:

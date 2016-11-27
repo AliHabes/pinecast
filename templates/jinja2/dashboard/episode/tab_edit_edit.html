@@ -1,4 +1,11 @@
 <form action="{{ url('edit_podcast_episode', podcast_slug=podcast.slug, episode_id=episode.id) }}" method="post" style="padding-top: 0">
+
+  {% if error %}
+    <div class="error">
+      {{ _('There was a problem saving your episode details.') }}
+    </div>
+  {% endif %}
+
   <strong>{{ _('Basic Details') }}</strong>
   <label>
     <span>{{ _('Title') }}</span>
@@ -130,16 +137,15 @@
     {% endif %}
   </p>
 
-  <div class="panel">
-    <label class="segment-full">
-      <span>{{ _('Publish On') }}</span>
-      <input type="datetime-local"
-        name="publish"
-        required
-        value="{{ default.get('publish', (episode.publish + tz_delta).strftime('%Y-%m-%dT%H:%M')) }}">
-      <button class="btn publish-now btn-neutral" type="button">{{ _('Now') }}</button>
-    </label>
-  </div>
+  <div
+    class="input-datetime"
+    data-name="publish"
+    data-default-value="{{ default.get('publish', episode.publish.isoformat()) }}"
+    data-label-now="{{ _('Publish Now') }}"
+    data-label-datetime="{{ _('Publish At...') }}"
+    data-label-date="{{ _('Publish Date') }}"
+    data-label-time="{{ _('Publish Time') }}"
+  ></div>
 
   <hr>
 

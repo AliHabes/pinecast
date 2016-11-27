@@ -742,6 +742,7 @@ menu.toolbar-right li {
     font-weight: 600;
     margin: 0 0 20px 0;
     padding: 0 35px 7px 0;
+    position: relative;
     transition: border-bottom 0.15s, color 0.15s, margin-bottom 0.15s;
 }
 .tabs-inline a:focus {
@@ -755,6 +756,11 @@ menu.toolbar-right li {
 .tabs-inline .tab--danger.selected a {
     border-bottom-color: #b00;
     color: #b00;
+}
+.tabs-inline a .pro-tag {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .form-block {
@@ -1075,8 +1081,12 @@ menu.toolbar-right li {
     text-align: left;
     white-space: nowrap;
 }
+.form-block .panel:not(.inline-form) label > input[type=radio],
 .form-block .panel:not(.inline-form) label > input[type=checkbox] {
     margin-left: 0;
+}
+.form-block .radio-group.half-flush label > input[type=radio] {
+    margin-left: 5%;
 }
 
 .form-block .select,
@@ -1093,15 +1103,20 @@ menu.toolbar-right li {
 .form-block form label input[type=file] {
     padding: 0;
 }
+.form-block form label input[type=radio],
 .form-block form label input[type=checkbox],
 .form-block .select {
     padding: 0;
 }
+.form-block form label input[type=radio],
+.form-block form label input[type=radio] + span,
 .form-block form label input[type=checkbox],
 .form-block form label input[type=checkbox] + span {
     opacity: 1;
     transition: opacity 0.5s;
 }
+.form-block form label input[type=radio]:disabled,
+.form-block form label input[type=radio]:disabled + span,
 .form-block form label input[type=checkbox]:disabled,
 .form-block form label input[type=checkbox]:disabled + span {
     opacity: 0.5;
@@ -1152,6 +1167,7 @@ menu.toolbar-right li {
     white-space: nowrap;
 }
 
+.form-block form label input[type=radio],
 .form-block form label input[type=checkbox] {
     -moz-appearance: none;
     -ms-appearance: none;
@@ -1164,11 +1180,45 @@ menu.toolbar-right li {
     margin-left: 30%;
     width: 1.5em;
 }
+.form-block form label input[type=radio] {
+    border-radius: 100px;
+}
+.form-block form label input[type=radio] + span,
 .form-block form label input[type=checkbox] + span {
     flex: 1 1;
     margin-left: 10px;
     text-align: left;
 }
+.form-block form label input[type=radio] + span:before {
+    background: #05a;
+    border-radius: 100px;
+    bottom: 0;
+    content: "";
+    display: block;
+    height: 0;
+    left: calc(30% + 0.75em + 1px);
+    line-height: 1.5em;
+    margin: auto;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    transition: height 0.075s, width 0.075s, left 0.075s;
+    width: 0;
+}
+.form-block form label input[type=radio]:checked + span:before {
+    bottom: 0;
+    height: 0.5em;
+    left: calc(30% + 0.25em + 1px);
+    top: 0;
+    width: 0.5em;
+}
+.form-block .radio-group.half-flush input[type=radio] + span:before {
+    left: calc(5% + 0.75em + 1px);
+}
+.form-block .radio-group.half-flush input[type=radio]:checked + span:before {
+    left: calc(5% + 0.25em + 1px);
+}
+
 .form-block form label input[type=checkbox]:checked + span:before {
     bottom: 0;
     color: #777;
@@ -1254,6 +1304,12 @@ menu.toolbar-right li {
 .form-block label > .segment-input input {
     flex: 1 1;
     margin: 0 5px;
+}
+
+.form-block .react-datepicker__input-container,
+.form-block .TimeInput {
+    display: flex;
+    flex: 1 1;
 }
 
 

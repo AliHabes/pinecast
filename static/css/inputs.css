@@ -9,10 +9,12 @@ label > span,
     font-size: 13px;
 }
 
-label > input[type="checkbox"] {
+label > input[type="checkbox"],
+label > input[type="radio"] {
     float: left;
 }
-label > input[type="checkbox"] + span {
+label > input[type="checkbox"] + span,
+label > input[type="radio"] + span {
     margin-left: 25px;
 }
 
