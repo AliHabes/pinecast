@@ -95,9 +95,19 @@
     </tbody>
   </table>
 {% endif %}
+
+{% set tip_eps = list(episodes.filter(publish__lte=now())) %}
 {% set podcast_tips = podcast.tip_events.order_by('-occurred_at') %}
 {% if podcast_tips.count() %}
-  <table class="card">
+  <div class="form-block" style="max-width: initial; padding: 0; margin-left: calc(-20% + 2em)">
+    <form>
+      <label class="checkbox">
+        <input type="checkbox" checked onchange="document.querySelector('.tip-table').classList.toggle('has-releases')">
+        <span>{{ _('Show episode releases') }}</span>
+      </label>
+    </form>
+  </div>
+  <table class="card tip-table has-releases">
     <thead>
       <tr>
         <th>{{ _('Tipper') }}</th>
@@ -106,8 +116,24 @@
         <th>{{ _('Date') }}</th>
       </tr>
     </thead>
+    {% macro tip_ep(ep) %}
+      <tr>
+        <td class="released-episode" colspan="4">
+          {% if not isinstance(ep, (int, float)) %}
+            {% trans title=ep.title, link=url('podcast_episode', podcast_slug=podcast.slug, episode_id=str(ep.id)), published=ep.publish.isoformat() %}
+              <a href="{{ link}}">{{ title }}</a> <abbr title="{{ published }}">was published</abbr>
+            {% endtrans %}
+          {% else %}
+            {{ ngettext('%d episode was hidden', '%d episodes were hidden', ep) % ep }}
+          {% endif %}
+        </td>
+      </tr>
+    {% endmacro %}
     <tbody>
       {% for tip in podcast_tips %}
+        {% for ep in pop_until_lt(tip_eps, 'publish', tip.occurred_at, max=5) %}
+          {{ tip_ep(ep) }}
+        {% endfor %}
         <tr>
           <td>
             <a href="mailto:{{ tip.tipper.get_email() }}">{{ tip.tipper.get_email() }}</a>
@@ -119,6 +145,16 @@
           <td>{{ tip.occurred_at|pretty_date }}</td>
         </tr>
       {% endfor %}
+      {% for ep in tip_eps[:5] %}
+        {{ tip_ep(ep) }}
+      {% endfor %}
+      {% if tip_eps %}
+        <tr>
+          <td colspan="4" class="released-episode">
+            {{ ngettext('%d episode is not shown.', '%d episodes are not shown.', len(tip_eps)) % len(tip_eps) }}
+          </td>
+        </tr>
+      {% endif %}
     </tbody>
   </table>
 {% endif %}

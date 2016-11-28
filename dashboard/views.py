@@ -126,6 +126,29 @@ def podcast_dashboard(req, podcast_slug):
     total_listens_this_week = analytics_query.total_listens_this_week(pod, tz)
     subscribers = analytics_query.total_subscribers(pod)
 
+    def pop_until_lt(arr, field, comp, max=-1):
+        count = 0
+        while arr:
+            if getattr(arr[0], field) >= comp:
+                yield arr.pop(0)
+            else:
+                return
+            if max > 0:
+                count += 1
+                if count == max:
+                    break
+        if not arr:
+            return
+        if max > 0:
+            ignored = 0
+            while arr:
+                if getattr(arr[0], field) >= comp:
+                    ignored += 1
+                else:
+                    break
+            if ignored:
+                yield ignored
+
     data = {
         'podcast': pod,
         'episodes': pod.podcastepisode_set.order_by('-publish'),
@@ -147,6 +170,8 @@ def podcast_dashboard(req, podcast_slug):
 
         'N_DESTINATIONS': NotificationHook.DESTINATIONS,
         'N_TRIGGERS': NotificationHook.TRIGGERS,
+
+        'pop_until_lt': pop_until_lt,
     }
 
     try:
