@@ -144,6 +144,7 @@ def podcast_dashboard(req, podcast_slug):
             while arr:
                 if getattr(arr[0], field) >= comp:
                     ignored += 1
+                    arr.pop(0)
                 else:
                     break
             if ignored:
