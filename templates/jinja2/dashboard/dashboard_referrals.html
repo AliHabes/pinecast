@@ -1,5 +1,16 @@
 <div class="form-block" style="margin-top: 40px">
   <strong>{{ _('Earn credit towards your subscription') }}</strong>
+
+  {% if not coupon %}
+    <aside>
+      <p>
+        {% trans discount=settings.REFERRAL_DISCOUNT, discount_duration=settings.REFERRAL_DISCOUNT_DURATION %}
+          Anyone that signs up with your referral code will receive <b>{{ discount }}% off</b> for <b>{{ discount_duration }} months</b>.
+        {% endtrans %}
+      </p>
+    </aside>
+  {% endif %}
+
   <p>
     {% trans %}
       Refer your fellow podcasters to Pinecast and earn credit towards the cost of your subscription while giving them a discount.
@@ -40,7 +51,7 @@
 
   <p style="font-size: 0.75em; line-height: 1.2em; margin-top: 2em">
     {% trans %}
-      Credit amounts are based on the lowest-tier plan that the referral was billed with in their first two months. Pinecast reserves the right to refuse referral payout for fraud and other types of abuse. Cancelled and resumed referrals are not eligible for referral credit. Downgrading to a free plan disqualifies any pending referral credits. Please contact Pinecast support with questions.
+      Credit amounts are based on the lowest-tier plan that the referral was billed with in their first two months. Pinecast reserves the right to refuse referral credit for fraud and other types of abuse. Cancelled and resumed referrals are not eligible for referral credit. Downgrading to a free plan disqualifies any pending referral credits. Please contact Pinecast support with questions.
     {% endtrans %}
   </p>
 
