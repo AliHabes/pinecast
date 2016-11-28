@@ -11,12 +11,6 @@
     {% endtrans %}
   </p>
 
-  <p style="font-size: 0.75em; line-height: 1.2em; margin-top: 2em">
-    {% trans %}
-      Credit amounts are based on the lowest-tier plan that the referral was billed with in their first two months. Pinecast reserves the right to refuse referral payout for fraud and other types of abuse. Cancelled and resumed referrals are not eligible for referral credit. Downgrading to a free plan disqualifies any pending referral credits. Please contact Pinecast support with questions.
-    {% endtrans %}
-  </p>
-
   <hr>
 
   <strong>{{ _('Start referring podcasters') }}</strong>
@@ -41,5 +35,13 @@
       <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     </form>
   {% endif %}
+
+  <hr>
+
+  <p style="font-size: 0.75em; line-height: 1.2em; margin-top: 2em">
+    {% trans %}
+      Credit amounts are based on the lowest-tier plan that the referral was billed with in their first two months. Pinecast reserves the right to refuse referral payout for fraud and other types of abuse. Cancelled and resumed referrals are not eligible for referral credit. Downgrading to a free plan disqualifies any pending referral credits. Please contact Pinecast support with questions.
+    {% endtrans %}
+  </p>
 
 </div>
