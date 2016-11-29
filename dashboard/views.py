@@ -35,7 +35,7 @@ from sites.models import Site
 
 signer = itsdangerous.Signer(settings.SECRET_KEY)
 
-ISO_FORMAT = '%Y-%m-%dT%H:%M:00.000Z'
+ISO_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
 
 def _pmrender(req, template, data=None):
@@ -315,7 +315,7 @@ def podcast_new_ep(req, podcast_slug):
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
 
     try:
-        publish_parsed = datetime.datetime.strptime(req.POST.get('publish'), ISO_FORMAT)
+        publish_parsed = datetime.datetime.strptime(req.POST.get('publish').split('.')[0], ISO_FORMAT)
         image_url = req.POST.get('image-url')
 
         ep = PodcastEpisode(
@@ -342,6 +342,7 @@ def podcast_new_ep(req, podcast_slug):
             prompt = EpisodeFeedbackPrompt(episode=ep, prompt=req.POST.get('feedback_prompt'))
             prompt.save()
     except Exception as e:
+        raise e
         ctx['error'] = True
         ctx['default'] = req.POST
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
@@ -355,7 +356,7 @@ def edit_podcast_episode(req, podcast_slug, episode_id):
     ep = get_object_or_404(PodcastEpisode, id=episode_id, podcast=pod)
 
     try:
-        publish_parsed = datetime.datetime.strptime(req.POST.get('publish'), ISO_FORMAT)
+        publish_parsed = datetime.datetime.strptime(req.POST.get('publish').split('.')[0], ISO_FORMAT)
 
         ep.title = req.POST.get('title')
         ep.subtitle = req.POST.get('subtitle')
