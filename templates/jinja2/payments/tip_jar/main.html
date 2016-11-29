@@ -114,7 +114,7 @@ window.addEventListener('load', function() {
     key: '{{ STRIPE_PUBLISHABLE_KEY }}',
 
     email: {{ (tipper.email_address|safe_json) if tipper else 'null' }},
-    image: {{ podcast.cover_image|https|safe_json }},
+    image: {{ podcast.cover_image|thumbnail(height=256, width=256)|safe_json }},
     name: {{ podcast.name|safe_json }},
     zipCode: true,
   });

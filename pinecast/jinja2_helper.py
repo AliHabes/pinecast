@@ -4,6 +4,7 @@ from __future__ import division
 import datetime
 import hashlib
 import json
+from urllib.parse import quote as urlencode
 
 import gfm
 import jinja2
@@ -99,6 +100,7 @@ def environment(**options):
     env.filters['safe_json'] = safe_json
     env.filters['sanitize'] = helpers.sanitize
     env.filters['sparkline'] = sparkline
+    env.filters['thumbnail'] = thumbnail
     return env
 
 
@@ -149,3 +151,9 @@ def sparkline(data, spacing=1, height=20):
     spark_range = spark_max - spark_min or 1
     sadj = ((i - spark_min) / spark_range for i in data)
     return ' '.join('%d,%d' % (i * spacing, (1 - y) * height) for i, y in enumerate(sadj))
+
+def thumbnail(url, width=100, height=100):
+    key = url.split('%s.s3.amazonaws.com/' % settings.S3_BUCKET)[1]
+    encoded_key = urlencode(key)
+    return 'https://thumb.service.pinecast.com/resize?h=%d&w=%d&key=%s' % (
+        height, width, encoded_key)

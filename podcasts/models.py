@@ -140,7 +140,7 @@ class Podcast(models.Model):
         else:
             return [(f, FLAIR_FLAGS_MAP[f]) for f in flags]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def last_eligible_payout_date(self):

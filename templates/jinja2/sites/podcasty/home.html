@@ -41,7 +41,7 @@
   {% for episode in pager[1 if is_first_page else 0:] %}
     <article class="episode inline height-limited">
       <div>
-        <img src="{{ episode.image_url }}" alt="" height="300" width="300">
+        <img src="{{ episode.image_url|thumbnail(height=300, width=300) }}" alt="" height="300" width="300">
         <hgroup>
           <a href="{{ url('site_episode', episode_id=str(episode.id)) }}">
             <h1>{{ episode.title }}</h1>

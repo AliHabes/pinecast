@@ -35,7 +35,7 @@
     {% for episode in pager %}
       <article class="episode">
         <a href="{{ url('site_episode', episode_id=str(episode.id)) }}">
-          <img src="{{ episode.image_url }}" alt="" height="300" width="300">
+          <img src="{{ episode.image_url|thumbnail(height=300, width=300) }}" alt="" height="300" width="300">
         </a>
       </article>
     {% else %}

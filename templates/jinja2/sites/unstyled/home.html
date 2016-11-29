@@ -32,8 +32,8 @@
         </a>
       </hgroup>
 
-      {% if episode.image_url %}
-        <img src="{{ episode.image_url }}" alt="">
+      {% if episode.image_url != site.podcast.cover_image %}
+        <img class="episode-image" src="{{ episode.image_url }}" alt="">
       {% else %}
         <iframe src="https://pinecast.com{{ url_global('player', episode_id=str(episode.id)) }}" seamless height="60" style="border:0" class="pinecast-embed"></iframe>
       {% endif %}

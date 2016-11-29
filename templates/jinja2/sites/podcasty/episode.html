@@ -4,7 +4,7 @@
 
   <article class="episode inline">
     <div>
-      <img src="{{ episode.image_url }}" alt="" height="300" width="300">
+      <img src="{{ episode.image_url|thumbnail(height=300, width=300) }}" alt="" height="300" width="300">
 
       <hgroup>
         <h1>{{ episode.title }}</h1>

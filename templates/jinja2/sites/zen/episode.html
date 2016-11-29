@@ -3,7 +3,7 @@
 {% block main %}
 
   <article class="episode is-expanded">
-    <img src="{{ episode.image_url }}" alt="" height="300" width="300">
+    <img src="{{ episode.image_url|thumbnail(height=300, width=300) }}" alt="" height="300" width="300">
     <div class="expando">
 
       <iframe src="https://pinecast.com{{ url_global('player', episode_id=str(episode.id)) }}" seamless height="60" style="border:0" class="pinecast-embed"></iframe>

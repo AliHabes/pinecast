@@ -7,7 +7,7 @@
 {% block body %}
   <header>
     {% if site.logo_url %}
-      <img src="{{ site.logo_url }}" alt="" class="logo" height="100" width="100">
+      <img src="{{ site.logo_url|thumbnail(height=100, width=100) }}" alt="" class="logo" height="100" width="100">
     {% endif %}
     <h1><a href="{{ url('site_home', podcast_slug=site.podcast.slug) }}">{{ site.podcast.name }}</a></h1>
     <h2>{{ site.podcast.subtitle }}</h2>
