@@ -154,7 +154,7 @@ def sparkline(data, spacing=1, height=20):
 
 def thumbnail(url, width=100, height=100):
     bucket_host = '%s.s3.amazonaws.com/' % settings.S3_BUCKET
-    if bucket_host not in thumbnail:
+    if bucket_host not in url:
         return url
     key = url.split(bucket_host)[1]
     encoded_key = urlencode(key)
