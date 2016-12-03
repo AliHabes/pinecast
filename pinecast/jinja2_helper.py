@@ -153,7 +153,10 @@ def sparkline(data, spacing=1, height=20):
     return ' '.join('%d,%d' % (i * spacing, (1 - y) * height) for i, y in enumerate(sadj))
 
 def thumbnail(url, width=100, height=100):
-    key = url.split('%s.s3.amazonaws.com/' % settings.S3_BUCKET)[1]
+    bucket_host = '%s.s3.amazonaws.com/' % settings.S3_BUCKET
+    if bucket_host not in thumbnail:
+        return url
+    key = url.split(bucket_host)[1]
     encoded_key = urlencode(key)
     return 'https://thumb.service.pinecast.com/resize?h=%d&w=%d&key=%s' % (
         height, width, encoded_key)
