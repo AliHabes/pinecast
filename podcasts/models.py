@@ -190,6 +190,9 @@ class Podcast(models.Model):
 
     @cached_method
     def get_remaining_surge(self, max_size):
+        uset = UserSettings.get_from_user(self.owner)
+        if not payment_plans.minimum(plan, payment_plans.PLAN_STARTER):
+            return 0
         thirty_ago = datetime.datetime.now() - datetime.timedelta(days=30)
         last_thirty_eps = self.podcastepisode_set.filter(created__gt=thirty_ago, audio_size__gt=max_size)
         surge_count = last_thirty_eps.count()
