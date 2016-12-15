@@ -432,8 +432,8 @@ def slug_available(req):
 
 @login_required
 @json_response
-def get_upload_url(req, podcast_slug, type):
-    if type not in ['audio', 'image']:
+def get_upload_url(req, podcast_slug, type_):
+    if type_ not in ['audio', 'image']:
         return Http404('Type not recognized')
 
     pod = None
@@ -442,7 +442,7 @@ def get_upload_url(req, podcast_slug, type):
     # to make sure that the cleanup script continues to work as expected.
     if not podcast_slug.startswith('$'):
         pod = get_podcast(req, podcast_slug)
-        basepath = 'podcasts/%s/%s/' % (pod.id, type)
+        basepath = 'podcasts/%s/%s/' % (pod.id, type_)
     elif podcast_slug == '$none':
         basepath = 'podcasts/covers/'
     elif podcast_slug == '$net':
@@ -463,7 +463,13 @@ def get_upload_url(req, podcast_slug, type):
 
     uset = UserSettings.get_from_user(pod.owner if pod is not None else req.user)
 
-    max_size = 1024 * 1024 * 2 if type == 'image' else payment_plans.MAX_FILE_SIZE[uset.plan]
+    if type_ == 'image':
+        max_size = 1024 * 1024 * 2
+    else:
+        max_size = payment_plans.MAX_FILE_SIZE[uset.plan]
+        if pod:
+            max_size += pod.get_remaining_surge(max_size)
+
     policy = {
         # hours=6 so users around midnight don't get screwed.
         'expiration': (datetime.datetime.now() + datetime.timedelta(days=1, hours=6)).strftime('%Y-%m-%dT00:00:00.000Z'),

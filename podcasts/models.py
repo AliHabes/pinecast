@@ -188,6 +188,16 @@ class Podcast(models.Model):
                     .aggregate(
                         models.aggregates.Sum('fee_amount')))['fee_amount__sum'] or 0
 
+    @cached_method
+    def get_remaining_surge(self, max_size):
+        thirty_ago = datetime.datetime.now() - datetime.timedelta(days=30)
+        last_thirty_eps = self.podcastepisode_set.filter(created__gt=thirty_ago, audio_size__gt=max_size)
+        surge_count = last_thirty_eps.count()
+        surge_amt = last_thirty_eps.aggregate(models.Sum('audio_size'))['audio_size__sum'] or 0
+        surge_amt -= surge_count * max_size
+
+        remaining = max_size - surge_amt
+        return 0 if remaining < 0 else remaining
 
 
 class PodcastEpisode(models.Model):
@@ -296,7 +306,7 @@ class PodcastEpisode(models.Model):
         except ObjectDoesNotExist:
             pass
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s - %s' % (self.title, self.subtitle)
 
 

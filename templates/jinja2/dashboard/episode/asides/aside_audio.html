@@ -1,10 +1,20 @@
 <aside>
   <p>
-    {% trans max_size=PLAN_MAX_FILE_SIZE[user_settings.plan]|filesizeformat(true) %}
+    {% set def_max_size = PLAN_MAX_FILE_SIZE[user_settings.plan] %}
+    {% trans max_size=def_max_size|filesizeformat(true) %}
       Your account can upload Mp3 and AAC files up to <b>{{ max_size }}</b>.
       We recommend saving audio as mono at 128kbps constant bitrate (CBR).
     {% endtrans %}
   </p>
+  {% set surge_max_size = podcast.get_remaining_surge(def_max_size) %}
+  {% if surge_max_size %}
+    <p>
+      {% trans max_size=surge_max_size|filesizeformat(true) %}
+        You can exceed this limit and upload <b>{{ max_size }}</b>
+        extra, but this can only be done once each month.
+      {% endtrans %}
+    </p>
+  {% endif %}
   {% if not minimum_plan(user_settings, PLANS.PLAN_PRO) %}
     <p>
       {% trans upgrade_url=url('upgrade') %}

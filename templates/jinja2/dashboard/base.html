@@ -43,7 +43,7 @@
 {% block subheader %}{% endblock %}
 
 <div class="main-container">
-  <main data-max-upload-size="{{ max_upload_size }}">
+  <main data-max-upload-size="{% if podcast %}{{ max_upload_size + podcast.get_remaining_surge(max_upload_size) }}{% else %}{{ max_upload_size }}{% endif %}">
     <noscript>
       <div class="error">
         {% trans %}
