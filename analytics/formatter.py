@@ -26,13 +26,21 @@ DELTAS = {
     'yearly': datetime.timedelta(weeks=52),
 }
 INTERVALS = {
-    'minutely': 'time(1m)',
-    'hourly': 'time(1h)',
-    'daily': 'time(1d)',
-    'weekly': 'time(1w)',
-    'monthly': 'time(30d)',
-    'quarterly': 'time(13w)',
-    'yearly': 'time(365d)',
+    'minutely': 'time(1m, %dh)',
+    'hourly': 'time(1h, %dh)',
+    'daily': 'time(1d, %dh)',
+    'weekly': 'time(1w, %dh)',
+    'monthly': 'time(30d, %dh)',
+    'quarterly': 'time(13w, %dh)',
+    'yearly': 'time(365d, %dh)',
+}
+
+IGNORE_TZ_OFFSET = {
+    'daily',
+    'weekly',
+    'monthly',
+    'quarterly',
+    'yearly',
 }
 
 dtnow = datetime.datetime.now
@@ -141,7 +149,7 @@ class Format(object):
         if self.interval_val:
             if group_by:
                 group_by += ', '
-            group_by += INTERVALS[self.interval_val]
+            group_by += INTERVALS[self.interval_val] % (-1 * self._get_tz_offset().total_seconds() // 3600)
 
         query = 'SELECT %s FROM %s' % (select, ident(self.event_type))
         if where:
@@ -151,8 +159,8 @@ class Format(object):
 
         query += ';'
 
-        # if settings.DEBUG:
-        #     print(query)
+        if settings.DEBUG:
+            print(query)
 
         self.res = get_client().query(query, database=self.db)
 
