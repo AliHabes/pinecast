@@ -61,7 +61,7 @@
 
     <label>
       <span>{{ _('YouTube Username') }}</span>
-      <input type="text" maxlength="20" name="contact_youtube" value="{{ blob.get('youtube', [''])[0] }}">
+      <input type="text" maxlength="32" name="contact_youtube" value="{{ blob.get('youtube', [''])[0] }}">
     </label>
 
   {% elif page.page_type == 'hosts' %}
