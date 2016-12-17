@@ -21,7 +21,7 @@
   </main>
   <footer>
     <div class="footer-row">
-      {% if site.sitelink_set.count() %}
+      {% if site.sitelink_set.count() or site.sitepage_set.count() %}
         <div class="footer-col">
           <strong>{{ _('Menu') }}</strong>
           <ul>
