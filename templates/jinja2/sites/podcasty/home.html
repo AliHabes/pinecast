@@ -20,16 +20,16 @@
         <div class="subscribe">
           <strong>{{ _('Subscribe to keep up') }}</strong>
           <a class="btn" href="https://pinecast.com{{ url_global('feed', podcast_slug=site.podcast.slug) }}">
-            {{ _('Subscribe with RSS') }}
+            {{ _('RSS') }}
           </a>
           {%- if site.itunes_url -%}
             <a class="btn" href="{{ site.itunes_url }}">
-              {{ _('Subscribe on iTunes') }}
+              {{ _('iTunes') }}
             </a>
           {%- endif -%}
           {%- if site.stitcher_url -%}
             <a class="btn" href="{{ site.stitcher_url }}">
-              {{ _('Subscribe on Stitcher') }}
+              {{ _('Stitcher Radio') }}
             </a>
           {%- endif -%}
         </div>
