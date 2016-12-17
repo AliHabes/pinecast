@@ -36,7 +36,7 @@
     {% set blob = page.body|json_parse %}
     <label>
       <span>{{ _('Email') }}</span>
-      <input type="email" maxlength="32" name="contact_email" value="{{ blob.get('email', [''])[0] }}">
+      <input type="email" maxlength="64" name="contact_email" value="{{ blob.get('email', [''])[0] }}">
     </label>
 
     <label>

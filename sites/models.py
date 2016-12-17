@@ -141,7 +141,7 @@ class SitePage(models.Model):
                 host_blob = {'name': host.get('name')}
 
                 if 'email' in host:
-                    host_blob['email'] = str(host.get('email'))[:32]
+                    host_blob['email'] = str(host.get('email'))[:64]
 
                 if 'twitter' in host:
                     host_blob['twitter'] = str(host.get('twitter'))[:32]
@@ -167,15 +167,15 @@ class SitePage(models.Model):
             # makes things forward-compatible.
 
             if req.POST.get('contact_email'):
-                blob['email'] = [req.POST.get('contact_email')]
+                blob['email'] = [str(req.POST.get('contact_email', ''))[:64]]
             if req.POST.get('contact_twitter'):
-                blob['twitter'] = [req.POST.get('contact_twitter')]
+                blob['twitter'] = [str(req.POST.get('contact_twitter', ''))[:32]]
             if req.POST.get('contact_facebook'):
-                blob['facebook'] = [req.POST.get('contact_facebook')]
+                blob['facebook'] = [str(req.POST.get('contact_facebook', ''))[:256]]
             if req.POST.get('contact_instagram'):
-                blob['instagram'] = [req.POST.get('contact_instagram')]
+                blob['instagram'] = [str(req.POST.get('contact_instagram', ''))[:32]]
             if req.POST.get('contact_twitch'):
-                blob['twitch'] = [req.POST.get('contact_twitch')]
+                blob['twitch'] = [str(req.POST.get('contact_twitch', ''))[:32]]
             if req.POST.get('contact_youtube'):
-                blob['youtube'] = [req.POST.get('contact_youtube')]
+                blob['youtube'] = [str(req.POST.get('contact_youtube', ''))[:32]]
             return json.dumps(blob)
