@@ -48,7 +48,7 @@
         <p>{{ site.podcast.copyright }}</p>
       </div>
     </section>
-    {% if site.sitelink_set.count() %}
+    {% if site.sitelink_set.count() or site.sitepage_set.count() %}
       <section class="footer-links">
         <div>
           {% include 'sites/menu.html' %}
