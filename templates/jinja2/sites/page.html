@@ -32,7 +32,7 @@
       <dt>{{ _('Instagram') }}</dt>
       <dd>
         <a href="https://www.instagram.com/{{ blob['instagram'][0] }}">
-          {{ blob['instagram'][0] }}
+          @{{ blob['instagram'][0] }}
         </a>
       </dd>
     {% endif %}
@@ -86,7 +86,7 @@
           <dt>{{ _('Instagram') }}</dt>
           <dd>
             <a href="https://www.instagram.com/{{ host.get('instagram') }}">
-              {{ host.get('instagram') }}
+              @{{ host.get('instagram') }}
             </a>
           </dd>
         {% endif %}
@@ -107,9 +107,9 @@
           </dd>
         {% endif %}
         {% if host.get('url') %}
-          <dt>{{ _('YouTube') }}</dt>
+          <dt>{{ _('Homepage') }}</dt>
           <dd>
-            <a href="https://www.youtube.com/{{ host.get('url') }}">
+            <a href="{{ host.get('url') }}">
               {{ host.get('url') }}
             </a>
           </dd>
