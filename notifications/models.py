@@ -315,5 +315,5 @@ class NotificationHook(models.Model):
     def get_destination_text(self):
         return dict(NotificationHook.DESTINATIONS)[self.destination_type]
 
-    def __unicode__(self):
+    def __str__(self):
         return '[%s] %s (%s)' % (self.podcast.name, self.trigger, self.destination_type)

@@ -5,6 +5,12 @@
         <a href="" data-tab=".tab-options">{{ _('Options') }}</a>
       </li>
       <li>
+        <a href="" data-tab=".tab-new-page">{{ _('New Page') }}</a>
+      </li>
+      <li>
+        <a href="" data-tab=".tab-links">{{ _('Links') }}</a>
+      </li>
+      <li>
         <a href="" data-tab=".tab-blog">
           {{ _('Blog') }}
           <i class="pro-tag"></i>
@@ -26,6 +32,12 @@
       </p>
     </div>
   {% endif %}
+</div>
+<div class="tab-new-page form-block" style="display: none">
+  {% include "dashboard/podcast/tab_site_new_page.html" %}
+</div>
+<div class="tab-links form-block" style="display: none">
+  {% include "dashboard/podcast/tab_site_links.html" %}
 </div>
 {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_BLOG) %}
   <div class="tab-blog form-block" style="display: none">

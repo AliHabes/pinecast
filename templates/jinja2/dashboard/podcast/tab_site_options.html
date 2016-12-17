@@ -12,3 +12,38 @@
     </a>
   </div>
 </div>
+
+<div class="form-block">
+
+{% set site_pages = site.sitepage_set.order_by('title').all() %}
+{% if site_pages %}
+  <table>
+    <thead>
+      <tr>
+        <th>{{ _('Page') }}</th>
+        <th>{{ _('Type') }}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for page in site_pages %}
+        <tr>
+          <td>
+            <a href="{{ url('site_edit_page', podcast_slug=podcast.slug, page_slug=page.slug) }}">
+              {{ page.title }}
+            </a>
+          </td>
+          <td>{{ dict(SITE_PAGE_TYPES)[page.page_type] }}</td>
+          <td>
+            <form style="padding: 0" action="{{ url('site_delete_page', podcast_slug=podcast.slug, page_slug=page.slug) }}" method="post">
+              <button class="btn btn--tiny btn--danger" type="submit"><i class="icon-trash-empty"></i></button>
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+</div>

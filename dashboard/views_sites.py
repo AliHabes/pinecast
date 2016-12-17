@@ -5,14 +5,14 @@ import datetime
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from .views import _pmrender, get_podcast, signer
 from accounts import payment_plans
 from accounts.models import Network, UserSettings
 from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import Podcast
-from sites.models import Site, SiteBlogPost, SiteLink
+from sites.models import Site, SiteBlogPost, SiteLink, SitePage
 
 
 def get_site(req, podcast_slug):
@@ -99,9 +99,9 @@ def add_link(req, podcast_slug):
 
         SiteLink(site=site, title=req.POST.get('title'), url=url).save()
     except Exception as e:
-        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?error=slink#settings,site-options')
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?error=slink#site,links')
     else:
-        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#settings,site-options')
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site,links')
 
 @require_POST
 @login_required
@@ -126,7 +126,7 @@ def add_blog_post(req, podcast_slug):
         raise Http404()
 
     try:
-        publis_parsed = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M:00.000Z')
+        publis_parsed = datetime.datetime.strptime(req.POST.get('publish', '').split('.')[0], '%Y-%m-%dT%H:%M:%S')
         post = SiteBlogPost(
             site=site,
             title=req.POST.get('title'),
@@ -136,6 +136,7 @@ def add_blog_post(req, podcast_slug):
             disable_comments=req.POST.get('disable_comments') == 'true')
         post.save()
     except Exception as e:
+        print(e)
         return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?error=sblog#site,blog')
     else:
         return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site,blog')
@@ -148,7 +149,7 @@ def edit_blog_post(req, podcast_slug, post_slug):
     if not req.POST:
         return _pmrender(req, 'dashboard/sites/blog/page_edit.html', {'site': site, 'post': post})
     try:
-        naive_publish = datetime.datetime.strptime(req.POST.get('publish'), '%Y-%m-%dT%H:%M') # 2015-07-09T12:00
+        naive_publish = datetime.datetime.strptime(req.POST.get('publish', '').split('.')[0], '%Y-%m-%dT%H:%M:%S') # 2015-07-09T12:00
         adjusted_publish = naive_publish - UserSettings.get_from_user(req.user).get_tz_delta()
         post.title = req.POST.get('title')
         post.slug = req.POST.get('slug')
@@ -160,7 +161,7 @@ def edit_blog_post(req, podcast_slug, post_slug):
         data.update(error=True, default=req.POST)
         return _pmrender(req, 'dashboard/sites/blog/page_edit.html', data)
     else:
-        return redirect('site_manage_blog', podcast_slug=podcast_slug)
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site,blog')
 
 
 @login_required
@@ -169,4 +170,63 @@ def remove_blog_post(req, podcast_slug):
     post = get_object_or_404(SiteBlogPost, site=site, slug=req.POST.get('slug'))
 
     post.delete()
-    return redirect('site_manage_blog', podcast_slug=podcast_slug)
+    return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site,blog')
+
+
+@login_required
+@require_GET
+@json_response
+def slug_available(req, podcast_slug):
+    site = get_site(req, podcast_slug)
+    try:
+        SitePage.objects.get(slug=req.GET.get('slug'))
+    except SitePage.DoesNotExist:
+        return {'valid': True}
+    else:
+        return {'valid': False}
+
+
+@login_required
+@require_POST
+def new_page(req, podcast_slug):
+    site = get_site(req, podcast_slug)
+
+    try:
+        page = SitePage(
+            site=site,
+            title=req.POST.get('title'),
+            slug=req.POST.get('slug'),
+            page_type=req.POST.get('page_type'),
+            body=SitePage.get_body_from_req(req),
+        )
+        page.save()
+    except Exception as e:
+        pass
+
+    return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site,options')
+
+@login_required
+def edit_page(req, podcast_slug, page_slug):
+    site = get_site(req, podcast_slug)
+    page = get_object_or_404(SitePage, site=site, slug=page_slug)
+
+    if not req.POST:
+        return _pmrender(req, 'dashboard/sites/pages/page_edit.html', {'site': site, 'page': page})
+    try:
+        page.title = req.POST.get('title')
+        page.body = SitePage.get_body_from_req(req, page.page_type)
+        page.save()
+    except Exception as e:
+        data.update(error=True, default=req.POST)
+        return _pmrender(req, 'dashboard/sites/pages/page_edit.html', data)
+    else:
+        return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site')
+
+@login_required
+@require_POST
+def delete_page(req, podcast_slug, page_slug):
+    site = get_site(req, podcast_slug)
+    page = get_object_or_404(SitePage, site=site, slug=page_slug)
+    page.delete()
+
+    return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site')

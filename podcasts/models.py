@@ -430,5 +430,5 @@ class PodcastCategory(models.Model):
                                 choices=[(x, x) for x in sorted(CATEGORIES)])
     podcast = models.ForeignKey(Podcast)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s: %s' % (self.podcast.name, self.category)

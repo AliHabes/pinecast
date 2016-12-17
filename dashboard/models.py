@@ -115,5 +115,5 @@ class AssetImportRequest(models.Model):
             'key': key,
         }
 
-    def __unicode__(self):
+    def __str__(self):
         return self.audio_source_url or self.image_source_url

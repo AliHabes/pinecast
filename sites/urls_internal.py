@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'^robots.txt$', lambda req, podcast_slug: HttpResponse('Sitemap: sitemap.xml\n')),
     url(r'^sitemap.xml$', views.sitemap, name='site_sitemap'),
     url(r'^favicon.ico$', views.favicon, name='site_favicon'),
+    url(r'^(?P<page_slug>[\w-]+)$', views.site_page, name='site_page'),
 ]

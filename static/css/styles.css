@@ -1570,7 +1570,7 @@ menu.toolbar-right li {
     display: block;
 }
 
-.markdwon-editor-small .markdown-editor {
+.markdown-editor-small .markdown-editor {
     height: 170px;
 }
 .markdown-editor div.CodeMirror-scroll {

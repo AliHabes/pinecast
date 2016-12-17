@@ -20,7 +20,7 @@
     <input type="text" name="slug" required pattern="[\w-]+" value="{{ default.get('slug', post.slug) }}">
   </label>
 
-  <label class="markdwon-editor-small">
+  <label class="markdown-editor-small">
     <span>{{ _('Body') }}</span>
     <textarea class="markdown-editor" name="body">{{ default.get('body', post.body) }}</textarea>
   </label>

@@ -1,19 +1,23 @@
+{% set blog_posts = site.siteblogpost_set.all().order_by('-publish') %}
+
+{% if blog_posts %}
 <div style="margin-bottom: 1em">
   <button class="btn write-post-btn" type="button">{{ _('Write New Post') }}</button>
 </div>
+{% endif %}
 
-<form class="panel write-post-panel" action="{{ url('site_add_blog_post', podcast_slug=site.podcast.slug) }}" method="post" style="display: none">
+<form class="panel write-post-panel" action="{{ url('site_add_blog_post', podcast_slug=site.podcast.slug) }}" method="post" {%- if blog_posts %} style="display: none" {%- endif %}>
   <label class="segment-full">
-    <span>{{ _('Title') }}</span>
+    <span style="flex-basis: 80px; text-align: right">{{ _('Title') }}</span>
     <input type="text" required name="title" maxlength="512">
   </label>
   <label class="segment-full">
-    <span>{{ _('Slug') }}</span>
+    <span style="flex-basis: 80px; text-align: right">{{ _('Slug') }}</span>
     <input type="text" name="slug" required pattern="[\w-]+">
   </label>
 
-  <label class="segment-full markdwon-editor-small">
-    <span>{{ _('Body') }}</span>
+  <label class="segment-full markdown-editor-small">
+    <span style="align-self: flex-start; flex-basis: 80px; text-align: right">{{ _('Body') }}</span>
     <textarea name="body" class="markdown-editor"></textarea>
   </label>
 
@@ -31,25 +35,24 @@
     data-label-datetime="{{ _('Publish At...') }}"
     data-label-date="{{ _('Publish Date') }}"
     data-label-time="{{ _('Publish Time') }}"
+    style="flex-basis: calc(100% - 80px); margin-left: 80px"
   ></div>
 
-  <menu class="toolbar">
+  <menu class="toolbar" style="display: flex; justify-content: flex-end; width: 100%">
     <button class="btn" type="submit">{{ _('Add Post') }}</button>
   </menu>
 
   <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 </form>
 
-<script>
-  document.querySelector('.write-post-btn').addEventListener('click', function(e) {
-    e.target.style.display = 'none';
-    document.querySelector('.write-post-panel').style.display = 'block';
-  });
-</script>
-
-{% set blog_posts = site.siteblogpost_set.all().order_by('-publish') %}
-
 {% if blog_posts %}
+  <script>
+    document.querySelector('.write-post-btn').addEventListener('click', function(e) {
+      e.target.style.display = 'none';
+      document.querySelector('.write-post-panel').style.display = 'block';
+    });
+  </script>
+
   <table>
     <thead>
       <tr>

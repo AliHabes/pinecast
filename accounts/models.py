@@ -132,7 +132,7 @@ class Network(models.Model):
 
     members = models.ManyToManyField(User)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @cached_method

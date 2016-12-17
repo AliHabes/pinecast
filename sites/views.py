@@ -75,6 +75,14 @@ def site_episode(req, podcast_slug, episode_id):
     return _srender(req, site, 'episode.html', {'episode': episode})
 
 
+def site_page(req, podcast_slug, page_slug):
+    pod = get_object_or_404(Podcast, slug=podcast_slug)
+    site = get_object_or_404(models.Site, podcast=pod)
+    page = get_object_or_404(models.SitePage, site=site, slug=page_slug)
+
+    return _srender(req, site, 'page.html', {'page': page})
+
+
 class BlogRSS(Feed):
 
     def get_object(self, req, podcast_slug):

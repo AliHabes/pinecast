@@ -23,15 +23,10 @@
     <div class="footer-row">
       {% if site.sitelink_set.count() %}
         <div class="footer-col">
-          <strong>{{ _('Links') }}</strong>
+          <strong>{{ _('Menu') }}</strong>
           <ul>
-            {% for link in site.sitelink_set.all() %}
-              <li>
-                <a{% if link.class_name %} class="{{ link.class_name }}"{% endif %} href="{{ link.url }}">
-                  {{ link.title }}
-                </a>
-              </li>
-            {% endfor %}
+            {% set use_li = true %}
+            {% include 'sites/menu.html' %}
           </ul>
         </div>
       {% endif %}

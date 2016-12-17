@@ -51,11 +51,7 @@
     {% if site.sitelink_set.count() %}
       <section class="footer-links">
         <div>
-          {% for link in site.sitelink_set.all() %}
-            <a{% if link.class_name %} class="{{ link.class_name }}"{% endif %} href="{{ link.url }}">
-              {{ link.title }}
-            </a>
-          {% endfor %}
+          {% include 'sites/menu.html' %}
         </div>
       </section>
     {% endif %}

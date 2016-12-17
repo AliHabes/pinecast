@@ -63,7 +63,7 @@
 
   <strong>{{ _('Audio File') }}</strong>
 
-  {% include 'dashboard/episode/asides/aside_audio.html' %}
+  {% include 'dashboard/asides/aside_audio.html' %}
 
   <div class="upload-placeholder"
     data-default-url="{{ sign(default.get('audio-url', episode.audio_url)) }}"
@@ -87,7 +87,7 @@
 
   <label for="description-field"><strong>{{ _('Description') }}</strong></label>
 
-  {% include 'dashboard/episode/asides/aside_markdown.html' %}
+  {% include 'dashboard/asides/aside_markdown.html' %}
 
   <textarea id="description-field" name="description" class="description-field markdown-editor">{{ default.get('description', episode.description)|sanitize|safe }}</textarea>
 

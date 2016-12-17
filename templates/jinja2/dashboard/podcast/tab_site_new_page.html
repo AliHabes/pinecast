@@ -1,0 +1,161 @@
+<strong>{{ _('New Page') }}</strong>
+
+<form action="{{ url('site_new_page', podcast_slug=podcast.slug) }}" method="post">
+
+  <div class="panel" style="margin-bottom: 1.5em">
+    <label class="segment-full">
+      <span>{{ _('Page Type') }}</span>
+      <div class="select">
+        <select name="page_type">
+          {% for page_type, page_type_name in SITE_PAGE_TYPES %}
+            <option value="{{ page_type }}">{{ page_type_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </label>
+  </div>
+
+  <label>
+    <span>{{ _('Page Title') }}</span>
+    <input type="text" required maxlength="256" name="title">
+  </label>
+
+  <label>
+    <span>{{ _('Page Slug') }}</span>
+    <input type="text" required maxlength="64" name="slug" pattern="[\w-]+">
+  </label>
+  <div class="url-availability"></div>
+
+  <hr>
+
+  <div data-page-type="markdown">
+    {% include 'dashboard/asides/aside_markdown.html' %}
+
+    <label>
+      <span>{{ _('Body') }}</span>
+      <textarea name="markdown_body" class="markdown-editor"></textarea>
+    </label>
+  </div>
+
+  <div data-page-type="hosts" style="display: none">
+    <aside>
+      <p>{{ _('An avatar will be shown for each host using their email\'s gravatar. Email addresses are not shown to visitors.') }}</p>
+      <a class="btn btn--tiny btn--go" href="https://gravatar.com">{{ _('Visit Gravatar') }}</a>
+    </aside>
+    {% include 'dashboard/sites/pages/host_template.html' %}
+
+    <div class="host-rows"></div>
+
+    <p>
+      <a href="" class="add-host">{{ _('+ Add host') }}</a>
+    </p>
+
+    <input type="hidden" name="host_blob" value="[]">
+  </div>
+
+  <div data-page-type="contact" style="display: none">
+    <label>
+      <span>{{ _('Email') }}</span>
+      <input type="email" maxlength="32" name="contact_email">
+    </label>
+
+    <label>
+      <span>{{ _('Twitter Username') }}</span>
+      <input type="text" maxlength="15" name="contact_twitter">
+    </label>
+
+    <label>
+      <span>{{ _('Facebook Page URL') }}</span>
+      <input type="url" maxlength="256" name="contact_facebook">
+    </label>
+
+    <label>
+      <span>{{ _('Instagram Username') }}</span>
+      <input type="text" maxlength="30" name="contact_instagram">
+    </label>
+
+    <label>
+      <span>{{ _('Twitch Username') }}</span>
+      <input type="text" maxlength="25" name="contact_twitch">
+    </label>
+
+    <label>
+      <span>{{ _('YouTube Username') }}</span>
+      <input type="text" maxlength="20" name="contact_youtube">
+    </label>
+  </div>
+
+  <hr>
+
+  <menu>
+    <button class="btn" type="submit">{{ _('Save') }}</button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>
+
+<script>
+  // Handle page type
+  document.querySelector('[name=page_type]').addEventListener('change', function() {
+    Array.prototype.slice.call(document.querySelectorAll('[data-page-type]')).forEach(function(x) {
+      x.style.display = x.getAttribute('data-page-type') === this.value ? 'block' : 'none';
+    }.bind(this));
+  });
+
+  // Handle the slug
+  (function() {
+    var nameField = document.querySelector('[name=title]');
+    var slugField = document.querySelector('[name=slug]');
+    var urlAvail = document.querySelector('.url-availability');
+
+    var slugDebounce;
+    var slugXHR;
+
+    nameField.addEventListener('input', function() {
+      if (slugField.hasGottenValue) {
+        return;
+      }
+      slugField.value = nameField.value.replace(/\s+/g, '-').replace(/[^\w-]/g, '').toLowerCase().slice(0, 64);
+      if (slugField.value) {
+        triggerValidation();
+      }
+    });
+    slugField.addEventListener('input', function() {
+      slugField.hasGottenValue = !!slugField.value;
+      triggerValidation();
+    });
+
+    function triggerValidation() {
+      if (slugDebounce) clearTimeout(slugDebounce);
+      if (slugXHR) slugXHR.abort();
+      if (!slugField.validity.valid) {
+        urlAvail.textContent = urlAvail.innerText = '';
+        urlAvail.className = 'url-availability';
+        return;
+      }
+      slugDebounce = setTimeout(validateSlug, 500);
+    }
+
+    function validateSlug() {
+      var xhr = new XMLHttpRequest();
+      xhr.onload = function() {
+        slugXHR = null;
+        var parsed = JSON.parse(xhr.responseText);
+        if (parsed.valid) {
+          urlAvail.textContent = urlAvail.innerText = '{% trans slug=("' + slugField.value + '"|safe) %}"{{ slug }}" is available!{% endtrans %}';
+          urlAvail.className = 'url-availability is-available';
+        } else {
+          urlAvail.textContent = urlAvail.innerText = '{% trans slug=("' + slugField.value + '"|safe) %}"{{ slug }}" is unavailable{% endtrans %}';
+          urlAvail.className = 'url-availability is-unavailable';
+        }
+      };
+      xhr.open('get', '{{ url('site_slug_available', podcast_slug=podcast.slug) }}?slug=' + encodeURIComponent(slugField.value), true);
+      xhr.send();
+      slugXHR = xhr;
+    }
+
+  }());
+
+  {% include 'dashboard/sites/pages/hosts.js' %}
+
+</script>

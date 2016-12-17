@@ -1,0 +1,14 @@
+{% for site_page in site.sitepage_set.all() %}
+  {{ '<li>'|safe if use_li else '' }}
+  <a href="{{ url('site_page', podcast_slug=site.podcast.slug, page_slug=site_page.slug) }}">
+    {{ site_page.title }}
+  </a>
+  {{ '</li>'|safe if use_li else '' }}
+{% endfor %}
+{% for link in site.sitelink_set.all() %}
+  {{ '<li>'|safe if use_li else '' }}
+  <a href="{{ link.url }}">
+    {{ link.title }}
+  </a>
+  {{ '</li>'|safe if use_li else '' }}
+{% endfor %}

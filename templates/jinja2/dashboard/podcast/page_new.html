@@ -213,7 +213,7 @@ window.PODCAST_CATEGORIES = {{ PODCAST_CATEGORIES|safe }};
     if (slugField.hasGottenValue) {
       return;
     }
-    slugField.value = nameField.value.replace(/\s+/g, '-').replace(/[^\w-]/g, '').toLowerCase();
+    slugField.value = nameField.value.replace(/\s+/g, '-').replace(/[^\w-]/g, '').toLowerCase().slice(0, 64);
     if (slugField.value) {
       triggerValidation();
     }

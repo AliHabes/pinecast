@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import json
 import re
 
 from django.core.exceptions import ValidationError
@@ -79,7 +80,7 @@ class Site(models.Model):
             return None
         return match.group(1)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s: %s' % (self.podcast.slug, self.podcast.name)
 
 
@@ -87,7 +88,6 @@ class SiteLink(models.Model):
     site = models.ForeignKey(Site)
     title = models.CharField(max_length=256)
     url = models.URLField(blank=True, max_length=500)
-    class_name = models.CharField(max_length=256, blank=True, null=True)
 
 class SiteBlogPost(models.Model):
     site = models.ForeignKey(Site)
@@ -99,8 +99,83 @@ class SiteBlogPost(models.Model):
 
     disable_comments = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s on %s' % (self.slug, self.site.podcast.slug)
 
     class Meta:
         unique_together = (('site', 'slug'), )
+
+
+class SitePage(models.Model):
+    PAGE_TYPES = (
+        ('markdown', ugettext_lazy('Markdown')),
+        ('hosts', ugettext_lazy('Hosts')),
+        ('contact', ugettext_lazy('Contact')),
+    )
+
+    site = models.ForeignKey(Site)
+    title = models.CharField(max_length=256)
+    slug = models.SlugField()
+    page_type = models.CharField(choices=PAGE_TYPES, max_length=16)
+    created = models.DateTimeField(auto_now_add=True)
+
+    body = models.TextField()
+
+    @classmethod
+    def get_body_from_req(cls, req, page_type=None):
+        page_type = page_type or req.POST.get('page_type')
+        if page_type == 'markdown':
+            return req.POST.get('markdown_body')
+
+        elif page_type == 'hosts':
+            blob = []
+
+            try:
+                input_blob = json.loads(req.POST.get('host_blob'))
+            except Exception:
+                input_blob = []
+
+            for host in input_blob:
+                if not host.get('name'):
+                    continue
+                host_blob = {'name': host.get('name')}
+
+                if 'email' in host:
+                    host_blob['email'] = str(host.get('email'))[:32]
+
+                if 'twitter' in host:
+                    host_blob['twitter'] = str(host.get('twitter'))[:32]
+                if 'instagram' in host:
+                    host_blob['instagram'] = str(host.get('instagram'))[:32]
+                if 'twitch' in host:
+                    host_blob['twitch'] = str(host.get('twitch'))[:32]
+                if 'youtube' in host:
+                    host_blob['youtube'] = str(host.get('youtube'))[:32]
+                if 'facebook' in host:
+                    host_blob['facebook'] = str(host.get('facebook'))[:256]
+                if 'url' in host:
+                    host_blob['url'] = str(host.get('url'))[:256]
+
+                blob.append(host_blob)
+
+            return json.dumps(blob)
+        elif page_type == 'contact':
+            blob = {}
+
+            # I'm saving these all as arrays in case someday we want to allow
+            # multiple of each. Easy enough to subscript the array for now, and
+            # makes things forward-compatible.
+
+            if req.POST.get('contact_email'):
+                blob['email'] = [req.POST.get('contact_email')]
+            if req.POST.get('contact_twitter'):
+                blob['twitter'] = [req.POST.get('contact_twitter')]
+            if req.POST.get('contact_facebook'):
+                blob['facebook'] = [req.POST.get('contact_facebook')]
+            if req.POST.get('contact_instagram'):
+                blob['instagram'] = [req.POST.get('contact_instagram')]
+            if req.POST.get('contact_twitch'):
+                blob['twitch'] = [req.POST.get('contact_twitch')]
+            if req.POST.get('contact_youtube'):
+                blob['youtube'] = [req.POST.get('contact_youtube')]
+            return json.dumps(blob)

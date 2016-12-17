@@ -1,0 +1,122 @@
+{% if page.page_type == 'markdown' %}
+  {{ page.body|markdown|sanitize|safe }}
+{% elif page.page_type == 'contact' %}
+  {% set blob = page.body|json_parse %}
+
+  <dl class="contact-list global-contact-list">
+    {% if blob['email'] %}
+      <dt>{{ _('Email') }}</dt>
+      <dd>
+        <a href="mailto:{{ blob['email'][0] }}">
+          {{ blob['email'][0] }}
+        </a>
+      </dd>
+    {% endif %}
+    {% if blob['twitter'] %}
+      <dt>{{ _('Twitter') }}</dt>
+      <dd>
+        <a href="https://twitter.com/{{ blob['twitter'][0] }}">
+          @{{ blob['twitter'][0] }}
+        </a>
+      </dd>
+    {% endif %}
+    {% if blob['facebook'] %}
+      <dt>{{ _('Facebook') }}</dt>
+      <dd>
+        <a href="{{ blob['facebook'][0] }}">
+          {{ blob['facebook'][0] }}
+        </a>
+      </dd>
+    {% endif %}
+    {% if blob['instagram'] %}
+      <dt>{{ _('Instagram') }}</dt>
+      <dd>
+        <a href="https://www.instagram.com/{{ blob['instagram'][0] }}">
+          {{ blob['instagram'][0] }}
+        </a>
+      </dd>
+    {% endif %}
+    {% if blob['twitch'] %}
+      <dt>{{ _('Twitch.tv') }}</dt>
+      <dd>
+        <a href="https://www.twitch.tv/{{ blob['twitch'][0] }}">
+          {{ blob['twitch'][0] }}
+        </a>
+      </dd>
+    {% endif %}
+    {% if blob['youtube'] %}
+      <dt>{{ _('YouTube') }}</dt>
+      <dd>
+        <a href="https://www.youtube.com/{{ blob['youtube'][0] }}">
+          {{ blob['youtube'][0] }}
+        </a>
+      </dd>
+    {% endif %}
+  </dl>
+
+{% elif page.page_type == 'hosts' %}
+  {% set blob = page.body|json_parse %}
+
+  <div class="hosts-page host-list">
+  {% for host in blob %}
+    <div class="hosts-page host">
+      <img src="{{ gravatar(host.get('email', 'nobody@pinecast.com'), size=120) }}" alt="">
+      <address>
+        {{ host.get('name', _('Anonymous')) }}
+      </address>
+
+      <dl class="contact-list host-contact-list">
+        {% if host.get('twitter') %}
+          <dt>{{ _('Twitter') }}</dt>
+          <dd>
+            <a href="https://twitter.com/{{ host.get('twitter') }}">
+              @{{ host.get('twitter') }}
+            </a>
+          </dd>
+        {% endif %}
+        {% if host.get('facebook') %}
+          <dt>{{ _('Facebook') }}</dt>
+          <dd>
+            <a href="{{ host.get('facebook') }}">
+              {{ host.get('facebook') }}
+            </a>
+          </dd>
+        {% endif %}
+        {% if host.get('instagram') %}
+          <dt>{{ _('Instagram') }}</dt>
+          <dd>
+            <a href="https://www.instagram.com/{{ host.get('instagram') }}">
+              {{ host.get('instagram') }}
+            </a>
+          </dd>
+        {% endif %}
+        {% if host.get('twitch') %}
+          <dt>{{ _('Twitch.tv') }}</dt>
+          <dd>
+            <a href="https://www.twitch.tv/{{ host.get('twitch') }}">
+              {{ host.get('twitch') }}
+            </a>
+          </dd>
+        {% endif %}
+        {% if host.get('youtube') %}
+          <dt>{{ _('YouTube') }}</dt>
+          <dd>
+            <a href="https://www.youtube.com/{{ host.get('youtube') }}">
+              {{ host.get('youtube') }}
+            </a>
+          </dd>
+        {% endif %}
+        {% if host.get('url') %}
+          <dt>{{ _('YouTube') }}</dt>
+          <dd>
+            <a href="https://www.youtube.com/{{ host.get('url') }}">
+              {{ host.get('url') }}
+            </a>
+          </dd>
+        {% endif %}
+      </dl>
+    </div>
+  {% endfor %}
+  </div>
+
+{% endif %}

@@ -94,6 +94,7 @@ def environment(**options):
     env.filters['format_tz'] = format_tz
     env.filters['https'] = lambda s: ('https:%s' % s[5:]) if s.startswith('http:') else s
     env.filters['json'] = json.dumps
+    env.filters['json_parse'] = json.loads
     env.filters['markdown'] = gfm.markdown
     env.filters['pretty_date'] = helpers.pretty_date
     env.filters['replace'] = lambda s: s.replace

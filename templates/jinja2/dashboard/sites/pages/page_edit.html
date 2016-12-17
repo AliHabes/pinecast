@@ -1,0 +1,150 @@
+{% extends 'dashboard/base.html' %}
+{% block dashboard_body %}
+
+<div class="form-block" style="padding-top: 50px">
+
+{% if error %}
+  <div class="error">
+    {{ _('Please make sure you fill out each field correctly.') }}
+  </div>
+{% endif %}
+
+<strong>{{ _('Edit Page') }}</strong>
+
+<form action="{{ url('site_edit_page', podcast_slug=site.podcast.slug, page_slug=page.slug) }}" method="post">
+
+  <label>
+    <span>{{ _('Title') }}</span>
+    <input type="text" required name="title" maxlength="512" value="{{ default.get('title', page.title) }}">
+  </label>
+
+  <hr>
+
+  {% if page.page_type == 'markdown' %}
+    <b>{{ _('Markdown Page') }}</b>
+
+    {% include 'dashboard/asides/aside_markdown.html' %}
+
+    <label>
+      <span>{{ _('Body') }}</span>
+      <textarea name="markdown_body" class="markdown-editor">{{ page.body }}</textarea>
+    </label>
+
+  {% elif page.page_type == 'contact' %}
+    <b>{{ _('Contact Page') }}</b>
+
+    {% set blob = page.body|json_parse %}
+    <label>
+      <span>{{ _('Email') }}</span>
+      <input type="email" maxlength="32" name="contact_email" value="{{ blob.get('email', [''])[0] }}">
+    </label>
+
+    <label>
+      <span>{{ _('Twitter Username') }}</span>
+      <input type="text" maxlength="15" name="contact_twitter" value="{{ blob.get('twitter', [''])[0] }}">
+    </label>
+
+    <label>
+      <span>{{ _('Facebook Page URL') }}</span>
+      <input type="url" maxlength="256" name="contact_facebook" value="{{ blob.get('facebook', [''])[0] }}">
+    </label>
+
+    <label>
+      <span>{{ _('Instagram Username') }}</span>
+      <input type="text" maxlength="30" name="contact_instagram" value="{{ blob.get('instagram', [''])[0] }}">
+    </label>
+
+    <label>
+      <span>{{ _('Twitch Username') }}</span>
+      <input type="text" maxlength="25" name="contact_twitch" value="{{ blob.get('twitch', [''])[0] }}">
+    </label>
+
+    <label>
+      <span>{{ _('YouTube Username') }}</span>
+      <input type="text" maxlength="20" name="contact_youtube" value="{{ blob.get('youtube', [''])[0] }}">
+    </label>
+
+  {% elif page.page_type == 'hosts' %}
+    <b>{{ _('Hosts Page') }}</b>
+
+    {% include 'dashboard/sites/pages/host_template.html' %}
+    {% set blob = page.body|json_parse %}
+
+    <div class="host-rows {{ 'only-one' if len(blob) == 1 else '' }}">
+      {% for host in blob %}
+        <div class="host-row" style="border: 2px solid rgba(0, 0, 0, 0.2); padding: 1em 1em 0; margin-bottom: 1em">
+          <div class="host-btn-div" style="text-align: right; margin-bottom: 0.5em">
+            <button class="btn btn--tiny btn--danger" type="button"><i class="icon-trash-empty"></i></button>
+          </div>
+
+          <label>
+            <span>{{ _('Host\'s Name') }}</span>
+            <input type="text" maxlength="64" data-type="name" placeholder="{{ _('Anonymous') }}" value="{{ host.name }}">
+          </label>
+
+          <label>
+            <span>{{ _('Gravatar Email') }}</span>
+            <input type="email" maxlength="32" data-type="email" value="{{ host.get('email', '') }}">
+          </label>
+
+          <hr>
+
+          <label>
+            <span>{{ _('Twitter Username') }}</span>
+            <input type="text" maxlength="15" data-contact-type="twitter" value="{{ host.get('twitter', '') }}">
+          </label>
+
+          <label>
+            <span>{{ _('Instagram Username') }}</span>
+            <input type="text" maxlength="30" data-contact-type="instagram" value="{{ host.get('instagram', '') }}">
+          </label>
+
+          <label>
+            <span>{{ _('Twitch Username') }}</span>
+            <input type="text" maxlength="25" data-contact-type="twitch" value="{{ host.get('twitch', '') }}">
+          </label>
+
+          <label>
+            <span>{{ _('YouTube Username') }}</span>
+            <input type="text" maxlength="20" data-contact-type="youtube" value="{{ host.get('youtube', '') }}">
+          </label>
+
+          <label>
+            <span>{{ _('Facebook Page URL') }}</span>
+            <input type="url" maxlength="256" data-contact-type="facebook" placeholder="https://www.facebook.com/abtsilence/" value="{{ host.get('facebook', '') }}">
+          </label>
+
+          <label>
+            <span>{{ _('URL') }}</span>
+            <input type="url" maxlength="128" data-contact-type="url" placeholder="http://breadshoes.rocks" value="{{ host.get('url', '') }}">
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+
+    <p>
+      <a href="" class="add-host">{{ _('+ Add host') }}</a>
+    </p>
+
+    <input type="hidden" name="host_blob" value="[]">
+
+  {% endif %}
+
+  <menu class="toolbar">
+    <button class="btn" type="submit">{{ _('Save') }}</button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>
+
+
+<script>
+  {% include 'dashboard/sites/pages/hosts.js' %}
+</script>
+
+</div>
+{% endblock %}
+
+{% block after_content %}
+<script src="/static/js/markdown-editor.js"></script>
+{% endblock %}

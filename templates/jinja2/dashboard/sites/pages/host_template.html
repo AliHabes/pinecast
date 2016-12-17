@@ -1,0 +1,52 @@
+<template class="host-template">
+  <div class="host-row" style="border: 2px solid rgba(0, 0, 0, 0.2); padding: 1em 1em 0; margin-bottom: 1em">
+    <div class="host-btn-div" style="text-align: right; margin-bottom: 0.5em">
+      <button class="btn btn--tiny btn--danger" type="button"><i class="icon-trash-empty"></i></button>
+    </div>
+    <label>
+      <span>{{ _('Host\'s Name') }}</span>
+      <input type="text" maxlength="64" data-type="name" placeholder="{{ _('Anonymous') }}">
+    </label>
+
+    <label>
+      <span>{{ _('Gravatar Email') }}</span>
+      <input type="email" maxlength="32" data-type="email">
+    </label>
+
+    <hr>
+
+    <label>
+      <span>{{ _('Twitter Username') }}</span>
+      <input type="text" maxlength="15" data-contact-type="twitter">
+    </label>
+
+    <label>
+      <span>{{ _('Instagram Username') }}</span>
+      <input type="text" maxlength="30" data-contact-type="instagram">
+    </label>
+
+    <label>
+      <span>{{ _('Twitch Username') }}</span>
+      <input type="text" maxlength="25" data-contact-type="twitch">
+    </label>
+
+    <label>
+      <span>{{ _('YouTube Username') }}</span>
+      <input type="text" maxlength="20" data-contact-type="youtube">
+    </label>
+
+    <label>
+      <span>{{ _('Facebook Page URL') }}</span>
+      <input type="url" maxlength="256" data-contact-type="facebook" placeholder="https://www.facebook.com/abtsilence/">
+    </label>
+
+    <label>
+      <span>{{ _('URL') }}</span>
+      <input type="url" maxlength="128" data-contact-type="url" placeholder="http://breadshoes.rocks">
+    </label>
+  </div>
+</template>
+
+<style>
+.host-rows.only-one .host-row > .host-btn-div {display: none;}
+</style>

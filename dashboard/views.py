@@ -30,7 +30,7 @@ from payments.stripe_lib import stripe
 from pinecast.helpers import get_object_or_404, json_response, reverse
 from podcasts.models import (CATEGORIES, Podcast, PodcastCategory,
                              PodcastEpisode)
-from sites.models import Site
+from sites.models import Site, SitePage
 
 
 signer = itsdangerous.Signer(settings.SECRET_KEY)
@@ -167,6 +167,7 @@ def podcast_dashboard(req, podcast_slug):
 
         'LOCALES': constants.locales,
         'PODCAST_CATEGORIES': json.dumps(list(CATEGORIES)),
+        'SITE_PAGE_TYPES': SitePage.PAGE_TYPES,
         'SITE_THEMES': Site.SITE_THEMES,
 
         'N_DESTINATIONS': NotificationHook.DESTINATIONS,

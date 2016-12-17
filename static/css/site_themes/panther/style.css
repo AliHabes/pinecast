@@ -51,7 +51,7 @@ main {
     background: #fcfaff;
 }
 
-.blog-post {
+.blog-post, .custom-page {
     padding: 40px;
 }
 .blog-post .teaser {
@@ -211,7 +211,8 @@ footer {
     text-align: center;
 }
 
-.post-full h1 {
+.post-full h1,
+.custom-page h1 {
     color: #2c3e50;
     font-size: 2.5em;
     margin-bottom: 1em;
@@ -219,4 +220,53 @@ footer {
 }
 .post-full .published {
     margin-bottom: 2em;
+}
+
+.custom-page {
+    padding-bottom: 100px;
+}
+
+.contact-list {
+    display: flex;
+    flex-wrap: wrap;
+    line-height: 2em;
+    margin: 0 auto;
+    max-width: 300px;
+}
+.contact-list dt {
+    flex: 1 1 20%;
+    font-weight: bold;
+    margin: 0;
+    padding-right: 20px;
+    text-align: right;
+}
+.contact-list dd {
+    flex: 1 1 70%;
+    margin: 0;
+}
+
+.hosts-page.host-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.hosts-page.host {
+    flex: 1 1 calc(50% - 40px);
+    margin: 20px;
+    max-width: 50%;
+    text-align: center;
+}
+.hosts-page.host img {
+    border-radius: 200px;
+}
+.hosts-page.host address {
+    font-size: 1.5em;
+    font-style: normal;
+    font-weight: bold;
+    line-height: 2em;
+}
+
+
+.hosts-page.host address {
+    font-family: Lobster;
 }

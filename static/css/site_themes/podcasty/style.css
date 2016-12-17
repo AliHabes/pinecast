@@ -205,6 +205,7 @@ main {
     font-size: 14px;
 }
 
+.custom-page > div,
 .blog-post > div {
     background: #fff;
     border-radius: 4px;
@@ -213,6 +214,7 @@ main {
     padding: 30px;
     width: 900px;
 }
+.custom-page h1,
 .blog-post h1 {
     font-size: 36px;
     margin-top: 0;
@@ -312,4 +314,47 @@ footer > section > div {
     font-size: 2em;
     padding: 30px;
     text-align: center;
+}
+
+
+.contact-list {
+    display: flex;
+    flex-wrap: wrap;
+    line-height: 2em;
+    max-width: 300px;
+}
+.contact-list dt {
+    flex: 1 1 20%;
+    font-weight: bold;
+    margin: 0;
+    padding-right: 20px;
+    text-align: right;
+}
+.contact-list dd {
+    flex: 1 1 70%;
+    margin: 0;
+}
+
+.hosts-page.host-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.hosts-page.host {
+    flex: 1 1 calc(50% - 40px);
+    margin: 20px;
+    max-width: 50%;
+    text-align: center;
+}
+.hosts-page.host img {
+    border-radius: 200px;
+}
+.hosts-page.host address {
+    font-size: 1.5em;
+    font-style: normal;
+    font-weight: bold;
+    line-height: 2em;
+}
+.host-contact-list {
+    margin: 0 auto;
 }

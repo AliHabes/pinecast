@@ -30,7 +30,7 @@ class TipUser(models.Model):
     def get_email(self):
         return self.email_address
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s%s' % (self.email_address, ' (v)' if self.verified else '')
 
 
@@ -48,7 +48,7 @@ class RecurringTip(models.Model):
 
     deactivated = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s - %s' % (self.tipper.email_address, self.amount)
 
     def get_subscription(self):
