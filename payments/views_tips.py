@@ -4,6 +4,7 @@ from __future__ import division
 from urllib.parse import quote
 
 import rollbar
+from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext
@@ -102,8 +103,7 @@ def _send_one_time_tip(req, podcast, owner_us, amount):
         rollbar.report_message('Error when sending tip: %s' % str(e), 'error')
         return {'error': str(e)}
 
-    podcast.total_tips += amount
-    podcast.save()
+    Podcast.objects.filter(id=podcast.id).update(total_tips=F('total_tips') + amount)
 
     tip_event = TipEvent(
         tipper=tip_user,

@@ -8,6 +8,7 @@ import iso8601
 import rollbar
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import F
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext
@@ -208,8 +209,7 @@ def hook(req):
             recurring_tip=sub)
         tip_event.save()
 
-        pod.total_tips += amount
-        pod.save()
+        Podcast.objects.filter(id=pod.id).update(total_tips=F('total_tips') + amount)
 
         email = sub.tipper.email_address
         send_notification_email(
