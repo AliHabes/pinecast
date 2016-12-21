@@ -216,7 +216,6 @@ def _finish_sub(req, pod, amount, email, token):
         sub_obj.save()
 
         # Update the DB with the new amount
-        old_amount = sub.amount
         sub.amount = amount
         sub.save()
 
