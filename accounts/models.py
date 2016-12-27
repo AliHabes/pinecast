@@ -24,7 +24,7 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
     stripe_customer_id = models.CharField(max_length=128, blank=True, null=True)
     stripe_payout_managed_account = models.CharField(max_length=128, blank=True, null=True)
 
-    coupon_code = models.CharField(max_length=16, blank=True, null=True, unique=True)
+    coupon_code = models.CharField(max_length=16, blank=True, null=True)
 
     def clean(self):
         if self.tz_offset < -12 or self.tz_offset > 14:
