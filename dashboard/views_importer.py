@@ -7,6 +7,7 @@ import time
 import uuid
 
 import itsdangerous
+import rollbar
 from defusedxml.minidom import parseString as parseXMLString
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -93,16 +94,18 @@ def start_import(req):
                 p.delete()
             except Exception:
                 pass
+        rollbar.report_message(str(e), 'error')
         return {'error': ugettext('There was a problem saving the podcast: %s') % str(e)}
 
     created_items = []
     try:
         for item in parsed_items:
+            time_tup = tuple(item.get('publish', ()))
             i = PodcastEpisode(
                 podcast=p,
                 title=item.get('title', '')[:1023],
                 subtitle=item.get('subtitle', '')[:1023],
-                publish=datetime.datetime.fromtimestamp(time.mktime(item.get('publish', ''))),
+                publish=datetime.datetime.fromtimestamp(time.mktime(time_tup)),
                 description=item.get('description', ''),
                 duration=int(item.get('duration', '0')),
                 audio_url=item.get('audio_url', '')[:512],
@@ -139,6 +142,7 @@ def start_import(req):
                 i.delete()
             except Exception:
                 pass
+        rollbar.report_message(str(e), 'error')
         return {'error': ugettext('There was a problem saving the podcast items: %s') % str(e)}
 
     for ir in asset_requests:
