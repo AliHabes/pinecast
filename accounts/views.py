@@ -38,6 +38,8 @@ def login_page(req):
     ctx = {}
     if req.GET.get('signup_success'):
         ctx['success'] = ugettext('Your account was created successfully. Login below.')
+    if req.GET.get('success') == 'resetpassword':
+        ctx['success'] = ugettext('Your password was reset successfully.')
 
     if not req.POST:
         return render(req, 'login.html', ctx)
@@ -95,7 +97,7 @@ def forgot_password_finalize(req):
         return redirect('login')
 
     ctx = {'email': email,
-           'signature': signer.sign(email),
+           'signature': signer.sign(email).decode('utf-8'),
            'error': req.GET.get('error')}
 
     return render(req, 'forgot_password_finalize.html', ctx)
@@ -110,7 +112,7 @@ def forgot_password_finish(req):
     sig = req.POST.get('__sig')
     email = req.POST.get('email')
     try:
-        h = signer.unsign(sig, max_age=1800)
+        h = signer.unsign(sig, max_age=1800).decode('utf-8')
         if h != email:
             raise Exception()
     except Exception:
