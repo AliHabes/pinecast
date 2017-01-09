@@ -85,9 +85,9 @@
 
   <label class="duration-control" style="flex-direction: row">
     <span>{{ _('Audio Length') }}</span>
-    <input type="number" class="duration-hours" name="duration-hours" value="{{ default.get('duration-hours', 0) }}" title="{{ _('Hours') }}">:
-    <input type="number" class="duration-minutes" name="duration-minutes" value="{{ default.get('duration-minutes', 0) }}" title="{{ _('Minutes') }}">:
-    <input type="number" class="duration-seconds" name="duration-seconds" value="{{ default.get('duration-seconds', 0) }}" title="{{ _('Seconds') }}">
+    <input type="number" class="duration-hours" name="duration-hours" value="{{ default.get('duration-hours', 0) }}" title="{{ _('Hours') }}" required min="0">:
+    <input type="number" class="duration-minutes" name="duration-minutes" value="{{ default.get('duration-minutes', 0) }}" title="{{ _('Minutes') }}" required min="0" max="59">:
+    <input type="number" class="duration-seconds" name="duration-seconds" value="{{ default.get('duration-seconds', 0) }}" title="{{ _('Seconds') }}" required min="0" max="59">
   </label>
 
   <hr>

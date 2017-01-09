@@ -11,6 +11,7 @@ import urllib.request
 import uuid
 
 import itsdangerous
+import rollbar
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
@@ -325,7 +326,7 @@ def podcast_new_ep(req, podcast_slug):
             subtitle=req.POST.get('subtitle'),
             publish=publish_parsed,
             description=req.POST.get('description'),
-            duration=int(req.POST.get('duration-hours')) * 3600 + int(req.POST.get('duration-minutes')) * 60 + int(req.POST.get('duration-seconds')),
+            duration=int(req.POST.get('duration-hours') or 0) * 3600 + int(req.POST.get('duration-minutes') or 0) * 60 + int(req.POST.get('duration-seconds') or 0),
 
             audio_url=signer.unsign(req.POST.get('audio-url')),
             audio_size=int(req.POST.get('audio-url-size')),
@@ -343,7 +344,7 @@ def podcast_new_ep(req, podcast_slug):
             prompt = EpisodeFeedbackPrompt(episode=ep, prompt=req.POST.get('feedback_prompt'))
             prompt.save()
     except Exception as e:
-        raise e
+        rollbar.report_message(str(e), 'error')
         ctx['error'] = True
         ctx['default'] = req.POST
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
