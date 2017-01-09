@@ -50,6 +50,8 @@ def total_subscribers(podcast):
 def get_top_episodes(podcasts, timeframe=None, tz=None):
     if not isinstance(podcasts, (list, tuple)):
         podcasts = [podcasts]
+    if not podcasts:
+        return {}
 
     where_clause = ' OR '.join('podcast = %s' % escape(p) for p in podcasts)
     if timeframe:
