@@ -191,10 +191,6 @@ STATIC_ROOT = STATIC_DIRS[0] + 'root'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
-GETCONNECT_IO_PID = os.environ.get('GETCONNECT_IO_PID')
-GETCONNECT_IO_QUERY_KEY = os.environ.get('GETCONNECT_IO_QUERY_KEY')
-GETCONNECT_IO_PUSH_KEY = os.environ.get('GETCONNECT_IO_PUSH_KEY')
-
 S3_BUCKET = os.environ.get('S3_BUCKET')
 S3_LOGS_BUCKET = os.environ.get('S3_LOGS_BUCKET')
 S3_PREMIUM_BUCKET = os.environ.get('S3_PREMIUM_BUCKET')
@@ -251,7 +247,7 @@ INFLUXDB_HOST = 'influx.service.pinecast.com'
 INFLUXDB_PORT = 443
 INFLUXDB_SSL = True
 
-DISABLE_GETCONNECT = os.environ.get('DISABLE_GETCONNECT', 'false') == 'true'
+DISABLE_GETCONNECT = True
 
 
 REFERRAL_DISCOUNT = 40  # percent off

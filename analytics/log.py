@@ -41,34 +41,6 @@ def write_influx_many(db, items):
         rollbar.report_message('Problem delivering logs to influx: %s' % e, 'error')
         return None
 
-
-def write_gc_many(collection, blobs):
-    if settings.DISABLE_GETCONNECT:
-        return
-
-    try:
-        posted = requests.post(
-            'https://api.getconnect.io/events',
-            timeout=15,
-            data=json.dumps({collection: blobs}),
-            headers={'X-Project-Id': settings.GETCONNECT_IO_PID,
-                     'X-Api-Key': settings.GETCONNECT_IO_PUSH_KEY})
-    except requests.exceptions.Timeout:
-        # fuck getconnect
-        return
-    except Exception as e:
-        rollbar.report_message('Analytics POST error: %s' % str(e), 'error')
-        return
-
-    # 409 is a duplicate ID error, which is expected
-    if posted.status_code != 200 and posted.status_code != 409:
-        rollbar.report_message(
-            'Got non-200 status code submitting logs: %s %s' % (
-                posted.status_code,
-                posted.text),
-            'error')
-
-
 def _get_country(ip, req=None):
     if req and req.META.get('HTTP_CF_IPCOUNTRY'):
         return req.META.get('HTTP_CF_IPCOUNTRY').upper()
@@ -103,22 +75,6 @@ def get_listen_obj(ep, source, req=None, ip=None, ua=None, timestamp=None):
 
     browser, device, os = get_device_type(req=req, ua=ua)
     country = _get_country(ip, req)
-
-    gc_listen = {
-        'podcast': pod_id,
-        'episode': ep_id,
-        'source': source,
-        'profile': {
-            'country': country,
-            'ip': ip,
-            'ua': ua,
-            'browser': browser,
-            'device': device,
-            'os': os,
-        },
-        'timestamp': timestamp.isoformat(),
-    }
-
 
     base_tags = {
         'podcast': pod_id,
@@ -168,7 +124,7 @@ def get_listen_obj(ep, source, req=None, ip=None, ua=None, timestamp=None):
             )
         )
 
-    return gc_listen, points
+    return None, points
 
 
 LISTEN_HOOKS = ['first_listen', 'listen_threshold', 'growth_milestone']
@@ -190,7 +146,6 @@ def commit_listens(listen_objs):
     pod_listens_before = {p: total_listens(p) for p in podcasts_with_hooks}
     ep_listens_before = {e: (p, total_listens(p, e)) for p, e in episodes}
 
-    write_gc_many('listen', [x[0] for x in listen_objs])
     write_influx_many(
         settings.INFLUXDB_DB_LISTEN, [i for _, y in listen_objs for i in y])
 
@@ -265,19 +220,6 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
     browser, device, os = get_device_type(req=req, ua=ua)
     country = _get_country(ip, req)
 
-    gc_subscription = {
-        'id': get_request_hash(req),
-        'podcast': pod_id,
-        'profile': {
-            'country': country,
-            'ip': ip,
-            'ua': ua,
-            'browser': browser,
-            'device': device,
-            'os': os,
-        },
-    }
-
     influx_ts = ts or datetime.datetime.combine(datetime.date.today(), datetime.time.min)
     hashed_influx_ts = influx_ts + datetime.timedelta(microseconds=get_ts_hash(ip, ua, influx_ts))
 
@@ -319,7 +261,6 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
     if dry_run:
         return
 
-    write_gc_many('subscribe', [gc_subscription])
     result = write_influx_many(settings.INFLUXDB_DB_SUBSCRIPTION, points)
     if not result:
         if settings.DEBUG:
