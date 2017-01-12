@@ -1,0 +1,16 @@
+<div class="upgrade-empty-state empty-state">
+  {% if podcast.owner == user %}
+    {% trans %}
+      Get Slack or Email alerts, or use webhooks to see when your show
+      receives a tip or feedback, an episode receives its first listen or
+      passes a listen threshold, or your show hits a growth milestone.
+    {% endtrans %}
+    <br>
+    <a class="btn" href="{{ url('upgrade') }}">{{ _('Upgrade Now') }}</a>
+  {% else %}
+    {% trans %}
+      Notifications are only available to podcasts owned by Pro users.
+    {% endtrans %}
+  {% endif %}
+
+</div>

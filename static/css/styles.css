@@ -777,7 +777,7 @@ menu.toolbar-right li {
     font-weight: 600;
     margin-bottom: 1em;
 }
-.form-block a {
+.form-block a:not(.btn) {
     background: linear-gradient(#F8F9FA, #F8F9FA) no-repeat,
         linear-gradient(#F8F9FA, #F8F9FA) no-repeat,
         linear-gradient(#32719C, #32719C) repeat-x;
@@ -1831,6 +1831,10 @@ main > header h2 {
 .upgrade-empty-state .btn {
     margin: 0 50px;
     padding: 0;
+}
+.form-block .upgrade-empty-state .btn {
+    margin: 20px auto;
+    padding: 0 20px;
 }
 
 .stats-panel + .chart-placeholder .chart-title {

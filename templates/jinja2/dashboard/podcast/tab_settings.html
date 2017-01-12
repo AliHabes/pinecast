@@ -3,11 +3,9 @@
     <li class="selected">
       <a href="" data-tab=".tab-details">{{ _('Details') }}</a>
     </li>
-    {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_NOTIFICATIONS) %}
-      <li>
-        <a href="" data-tab=".tab-notifications">{{ _('Notifications') }}</a>
-      </li>
-    {% endif %}
+    <li>
+      <a href="" data-tab=".tab-notifications">{{ _('Notifications') }}</a>
+    </li>
     {% if site and minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITES) %}
       <li>
         <a href="" data-tab=".tab-site-options">{{ _('Site') }}</a>
@@ -29,11 +27,25 @@
   {% include "dashboard/podcast/tab_settings_edit.html" %}
 </div>
 
-{% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_NOTIFICATIONS) %}
-  <div class="tab-notifications form-block" style="display: none">
+<div class="tab-notifications form-block" style="display: none">
+  <strong>
+    {{ _('Notifications')}}
+    <i class="pro-tag"></i>
+  </strong>
+
+  <p>
+    {% trans %}
+      Notifications allow you to receive alerts when certain events occur with
+      your podcast.
+    {% endtrans %}
+  </p>
+
+  {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_NOTIFICATIONS) %}
     {% include "dashboard/podcast/tab_settings_notifications.html" %}
-  </div>
-{% endif %}
+  {% else %}
+    {% include "dashboard/podcast/tab_settings_notifications_upgrade.html" %}
+  {% endif %}
+</div>
 
 {% if site and minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITES) %}
   <div class="tab-site-options form-block" style="display: none">

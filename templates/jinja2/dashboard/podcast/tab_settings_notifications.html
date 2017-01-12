@@ -1,15 +1,3 @@
-<strong>
-  {{ _('Notifications')}}
-  <i class="pro-tag"></i>
-</strong>
-
-<p>
-  {% trans %}
-    Notifications allow you to receive alerts when certain events occur with
-    your podcast.
-  {% endtrans %}
-</p>
-
 {% if notification_sent %}
   <div class="success">
     {{ _('The test notification was sent') }}
