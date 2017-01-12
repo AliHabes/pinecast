@@ -144,6 +144,7 @@ def commit_listens(listen_objs):
         x[0]['tags']['podcast'] in podcasts_with_hooks)
 
     pod_listens_before = {p: total_listens(p) for p in podcasts_with_hooks}
+    # FIXME: This should pass the episode object, not the episode ID
     ep_listens_before = {e: (p, total_listens(p, e)) for p, e in episodes}
 
     write_influx_many(
@@ -186,10 +187,11 @@ def commit_listens(listen_objs):
             matching_hooks = [h for h in notifications[pod_id] if h.trigger == 'listen_threshold']
             if not matching_hooks:
                 continue
-            new_count = total_listens(pod_id, ep_id)
+            episode = get_ep(ep_id)
+            new_count = total_listens(pod_id, episode)
             notify_all(
                 [h for h in matching_hooks if h.test_condition(count, new_count)],
-                {'episode': get_ep(ep_id), 'listens': new_count})
+                {'episode': episode, 'listens': new_count})
 
     # Handle growth_milestone
     if any(hook.trigger == 'growth_milestone' for hook in hooks):

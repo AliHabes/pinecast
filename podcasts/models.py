@@ -243,6 +243,8 @@ class PodcastEpisode(models.Model):
         default=EXPLICIT_OVERRIDE_CHOICE_NONE
     )
 
+    stats_base_listens = models.PositiveIntegerField(default=0)
+
     @cached_method
     def formatted_duration(self):
         seconds = self.duration

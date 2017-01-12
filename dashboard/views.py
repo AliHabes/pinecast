@@ -409,7 +409,7 @@ def podcast_episode(req, podcast_slug, episode_id):
     pod = get_podcast(req, podcast_slug)
     ep = get_object_or_404(PodcastEpisode, id=episode_id, podcast=pod)
 
-    total_listens = analytics_query.total_listens(pod, episode_id=str(ep.id))
+    total_listens = analytics_query.total_listens(pod, episode=ep)
 
     data = {
         'error': 'error' in req.GET,
