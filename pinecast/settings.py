@@ -13,6 +13,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
+import logging
 import os
 
 import mimetypes
@@ -29,6 +30,7 @@ SECRET_KEY = os.environ.get('SECRET', 'p)r2w-c!m^znb%2ppj0rxp9uu$+$q928w#*$41y5(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG_TOOLBAR = DEBUG and os.environ.get('DEBUG_TOOLBAR')
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
@@ -38,6 +40,9 @@ else:
     # middleware. Remove in 2017.
     ALLOWED_HOSTS.append('host.podmaster.io')
 
+
+if DEBUG_TOOLBAR:
+    print('Loading Django Debug Toolbar')
 
 mimetypes.add_type("image/svg+xml", ".svg", True)
 
@@ -63,8 +68,8 @@ INSTALLED_APPS = (
     'sites',
 )
 if DEBUG:
-    INSTALLED_APPS = INSTALLED_APPS + ('django_nose', )
-if DEBUG and os.environ.get('DEBUG_TOOLBAR'):
+    INSTALLED_APPS = INSTALLED_APPS + ('django_nose', 'nplusone.ext.django', )
+if DEBUG_TOOLBAR:
     INSTALLED_APPS = INSTALLED_APPS + ('debug_toolbar', )
 
 MIDDLEWARE_CLASSES = (
@@ -82,6 +87,10 @@ MIDDLEWARE_CLASSES = (
     'pinecast.middleware.hnredirect.HostnameRedirect',
     'pinecast.middleware.tsredirect.TrailingSlashRedirect',
 )
+if DEBUG:
+    MIDDLEWARE_CLASSES = ('nplusone.ext.django.NPlusOneMiddleware', ) + MIDDLEWARE_CLASSES
+if DEBUG_TOOLBAR:
+    MIDDLEWARE_CLASSES = ('debug_toolbar.middleware.DebugToolbarMiddleware', ) + MIDDLEWARE_CLASSES
 
 ROOT_URLCONF = 'pinecast.urls'
 
@@ -180,6 +189,11 @@ USE_L10N = True
 USE_TZ = False
 
 
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda req: True,
+}
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
@@ -256,6 +270,9 @@ CHALLENGE_RESPONSE = os.environ.get('CHALLENGE_RESPONSE')
 
 REFERRAL_DISCOUNT = 40  # percent off
 REFERRAL_DISCOUNT_DURATION = 4  # months
+
+NPLUSONE_LOGGER = logging.getLogger('nplusone')
+NPLUSONE_LOG_LEVEL = logging.ERROR
 
 
 try:

@@ -47,6 +47,11 @@ urlpatterns = (
     ]
 )
 
+if settings.DEBUG_TOOLBAR:
+    import debug_toolbar
+    urlpatterns += (url(r'^__debug__/', include(debug_toolbar.urls)), )
+
+
 if settings.CHALLENGE_URL:
     urlpatterns += (
         url(settings.CHALLENGE_URL, lambda *_: HttpResponse(settings.CHALLENGE_RESPONSE)),
