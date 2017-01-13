@@ -19,7 +19,7 @@ def _get_lone(response, default=-1):
 
 def total_listens(podcast, episode=None):
     podcast_is_str = isinstance(podcast, StringTypes)
-    episode_is_str = isinstance(podcast, StringTypes)
+    episode_is_str = isinstance(episode, StringTypes)
 
     if episode_is_str:
         episode_qualifier = ' AND episode = \'%s\'' % episode
