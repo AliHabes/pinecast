@@ -23,6 +23,7 @@ from django.views.decorators.http import require_GET, require_POST
 import accounts.payment_plans as payment_plans
 import analytics.query as analytics_query
 import pinecast.constants as constants
+from .models import Collaborator
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
 from feedback.models import Feedback, EpisodeFeedbackPrompt
@@ -58,9 +59,13 @@ def _pmrender(req, template, data=None):
         networks = req.user.network_set.filter(deactivated=False)
         data.setdefault('networks', networks)
 
-        podcasts = list(set(
-            req.user.podcast_set.all() | Podcast.objects.filter(networks__in=networks)))
-        data.setdefault('podcasts', podcasts)
+        podcasts = set(req.user.podcast_set.all())
+        podcasts |= set(Podcast.objects.filter(networks__in=networks))
+        podcasts |= {
+            x.podcast for x in
+            Collaborator.objects.filter(collaborator=req.user).select_related('podcast')}
+
+        data.setdefault('podcasts', list(podcasts))
 
         uset = UserSettings.get_from_user(req.user)
         data.setdefault('user_settings', uset)
@@ -92,6 +97,9 @@ def get_podcast(req, slug):  # TODO: move to the Podcast model
 
     if pod.owner == req.user:
         return pod
+    elif pod.collaborators.filter(collaborator=req.user).count():
+        return pod
+
     pods = Network.objects.filter(deactivated=False, members__in=[req.user], podcast__in=[pod])
     if not pods.count():
         raise Http404()
@@ -127,30 +135,6 @@ def podcast_dashboard(req, podcast_slug):
     total_listens_this_week = analytics_query.total_listens_this_week(pod, tz)
     subscribers = analytics_query.total_subscribers(pod)
 
-    def pop_until_lt(arr, field, comp, max=-1):
-        count = 0
-        while arr:
-            if getattr(arr[0], field) >= comp:
-                yield arr.pop(0)
-            else:
-                return
-            if max > 0:
-                count += 1
-                if count == max:
-                    break
-        if not arr:
-            return
-        if max > 0:
-            ignored = 0
-            while arr:
-                if getattr(arr[0], field) >= comp:
-                    ignored += 1
-                    arr.pop(0)
-                else:
-                    break
-            if ignored:
-                yield ignored
-
     data = {
         'podcast': pod,
         'episodes': pod.podcastepisode_set.order_by('-publish'),
@@ -173,8 +157,6 @@ def podcast_dashboard(req, podcast_slug):
 
         'N_DESTINATIONS': NotificationHook.DESTINATIONS,
         'N_TRIGGERS': NotificationHook.TRIGGERS,
-
-        'pop_until_lt': pop_until_lt,
     }
 
     try:
@@ -198,6 +180,9 @@ def podcast_dashboard(req, podcast_slug):
         data['notifications'] = NotificationHook.objects.filter(podcast=pod)
         if req.GET.get('notification_sent'):
             data['notification_sent'] = True
+
+    if payment_plans.minimum(owner_uset.plan, payment_plans.FEATURE_MIN_COLLABORATORS):
+        data['collab_error'] = req.GET.get('collaberr')
 
     return _pmrender(req, 'dashboard/podcast/page_podcast.html', data)
 

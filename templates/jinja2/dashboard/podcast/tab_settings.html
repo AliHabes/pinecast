@@ -6,6 +6,11 @@
     <li>
       <a href="" data-tab=".tab-notifications">{{ _('Notifications') }}</a>
     </li>
+    {% if podcast.owner == user %}
+    <li>
+      <a href="" data-tab=".tab-collabs">{{ _('Collaborators') }}</a>
+    </li>
+    {% endif %}
     {% if site and minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITES) %}
       <li>
         <a href="" data-tab=".tab-site-options">{{ _('Site') }}</a>
@@ -46,6 +51,20 @@
     {% include "dashboard/podcast/tab_settings_notifications_upgrade.html" %}
   {% endif %}
 </div>
+
+{% if podcast.owner == user %}
+  <div class="tab-collabs form-block" style="display: none">
+    <strong>
+      {{ _('Collaborators')}}
+      <i class="pro-tag"></i>
+    </strong>
+    {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_COLLABORATORS) %}
+      {% include "dashboard/podcast/tab_settings_collaborators.html" %}
+    {% else %}
+      {% include "dashboard/podcast/tab_settings_collaborators_upgrade.html" %}
+    {% endif %}
+  </div>
+{% endif %}
 
 {% if site and minimum_plan(podcast.owner, PLANS.FEATURE_MIN_SITES) %}
   <div class="tab-site-options form-block" style="display: none">

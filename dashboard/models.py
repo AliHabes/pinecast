@@ -4,6 +4,7 @@ import datetime
 import uuid
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext
 
@@ -117,3 +118,13 @@ class AssetImportRequest(models.Model):
 
     def __str__(self):
         return self.audio_source_url or self.image_source_url
+
+
+class Collaborator(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+
+    podcast = models.ForeignKey(Podcast, null=True, blank=True, related_name='collaborators')
+    collaborator = models.ForeignKey(User, related_name='collaborated_podcasts')
+
+    def __str__(self):
+        return '%s - %s' % (self.podcast.name, self.collaborator.email)

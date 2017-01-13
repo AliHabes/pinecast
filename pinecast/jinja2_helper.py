@@ -46,6 +46,7 @@ def environment(**options):
         'is_paid_plan': lambda p: p != payment_plans.PLAN_DEMO and p != payment_plans.PLAN_COMMUNITY,
         'minimum_plan': minimum_plan,
         'now': lambda hours=0: datetime.datetime.now() + datetime.timedelta(hours=hours),
+        'pop_until_lt': pop_until_lt,
         'url': helpers.reverse,
 
         '_': ugettext,
@@ -161,3 +162,27 @@ def thumbnail(url, width=100, height=100):
     encoded_key = urlencode(key)
     return 'https://thumb.service.pinecast.com/resize?h=%d&w=%d&key=%s' % (
         height, width, encoded_key)
+
+def pop_until_lt(arr, field, comp, max=-1):
+        count = 0
+        while arr:
+            if getattr(arr[0], field) >= comp:
+                yield arr.pop(0)
+            else:
+                return
+            if max > 0:
+                count += 1
+                if count == max:
+                    break
+        if not arr:
+            return
+        if max > 0:
+            ignored = 0
+            while arr:
+                if getattr(arr[0], field) >= comp:
+                    ignored += 1
+                    arr.pop(0)
+                else:
+                    break
+            if ignored:
+                yield ignored

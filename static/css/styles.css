@@ -1868,6 +1868,10 @@ main > header h2 {
     margin: 0 1em 1em 0;
     width: 60px;
 }
+.avatar.avatar--small {
+    height: 24px;
+    width: 24px;
+}
 
 [data-still-importing] {
     position: relative;

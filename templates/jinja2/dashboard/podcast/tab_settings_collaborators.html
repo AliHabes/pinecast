@@ -1,0 +1,75 @@
+{% if collab_error == 'collab_dne' %}
+  <div class="error">
+    {{ _('No user with that email address currently exists. Please try again with a different email.') }}
+  </div>
+{% elif collab_error == 'yourself' %}
+  <div class="error">
+    {{ _('Nice try, but you cannot add yourself as a collaborator.') }}
+  </div>
+{% endif %}
+
+<hr>
+
+{% set collaborators = list(podcast.collaborators.all()) %}
+
+{% if collaborators %}
+  <strong>{{ _('Existing Notifications') }}</strong>
+
+  <table style="margin-bottom: 40px">
+    <thead>
+      <tr>
+        <th>{{ _('Email') }}</th>
+        <th>{{ _('Added') }}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for collaborator in collaborators %}
+        <tr>
+          <td>
+            <div class="flex-row">
+              <img class="avatar avatar--small" src="{{ gravatar(user.email, 24) }}" alt="" style="flex: 0 0 24px; margin-bottom: 0">
+              <a href="mailto:{{ collaborator.collaborator.email }}">
+                {{ collaborator.collaborator.email }}
+              </a>
+            </div>
+          </td>
+          <td>
+            {{ collaborator.created|pretty_date }}
+          </td>
+          <td>
+            <form action="{{ url('delete_collaborator', podcast_slug=podcast.slug) }}" method="post" style="display: inline-block; padding: 0">
+              <button class="btn btn--tiny btn--danger" type="submit">
+                <i class="icon-trash-empty" aria-label="{{ _('Remove collaborator') }}"></i>
+              </button>
+
+              <input type="hidden" name="id" value="{{ collaborator.id }}">
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+<strong>{{ _('New Collaborator') }}</strong>
+
+<p>
+  {% trans %}
+    Collaborators must be existing Pinecast users.
+  {% endtrans %}
+</p>
+
+<form class="inline-form" action="{{ url('new_collaborator', podcast_slug=podcast.slug) }}" method="post">
+  <label>
+    <strong>{{ _('Collaborator Email') }}</strong>
+    <input type="email" name="email">
+  </label>
+  <menu class="toolbar">
+    <button type="submit" class="btn">
+      {{ _('Add') }}
+    </button>
+  </menu>
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>
