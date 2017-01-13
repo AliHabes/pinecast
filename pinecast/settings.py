@@ -96,6 +96,7 @@ TEMPLATES = [
             'environment': 'pinecast.jinja2_helper.environment',
         },
     },
+    # This is needed for the admin app
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
@@ -248,6 +249,9 @@ INFLUXDB_PORT = 443
 INFLUXDB_SSL = True
 
 DISABLE_GETCONNECT = True
+
+CHALLENGE_URL = os.environ.get('CHALLENGE_URL')
+CHALLENGE_RESPONSE = os.environ.get('CHALLENGE_RESPONSE')
 
 
 REFERRAL_DISCOUNT = 40  # percent off

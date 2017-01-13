@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import logout
@@ -45,3 +46,8 @@ urlpatterns = (
 
     ]
 )
+
+if settings.CHALLENGE_URL:
+    urlpatterns += (
+        url(settings.CHALLENGE_URL, lambda *_: HttpResponse(settings.CHALLENGE_RESPONSE)),
+    )
