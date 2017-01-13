@@ -94,8 +94,12 @@ class Podcast(models.Model):
                 .count())
 
     @cached_method
+    def get_all_episodes_raw(self):
+        return PodcastEpisode.objects.filter(podcast=self)
+
+    @cached_method
     def get_episodes(self):
-        episodes = self.podcastepisode_set.filter(
+        episodes = self.get_all_episodes_raw().filter(
             publish__lt=round_now(),
             awaiting_import=False).order_by('-publish')
         us = UserSettings.get_from_user(self.owner)

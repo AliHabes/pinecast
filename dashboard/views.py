@@ -56,7 +56,7 @@ def _pmrender(req, template, data=None):
     if not req.user.is_anonymous():
         data.setdefault('user', req.user)
 
-        networks = req.user.network_set.filter(deactivated=False)
+        networks = set(req.user.network_set.filter(deactivated=False))
         data.setdefault('networks', networks)
 
         podcasts = set(req.user.podcast_set.all())

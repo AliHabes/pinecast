@@ -75,7 +75,7 @@
   </ul>
 </div>
 <div class="tab-networks dashboard" style="display: none">
-  {% if not networks.count() %}
+  {% if not networks %}
     {% if not minimum_plan(user_settings, PLANS.FEATURE_MIN_NETWORK) %}
       <div class="upgrade-empty-state">
         <p>{{ _('Upgrade to our Pro plan and collaborate with your peers using a network. Networks let you share access to your podcasts and view stats all in one place.') }}</p>
