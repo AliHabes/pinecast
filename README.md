@@ -28,12 +28,18 @@ Pushing to Heroku as-is should work. [The wiki](https://github.com/Pinecast/pine
 Run the following scripts from the console:
 
 ```bash
-virtualenv venv --distribute
+# Upgrade pip
+pip install --upgrade pip
+# Create a virtuenv with python3
+virtualenv -p $(which python3) venv --distribute
+
+# Activate the virtualenv
 source venv/bin/activate
+# Install all the deps into the virtualenv
 pip install -r requirements-dev.txt
 ```
 
-This will set up a virtual environment and install all Python dependencies necessary for development.
+After initial setup, you can just run `source venv/bin/activate` from the project directory to load the virtualenv with everything installed.
 
 If you intend to deploy Pinecast to production (which will require a database server), you will need to install the prod requirements instead:
 
