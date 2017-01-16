@@ -72,7 +72,7 @@
   </div>
 </section>
 
-{% set recurring_tips = podcast.recurring_tips.filter(deactivated=False).order_by('-created') %}
+{% set recurring_tips = podcast.recurring_tips.filter(deactivated=False).order_by('-created').select_related('tipper') %}
 {% if recurring_tips.count() %}
   <table class="card">
     <thead>
@@ -97,7 +97,7 @@
 {% endif %}
 
 {% set tip_eps = list(episodes.filter(publish__lte=now())) %}
-{% set podcast_tips = podcast.tip_events.order_by('-occurred_at') %}
+{% set podcast_tips = podcast.tip_events.order_by('-occurred_at').select_related('tipper', 'recurring_tip') %}
 {% if podcast_tips.count() %}
   <div class="form-block" style="max-width: initial; padding: 0; margin-left: calc(-20% + 2em)">
     <form>
