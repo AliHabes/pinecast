@@ -47,13 +47,14 @@ def _get_country(ip, req=None):
     if ip == '127.0.0.1':
         return 'US'
     try:
-        res = requests.get('http://geoip.nekudo.com/api/%s' % ip)
+        res = requests.post('https://geoip.service.pinecast.com/bulk', json=[ip], timeout=4)
         parsed = res.json()
-        if not parsed['country']:
+        if not parsed:
             return None
-        return parsed['country']['code']
+        print(parsed)
+        return parsed[0]['code']
     except Exception as e:
-        rollbar.report_message('Error resolving country IP (%s): %s' % (ip, str(e)), 'error')
+        rollbar.report_message('[pinecast geoip] Error resolving country IP (%s): %s' % (ip, str(e)), 'error')
         return None
 
 
