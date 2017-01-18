@@ -116,6 +116,20 @@ class AssetImportRequest(models.Model):
             'key': key,
         }
 
+    def trace_podcast(self):
+        return self.podcast or self.episode.podcast
+
+    def asset_type(self):
+        return 'image' if self.image_source_url else 'audio'
+
+    def status(self):
+        if self.resolved:
+            return 'resolved'
+        elif self.failed:
+            return 'failed'
+        else:
+            return 'unresolved'
+
     def __str__(self):
         return self.audio_source_url or self.image_source_url
 
