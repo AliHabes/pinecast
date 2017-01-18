@@ -29,7 +29,7 @@ def new_collaborator(req, podcast_slug):
     if req.user == user:
         return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?collaberr=yourself#settings,collabs')
 
-    if Collaborator.objects.filter(collaborator=user).count():
+    if Collaborator.objects.filter(collaborator=user, podcast=pod).count():
         return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#settings,collabs')
 
     c = Collaborator(podcast=pod, collaborator=user)
