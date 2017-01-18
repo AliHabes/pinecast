@@ -198,6 +198,7 @@ def import_result(req):
 
     if req.POST.get('failed'):
         p.failure_message = req.POST.get('error')
+        p.failed = True
         p.save()
         return {'success': True}
 
