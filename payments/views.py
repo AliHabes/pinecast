@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 
 import json
+import sys
 import time
 
 import iso8601
@@ -119,7 +120,7 @@ def set_payment_method_redir(req):
     except stripe.error.CardError as e:
         return redirect(next_url + '?error=crej#settings')
     except Exception as e:
-        rollbar.report_message(str(e), 'error')
+        rollbar.report_exc_info(sys.exc_info(), req)
         return redirect(next_url + '?error=cerr#settings')
 
     return redirect(next_url)

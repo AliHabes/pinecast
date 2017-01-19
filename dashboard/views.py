@@ -6,6 +6,7 @@ import datetime
 import hashlib
 import hmac
 import json
+import sys
 import time
 import urllib.request
 import uuid
@@ -329,7 +330,7 @@ def podcast_new_ep(req, podcast_slug):
             prompt = EpisodeFeedbackPrompt(episode=ep, prompt=req.POST.get('feedback_prompt'))
             prompt.save()
     except Exception as e:
-        rollbar.report_message(str(e), 'error')
+        rollbar.report_exc_info(sys.exc_info(), req)
         ctx['error'] = True
         ctx['default'] = req.POST
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)

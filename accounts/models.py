@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import datetime
+import sys
 
 import rollbar
 from django.contrib.auth.models import User
@@ -95,7 +96,7 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
             try:
                 existing_sub.save()
             except Exception as e:
-                rollbar.report_message(str(e), 'error')
+                rollbar.report_exc_info(sys.exc_info())
                 return 'card_error'
         else:
             try:
@@ -105,7 +106,7 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
             except stripe.error.CardError:
                 return 'card_error'
             except Exception as e:
-                rollbar.report_message(str(e), 'error')
+                rollbar.report_exc_info(sys.exc_info())
                 return 'card_error'
 
         self.plan = new_plan_val

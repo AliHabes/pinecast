@@ -3,6 +3,7 @@ from __future__ import division
 
 import datetime
 import json
+import sys
 import time
 import uuid
 
@@ -94,7 +95,7 @@ def start_import(req):
                 p.delete()
             except Exception:
                 pass
-        rollbar.report_message(str(e), 'error')
+        rollbar.report_exc_info(sys.exc_info(), req)
         return {'error': ugettext('There was a problem saving the podcast: %s') % str(e)}
 
     created_items = []
@@ -142,7 +143,7 @@ def start_import(req):
                 i.delete()
             except Exception:
                 pass
-        rollbar.report_message(str(e), 'error')
+        rollbar.report_exc_info(sys.exc_info(), req)
         return {'error': ugettext('There was a problem saving the podcast items: %s') % str(e)}
 
     for ir in asset_requests:
