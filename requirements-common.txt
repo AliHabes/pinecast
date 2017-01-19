@@ -12,7 +12,7 @@ Jinja2==2.8
 MarkupSafe==0.23
 PyYAML==3.12
 requests==2.11.1
-rollbar==0.13.8
+rollbar==0.13.9
 stripe==1.41.1
 ua-parser==0.5.1
 user-agents==1.0.1
