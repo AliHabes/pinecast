@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import collections
 import datetime
 from functools import wraps
 
@@ -50,6 +51,17 @@ def restrict(minimum_plan):
     return wrapped
 
 
+SPECIFIC_LOCATION_TIMEFRAMES = ['day', 'yesterday', 'week', 'month']
+
+def specific_location_timeframe(view):
+    @wraps(view)
+    def wrapped(req, *args, **kwargs):
+        if req.GET.get('timeframe', 'day') not in SPECIFIC_LOCATION_TIMEFRAMES:
+            return HttpResponseBadRequest()
+        result = view(req, *args, **kwargs)
+        return result
+    return wrapped
+
 @restrict(plans.PLAN_PRO)
 def podcast_subscriber_locations(req, pod):
     f = (Format(req, 'subscription-country')
@@ -60,6 +72,16 @@ def podcast_subscriber_locations(req, pod):
 
     return f.format_country()
 
+@restrict(plans.PLAN_PRO)
+@specific_location_timeframe
+def podcast_subscriber_locations_specific(req, pod, country):
+    f = (Format(req, 'subscription-country')
+            .select(ip=True)
+            .where(podcast=str(pod.id), country=country)
+            .during('yesterday'))
+
+    counted_ips = collections.Counter(f.get_resulting_values(['ip']))
+    #
 
 @restrict(plans.FEATURE_MIN_GEOANALYTICS)
 def podcast_listener_locations(req, pod):
@@ -158,7 +180,6 @@ def episode_listen_breakdown(req, pod):
     return f.format_breakdown(SOURCE_MAP)
 
 
-@login_required
 @json_response
 def network_listen_history(req):
     net = get_object_or_404(Network, id=req.GET.get('network_id'), members__in=[req.user])
@@ -177,7 +198,6 @@ def network_listen_history(req):
         extra_data={str(p.id): {'slug': p.slug} for p in pods})
 
 
-@login_required
 @restrict(plans.PLAN_PRO)
 def podcast_top_episodes(req, pod):
     timeframe = req.GET.get('timeframe')

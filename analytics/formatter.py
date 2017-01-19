@@ -46,7 +46,7 @@ IGNORE_TZ_OFFSET = {
 dtnow = datetime.datetime.now
 
 def select_format(k, v):
-    if isinstance(v, bool) and v:
+    if isinstance(v, bool) and v or v is None:
         return ident(k)
 
     if v == 'count':
@@ -271,3 +271,12 @@ class Format(object):
             (_, tags), v in
             self.res.items()
         ))
+
+    def get_resulting_values(self, fields):
+        if not self.res: self._process()
+        if not self.res: return []
+
+        return (
+            {f: x[v] for f, v in fields} for
+            x in
+            self.res.get_points())
