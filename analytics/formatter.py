@@ -272,6 +272,12 @@ class Format(object):
             self.res.items()
         ))
 
+    def get_resulting_value(self, field):
+        if not self.res: self._process()
+        if not self.res: return []
+
+        return (x[field] for x in self.res.get_points())
+
     def get_resulting_values(self, fields):
         if not self.res: self._process()
         if not self.res: return []

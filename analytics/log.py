@@ -5,13 +5,13 @@ import datetime
 import hashlib
 import json
 
-import requests
 import rollbar
 from django.conf import settings
 
 from .analyze import get_device_type, get_request_hash, get_request_ip, get_ts_hash, is_bot
 from .influx import get_client
 from .query import total_listens
+from .util import get_country
 from notifications.models import NotificationHook
 from pinecast.types import StringTypes
 
@@ -41,22 +41,6 @@ def write_influx_many(db, items):
         rollbar.report_message('Problem delivering logs to influx: %s' % e, 'error')
         return None
 
-def _get_country(ip, req=None):
-    if req and req.META.get('HTTP_CF_IPCOUNTRY'):
-        return req.META.get('HTTP_CF_IPCOUNTRY').upper()
-    if ip == '127.0.0.1':
-        return 'US'
-    try:
-        res = requests.post('https://geoip.service.pinecast.com/bulk', json=[ip], timeout=4)
-        parsed = res.json()
-        if not parsed:
-            return None
-        print(parsed)
-        return parsed[0]['code']
-    except Exception as e:
-        rollbar.report_message('[pinecast geoip] Error resolving country IP (%s): %s' % (ip, str(e)), 'error')
-        return None
-
 
 def write_listen(*args, **kwargs):
     obj = get_listen_obj(*args, **kwargs)
@@ -75,7 +59,7 @@ def get_listen_obj(ep, source, req=None, ip=None, ua=None, timestamp=None):
     pod_id = str(ep.podcast.id)
 
     browser, device, os = get_device_type(req=req, ua=ua)
-    country = _get_country(ip, req)
+    country = get_country(ip, req)
 
     base_tags = {
         'podcast': pod_id,
@@ -221,7 +205,7 @@ def write_subscription(req, podcast, ts=None, dry_run=False):
         pod_id = str(podcast.id)
 
     browser, device, os = get_device_type(req=req, ua=ua)
-    country = _get_country(ip, req)
+    country = get_country(ip, req)
 
     influx_ts = ts or datetime.datetime.combine(datetime.date.today(), datetime.time.min)
     hashed_influx_ts = influx_ts + datetime.timedelta(microseconds=get_ts_hash(ip, ua, influx_ts))

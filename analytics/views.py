@@ -12,6 +12,7 @@ from django.utils.translation import ugettext, ugettext_lazy
 import accounts.payment_plans as plans
 from . import query
 from .formatter import Format
+from .util import geoip_lookup_bulk
 from accounts.models import Network, UserSettings
 from dashboard.views import get_podcast
 from pinecast.helpers import get_object_or_404, json_response, reverse
@@ -62,6 +63,16 @@ def specific_location_timeframe(view):
         return result
     return wrapped
 
+def format_ip_list(ip_counts):
+    lookups = geoip_lookup_bulk([x for x, _ in ip_counts])
+    return {
+        ip: dict(count=count, **lookups[i]) for
+        i, (ip, count) in
+        enumerate(ip_counts) if
+        lookups[i]
+    }
+
+
 @restrict(plans.PLAN_PRO)
 def podcast_subscriber_locations(req, pod):
     f = (Format(req, 'subscription-country')
@@ -74,14 +85,15 @@ def podcast_subscriber_locations(req, pod):
 
 @restrict(plans.PLAN_PRO)
 @specific_location_timeframe
-def podcast_subscriber_locations_specific(req, pod, country):
+def podcast_subscriber_locations_specific(req, pod, iso_code):
     f = (Format(req, 'subscription-country')
             .select(ip=True)
-            .where(podcast=str(pod.id), country=country)
+            .where(podcast=str(pod.id), country=iso_code)
             .during('yesterday'))
 
-    counted_ips = collections.Counter(f.get_resulting_values(['ip']))
-    #
+    counted_ips = collections.Counter(f.get_resulting_value('ip'))
+    most_common = counted_ips.most_common(200)
+    return format_ip_list(most_common)
 
 @restrict(plans.FEATURE_MIN_GEOANALYTICS)
 def podcast_listener_locations(req, pod):
@@ -93,6 +105,18 @@ def podcast_listener_locations(req, pod):
 
     return f.format_country(label=ugettext('Listeners'))
 
+@restrict(plans.PLAN_PRO)
+@specific_location_timeframe
+def podcast_listener_locations_specific(req, pod, iso_code):
+    f = (Format(req, 'listen-country')
+            .select(ip=True)
+            .where(podcast=str(pod.id), country=iso_code)
+            .during('yesterday'))
+
+    counted_ips = collections.Counter(f.get_resulting_value('ip'))
+    most_common = counted_ips.most_common(200)
+    return format_ip_list(most_common)
+
 @restrict(plans.FEATURE_MIN_GEOANALYTICS_EP)
 def episode_listener_locations(req, pod):
     ep = get_object_or_404(PodcastEpisode, podcast=pod, id=req.GET.get('episode'))
@@ -102,6 +126,19 @@ def episode_listener_locations(req, pod):
             .group('country'))
 
     return f.format_country(label=ugettext('Listeners'))
+
+@restrict(plans.PLAN_PRO)
+@specific_location_timeframe
+def episode_listener_locations_specific(req, pod, iso_code):
+    ep = get_object_or_404(PodcastEpisode, podcast=pod, id=req.GET.get('episode'))
+    f = (Format(req, 'listen-country')
+            .select(ip=True)
+            .where(episode=str(ep.id), country=iso_code)
+            .during('yesterday'))
+
+    counted_ips = collections.Counter(f.get_resulting_value('ip'))
+    most_common = counted_ips.most_common(200)
+    return format_ip_list(most_common)
 
 
 @restrict(plans.PLAN_DEMO)

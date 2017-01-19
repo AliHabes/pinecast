@@ -7,6 +7,7 @@ from . import views
 
 urlpatterns = [
     url(r'^podcast-subscriber-locations$', views.podcast_subscriber_locations),
+    url(r'^podcast-subscriber-locations/(?P<iso_code>[A-Z0-9]{2})$', views.podcast_subscriber_locations_specific),
     url(r'^podcast-listener-locations$', views.podcast_listener_locations),
     url(r'^episode-listener-locations$', views.episode_listener_locations),
     url(r'^podcast-subscriber-history$', views.podcast_subscriber_history),
