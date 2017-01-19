@@ -350,7 +350,7 @@ def edit_podcast_episode(req, podcast_slug, episode_id):
         ep.subtitle = req.POST.get('subtitle')
         ep.publish = publish_parsed
         ep.description = req.POST.get('description')
-        ep.duration = int(req.POST.get('duration-hours')) * 3600 + int(req.POST.get('duration-minutes')) * 60 + int(req.POST.get('duration-seconds'))
+        ep.duration = int(req.POST.get('duration-hours') or 0) * 3600 + int(req.POST.get('duration-minutes') or 0) * 60 + int(req.POST.get('duration-seconds') or 0)
 
         ep.audio_url = signer.unsign(req.POST.get('audio-url'))
         ep.audio_size = int(req.POST.get('audio-url-size'))

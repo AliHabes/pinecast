@@ -108,7 +108,7 @@ def start_import(req):
                 subtitle=item.get('subtitle', '')[:1023],
                 publish=datetime.datetime.fromtimestamp(time.mktime(time_tup)),
                 description=item.get('description', ''),
-                duration=int(item.get('duration', '0')),
+                duration=int(item.get('duration', '0') or 0),
                 audio_url=item.get('audio_url', '')[:512],
                 audio_size=int(item.get('audio_size', '0')),
                 audio_type=item.get('audio_type', 'audio/mp3')[:64],
