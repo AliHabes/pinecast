@@ -65,12 +65,14 @@ def specific_location_timeframe(view):
 
 def format_ip_list(ip_counts):
     lookups = geoip_lookup_bulk([x for x, _ in ip_counts])
-    return {
-        ip: dict(count=count, **lookups[i]) for
-        i, (ip, count) in
-        enumerate(ip_counts) if
-        lookups[i]
-    }
+    geo_index = {(x['lat'], x['lon']): x for x in lookups if x and x['zip']}
+    c = collections.Counter()
+    for i, x in enumerate(lookups):
+        if not x or not x['zip']:
+            continue
+        c[(x['lat'], x['lon'])] += ip_counts[i][1]
+
+    return [dict(count=count, **geo_index[coord]) for coord, count in c.items()]
 
 
 @restrict(plans.PLAN_PRO)
@@ -91,7 +93,8 @@ def podcast_subscriber_locations_specific(req, pod, iso_code):
             .where(podcast=str(pod.id), country=iso_code)
             .during('yesterday'))
 
-    counted_ips = collections.Counter(f.get_resulting_value('ip'))
+    # counted_ips = collections.Counter(f.get_resulting_value('ip'))
+    counted_ips = collections.Counter(['8.8.8.8', '8.8.8.9', '121.25.113.6'])
     most_common = counted_ips.most_common(200)
     return format_ip_list(most_common)
 
