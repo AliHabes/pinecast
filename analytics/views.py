@@ -75,7 +75,7 @@ def format_ip_list(formatter, label):
             continue
         c[(x['lat'], x['lon'])] += ip_counts[i][1]
 
-    return [dict(count=count, **geo_index[coord], label=geo_index[label]) for coord, count in c.items()]
+    return [dict(count=count, **geo_index[coord], label=geo_index[coord][label]) for coord, count in c.items()]
 
 
 @restrict(plans.PLAN_PRO)
