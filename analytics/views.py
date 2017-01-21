@@ -63,7 +63,7 @@ def specific_location_timeframe(view):
         return result
     return wrapped
 
-def format_ip_list(formatter):
+def format_ip_list(formatter, label):
     ip_counter = collections.Counter(formatter.get_resulting_value('ip'))
     ip_counts = ip_counter.most_common(200)
 
@@ -75,7 +75,7 @@ def format_ip_list(formatter):
             continue
         c[(x['lat'], x['lon'])] += ip_counts[i][1]
 
-    return [dict(count=count, **geo_index[coord]) for coord, count in c.items()]
+    return [dict(count=count, **geo_index[coord], label=geo_index[label]) for coord, count in c.items()]
 
 
 @restrict(plans.PLAN_PRO)
@@ -95,7 +95,7 @@ def podcast_subscriber_locations_specific(req, pod, iso_code):
             .select(ip=True)
             .where(podcast=str(pod.id), country=iso_code)
             .during('yesterday'))
-    return format_ip_list(f)
+    return format_ip_list(f, 'city')
 
 @restrict(plans.FEATURE_MIN_GEOANALYTICS)
 def podcast_listener_locations(req, pod):
@@ -114,7 +114,7 @@ def podcast_listener_locations_specific(req, pod, iso_code):
             .select(ip=True)
             .where(podcast=str(pod.id), country=iso_code)
             .during('yesterday'))
-    return format_ip_list(f)
+    return format_ip_list(f, 'city')
 
 @restrict(plans.FEATURE_MIN_GEOANALYTICS_EP)
 def episode_listener_locations(req, pod):
@@ -134,7 +134,7 @@ def episode_listener_locations_specific(req, pod, iso_code):
             .select(ip=True)
             .where(episode=str(ep.id), country=iso_code)
             .during('yesterday'))
-    return format_ip_list(f)
+    return format_ip_list(f, 'city')
 
 
 @restrict(plans.PLAN_DEMO)
@@ -221,6 +221,24 @@ def network_listen_history(req):
 
     f = (Format(req, 'listen')
             .select(episode_f='count')
+            .last_thirty()
+            .interval()
+            .group('podcast')
+            .where(podcast=[str(p.id) for p in pods]))
+
+    return f.format_intervals(
+        labels_map={str(p.id): p.name for p in pods},
+        extra_data={str(p.id): {'slug': p.slug} for p in pods})
+
+
+@json_response
+def network_subscriber_history(req):
+    net = get_object_or_404(Network, id=req.GET.get('network_id'), members__in=[req.user])
+
+    pods = net.podcast_set.all()
+
+    f = (Format(req, 'subscription')
+            .select(podcast_f='count')
             .last_thirty()
             .interval()
             .group('podcast')

@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^podcast-top-episodes$', views.podcast_top_episodes),
 
     url(r'^network-listen-history$', views.network_listen_history),
+    url(r'^network-subscriber-history$', views.network_subscriber_history),
 ]
