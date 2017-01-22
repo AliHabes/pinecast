@@ -60,7 +60,7 @@
         </tr>
       {% endmacro %}
 
-      {% if get_user_settings(podcast.owner).plan == PLANS.PLAN_DEMO or user_settings.plan == PLANS.PLAN_DEMO %}
+      {% if get_user_settings(podcast.owner).plan == PLANS.PLAN_DEMO %}
         {% for ep in episodes[:10] %}
           {{ episode(ep) }}
         {% endfor %}
@@ -71,19 +71,13 @@
       {% endif %}
     </tbody>
   </table>
-  {% if get_user_settings(podcast.owner).plan == PLANS.PLAN_DEMO or user_settings.plan == PLANS.PLAN_DEMO %}
+  {% if get_user_settings(podcast.owner).plan == PLANS.PLAN_DEMO %}
     <div class="upgrade-empty-state empty-state">
       {% if user == podcast.owner and user_settings.plan == PLANS.PLAN_DEMO %}
         {% trans %}
           Because you are using a demo account, only the ten most recent episodes are shown. Older episodes will also be hidden from the podcast feed.
           <br>
           <b>Upgrade to a paid account to avoid this.</b>
-        {% endtrans %}
-        <br>
-        <a class="btn" href="{{ url('upgrade') }}">{{ _('Upgrade Now') }}</a>
-      {% elif user_settings.plan == PLANS.PLAN_DEMO %}
-        {% trans %}
-          Because you are using a demo account, you can only see a maximum of ten episodes. After ten episodes have been uploaded, the oldest episodes will be hidden. To see all of the episodes, upgrade to a paid plan.
         {% endtrans %}
         <br>
         <a class="btn" href="{{ url('upgrade') }}">{{ _('Upgrade Now') }}</a>
