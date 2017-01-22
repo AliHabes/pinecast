@@ -8,8 +8,7 @@ from django.utils.translation import ugettext
 
 from . import query
 from .constants import influx_databases, USER_TIMEFRAMES
-from .influx import get_client
-from .util import escape, ident
+from .influx import escape, get_client, ident
 from accounts.models import UserSettings
 from pinecast.types import StringTypes
 
@@ -51,6 +50,8 @@ def select_format(k, v):
 
     if v == 'count':
         return 'COUNT(%s)' % ident(k)
+    elif v == 'distinct':
+        return 'DISTINCT(%s)' % ident(k)
 
     raise Exception('Unknown selector %s' % v)
 
@@ -83,6 +84,7 @@ class Format(object):
         self.selection = {}
         self.criteria = {}
         self.timeframe = None
+        self.force_timeframe = False
         self.interval_val = None
         self.group_by = None
         self.res = None
@@ -99,12 +101,16 @@ class Format(object):
         self.group_by = by
         return self
 
-    def during(self, timeframe=None, **kwargs):
+    def during(self, timeframe=None, force=False, **kwargs):
         self.timeframe = timeframe or kwargs
+        if force:
+            self.force_timeframe = True
         return self
 
-    def last_thirty(self):
+    def last_thirty(self, force=False):
         self.timeframe = 'month'
+        if force:
+            self.force_timeframe = True
         return self
 
     def interval(self, value=None):
@@ -139,7 +145,9 @@ class Format(object):
 
         if self.timeframe:
             tf = USER_TIMEFRAMES.get(
-                self.req.GET.get('timeframe', self.timeframe),
+                self.req.GET.get('timeframe', self.timeframe) if
+                    not self.force_timeframe else
+                    self.timeframe,
                 lambda tz: None)(tz)
             if tf:
                 if where:
@@ -286,3 +294,7 @@ class Format(object):
             {f: x[v] for f, v in fields} for
             x in
             self.res.get_points())
+
+    def get_resulting_groups(self):
+        if not self.res: self._process()
+        return [groupings[self.group_by] for _, groupings in self.res.keys()]

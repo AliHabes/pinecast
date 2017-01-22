@@ -10,7 +10,7 @@
 
 <hr>
 
-{% set collaborators = list(podcast.collaborators.all()) %}
+{% set collaborators = list(podcast.collaborators.all().select_related('collaborator')) %}
 
 {% if collaborators %}
   <strong>{{ _('Existing Notifications') }}</strong>

@@ -6,8 +6,7 @@ import json
 from django.conf import settings
 
 from .constants import USER_TIMEFRAMES
-from .influx import get_client
-from .util import escape, ident
+from .influx import escape, get_client, ident
 from pinecast.types import StringTypes
 
 

@@ -2,25 +2,46 @@ from __future__ import absolute_import
 
 from django.conf.urls import url
 
-from . import views
+from . import views, views_episode, views_network
 
 
 urlpatterns = [
+    # New
+    url(r'^podcast/listens$', views.podcast_listen_history),
+    url(r'^podcast/listens/location$', views.podcast_listener_locations),
+    url(r'^podcast/listens/location/options$', views.podcast_listener_locations_specific_source),
+    url(r'^podcast/listens/location/(?P<iso_code>[A-Z0-9]{2})$', views.podcast_listener_locations_specific),
+    url(r'^podcast/listens/breakdown$', views.podcast_listen_breakdown),
+    url(r'^podcast/listens/agent$', views.podcast_listen_platform_breakdown),
+    url(r'^podcast/listens/os$', views.podcast_listen_os_breakdown),
+    url(r'^podcast/listens/top-episodes$', views.podcast_top_episodes),
+    url(r'^podcast/subscribers$', views.podcast_subscriber_history),
+    url(r'^podcast/subscribers/location$', views.podcast_subscriber_locations),
+    url(r'^podcast/subscribers/location/options$', views.podcast_subscriber_locations_specific_source),
+    url(r'^podcast/subscribers/location/(?P<iso_code>[A-Z0-9]{2})$', views.podcast_subscriber_locations_specific),
+
+    url(r'^episode/listens$', views_episode.episode_listen_history),
+    url(r'^episode/listens/breakdown$', views_episode.episode_listen_breakdown),
+    url(r'^episode/listens/location$', views_episode.episode_listener_locations),
+    url(r'^episode/listens/location/(?P<iso_code>[A-Z0-9]{2})$', views_episode.episode_listener_locations_specific),
+
+    url(r'^network/listens$', views_network.network_listen_history),
+    url(r'^network/subscribers$', views_network.network_subscriber_history),
+
+    # Legacy
     url(r'^podcast-subscriber-locations$', views.podcast_subscriber_locations),
-    url(r'^podcast-subscriber-locations/(?P<iso_code>[A-Z0-9]{2})$', views.podcast_subscriber_locations_specific),
     url(r'^podcast-listener-locations$', views.podcast_listener_locations),
-    url(r'^podcast-listener-locations/(?P<iso_code>[A-Z0-9]{2})$', views.podcast_listener_locations_specific),
-    url(r'^episode-listener-locations$', views.episode_listener_locations),
-    url(r'^episode-listener-locations/(?P<iso_code>[A-Z0-9]{2})$', views.episode_listener_locations_specific),
-    url(r'^podcast-subscriber-history$', views.podcast_subscriber_history),
     url(r'^podcast-listen-history$', views.podcast_listen_history),
-    url(r'^episode-listen-history$', views.episode_listen_history),
+    url(r'^podcast-subscriber-history$', views.podcast_subscriber_history),
     url(r'^podcast-listen-breakdown$', views.podcast_listen_breakdown),
     url(r'^podcast-listen-platform-breakdown$', views.podcast_listen_platform_breakdown),
-    url(r'^episode-listen-breakdown$', views.episode_listen_breakdown),
-
+    url(r'^podcast-listen-os-breakdown$', views.podcast_listen_os_breakdown),
     url(r'^podcast-top-episodes$', views.podcast_top_episodes),
 
-    url(r'^network-listen-history$', views.network_listen_history),
-    url(r'^network-subscriber-history$', views.network_subscriber_history),
+    url(r'^episode-listen-history$', views_episode.episode_listen_history),
+    url(r'^episode-listen-breakdown$', views_episode.episode_listen_breakdown),
+    url(r'^episode-listener-locations$', views_episode.episode_listener_locations),
+
+    url(r'^network-listen-history$', views_network.network_listen_history),
+
 ]

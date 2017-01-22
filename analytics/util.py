@@ -1,21 +1,17 @@
-from __future__ import absolute_import
+import collections
+import json
+import os.path
 
 import requests
 import rollbar
+from functools import wraps
 
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
+
+import accounts.payment_plans as plans
+from accounts.models import UserSettings
+from dashboard.views import get_podcast
 from pinecast.types import StringTypes
-
-
-def escape(val):
-    if isinstance(val, StringTypes):
-        return "'%s'" % val.replace("'", "\\'")
-    elif isinstance(val, (int, float)):
-        return str(val)
-
-    raise Exception('Unknown type %s' % type(val))
-
-def ident(val):
-    return '"%s"' % val.replace('"', '\\"')
 
 
 def get_country(ip, req=None):
@@ -33,3 +29,58 @@ def geoip_lookup_bulk(ips):
     except Exception as e:
         rollbar.report_message('[pinecast geoip] Error resolving country IP (%s): %s' % (ip, str(e)), 'error')
         return None
+
+
+def restrict(minimum_plan):
+    def wrapped(view):
+        @wraps(view)
+        def wrapper(*args, **kwargs):
+            req = args[0]
+            if not req.user:
+                return HttpResponseForbidden()
+
+            pod = get_podcast(req, req.GET.get('podcast'))
+
+            uset = UserSettings.get_from_user(pod.owner)
+            if (not plans.minimum(uset.plan, minimum_plan) and
+                not req.user.is_staff):
+                return HttpResponseForbidden()
+
+            resp = view(req, pod, *args[1:], **kwargs)
+            if not isinstance(resp, (dict, list, bool, int, float) + StringTypes) and resp is not None:
+                # Handle HttpResponse/HttpResponseBadRequest/etc
+                return resp
+            return JsonResponse(resp, safe=False)
+        return wrapper
+    return wrapped
+
+
+SPECIFIC_LOCATION_TIMEFRAMES = ['day', 'yesterday', 'week', 'month']
+
+def specific_location_timeframe(view):
+    @wraps(view)
+    def wrapped(req, *args, **kwargs):
+        if req.GET.get('timeframe', 'day') not in SPECIFIC_LOCATION_TIMEFRAMES:
+            return HttpResponseBadRequest()
+        result = view(req, *args, **kwargs)
+        return result
+    return wrapped
+
+
+def format_ip_list(formatter, label):
+    ip_counter = collections.Counter(formatter.get_resulting_value('ip'))
+    ip_counts = ip_counter.most_common(200)
+
+    lookups = geoip_lookup_bulk([x for x, _ in ip_counts])
+    geo_index = {(x['lat'], x['lon']): x for x in lookups if x and x['zip']}
+    c = collections.Counter()
+    for i, x in enumerate(lookups):
+        if not x or not x['zip']:
+            continue
+        c[(x['lat'], x['lon'])] += ip_counts[i][1]
+
+    return [dict(count=count, **geo_index[coord], label=geo_index[coord][label]) for coord, count in c.items()]
+
+
+country_codes = json.load(open(os.path.join(os.path.dirname(__file__), 'country_codes.json')))
+country_code_map = {x['Code']: x['Name'] for x in country_codes}

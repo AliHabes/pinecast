@@ -3,8 +3,9 @@ from __future__ import absolute_import
 from datetime import datetime, timedelta
 
 from django.conf import settings
+from django.utils.translation import ugettext_lazy
 
-from .util import escape
+from .influx import escape
 
 
 TIME_MIN = '1677-09-21T00:12:43.145224194Z'
@@ -16,6 +17,13 @@ influx_databases = {
     'listen-country': settings.INFLUXDB_DB_LISTEN,
     'listen-platform': settings.INFLUXDB_DB_LISTEN,
     'notification': settings.INFLUXDB_DB_NOTIFICATION,
+}
+
+SOURCE_MAP = {
+    'direct': ugettext_lazy('Direct'),
+    'rss': ugettext_lazy('Subscription'),
+    'embed': ugettext_lazy('Player'),
+    None: ugettext_lazy('Unknown'),
 }
 
 def dtnow(tz):
