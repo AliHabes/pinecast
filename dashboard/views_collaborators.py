@@ -22,7 +22,7 @@ def new_collaborator(req, podcast_slug):
         raise Http404
 
     try:
-        user = User.objects.get(email=req.POST.get('email'))
+        user = User.objects.get(email__iexact=req.POST.get('email'))
     except User.DoesNotExist:
         return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '?collaberr=collab_dne#settings,collabs')
 
