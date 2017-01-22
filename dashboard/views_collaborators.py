@@ -18,7 +18,7 @@ from pinecast.helpers import reverse
 @restrict_minimum_plan(payment_plans.FEATURE_MIN_COLLABORATORS)
 def new_collaborator(req, podcast_slug):
     pod = get_podcast(req, podcast_slug)
-    if pod.owner != req.user:
+    if pod.owner != req.user and not req.user.is_staff:
         raise Http404
 
     try:
@@ -43,7 +43,7 @@ def new_collaborator(req, podcast_slug):
 @restrict_minimum_plan(payment_plans.FEATURE_MIN_COLLABORATORS)
 def delete_collaborator(req, podcast_slug):
     pod = get_podcast(req, podcast_slug)
-    if pod.owner != req.user:
+    if pod.owner != req.user and not req.user.is_staff:
         raise Http404
 
     try:
