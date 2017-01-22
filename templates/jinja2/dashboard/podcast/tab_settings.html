@@ -6,7 +6,7 @@
     <li>
       <a href="" data-tab=".tab-notifications">{{ _('Notifications') }}</a>
     </li>
-    {% if podcast.owner == user %}
+    {% if podcast.owner == user or user.is_staff %}
     <li>
       <a href="" data-tab=".tab-collabs">{{ _('Collaborators') }}</a>
     </li>
@@ -52,7 +52,7 @@
   {% endif %}
 </div>
 
-{% if podcast.owner == user %}
+{% if podcast.owner == user or user.is_staff %}
   <div class="tab-collabs form-block" style="display: none">
     <strong>
       {{ _('Collaborators')}}
@@ -75,7 +75,7 @@
   </div>
 {% endif %}
 
-{% if podcast.owner == user %}
+{% if podcast.owner == user or user.is_staff %}
   <div class="tab-delete form-block" style="display: none">
     {% include "dashboard/podcast/tab_settings_delete.html" %}
   </div>
