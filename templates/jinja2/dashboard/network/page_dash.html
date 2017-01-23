@@ -33,12 +33,11 @@
 <div class="tab-overview">
   {% if len(net_podcasts) %}
     <div class="card-block card">
-      <div class="chart-placeholder"
-        data-type="network-listen-history"
-        data-extra="network_id={{ network.id }}"
-        data-title="{{ _('Listen history') }}"
-        data-chart-type="line"
-        data-has-legend="true"></div>
+      <div class="analytics-dash"
+        data-network="{{ network.id }}"
+        data-is-starter="true"
+        data-is-pro="true"
+        data-upgrade-url="{{ url('upgrade') }}"></div>
     </div>
 
     {% if upcoming_episodes %}

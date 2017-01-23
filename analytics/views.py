@@ -108,12 +108,9 @@ def podcast_listen_breakdown(req, pod):
 
 @restrict(plans.PLAN_STARTER)
 def podcast_listen_platform_breakdown(req, pod):
-    breakdown_type = req.GET.get('breakdown_type', 'browser')
-    if breakdown_type not in ['browser', 'os']: raise Http404()
-
     f = (Format(req, 'listen-platform')
             .select(podcast_f='count')
-            .group(breakdown_type)
+            .group('browser')
             .last_thirty()
             .where(podcast=str(pod.id)))
 
