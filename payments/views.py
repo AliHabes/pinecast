@@ -83,6 +83,9 @@ def set_coupon(req):
     except stripe.error.InvalidRequestError:
         return redirect(reverse('upgrade') + '?coupon_invalid')
 
+    if not coupon.valid:
+        return redirect(reverse('upgrade') + '?coupon_invalid')
+
     if 'owner_id' in coupon.metadata:
         us = UserSettings.get_from_user(req.user)
         if us.plan != payment_plans.PLAN_DEMO:
