@@ -7,7 +7,7 @@ from django.utils.translation import ugettext
 import accounts.payment_plans as plans
 from .constants import SOURCE_MAP
 from .formatter import Format
-from .util import format_ip_list, restrict, specific_location_timeframe
+from .util import country_code_map, format_ip_list, restrict, specific_location_timeframe
 from pinecast.helpers import get_object_or_404
 from podcasts.models import PodcastEpisode
 
@@ -29,7 +29,19 @@ def episode_listener_locations(req, pod, ep):
             .where(episode=str(ep.id))
             .group('country'))
 
-    return f.format_country(label=ugettext('Listeners'))
+    return f.format_country(label=ugettext('Listens'))
+
+
+@restrict(plans.PLAN_PRO)
+@requires_episode
+def episode_listener_locations_specific_source(req, pod, ep):
+    return {x: country_code_map[x] for x in
+            Format(req, 'listen-country')
+                .select(v='distinct')
+                .where(episode=str(ep.id))
+                .during('sixmonth', force=True)
+                .group('country')
+                .get_resulting_groups()}
 
 @restrict(plans.PLAN_PRO)
 @specific_location_timeframe

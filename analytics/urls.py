@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^episode/listens$', views_episode.episode_listen_history),
     url(r'^episode/listens/breakdown$', views_episode.episode_listen_breakdown),
     url(r'^episode/listens/location$', views_episode.episode_listener_locations),
+    url(r'^episode/listens/location/options$', views_episode.episode_listener_locations_specific_source),
     url(r'^episode/listens/location/(?P<iso_code>[A-Z0-9]{2})$', views_episode.episode_listener_locations_specific),
 
     url(r'^network/listens$', views_network.network_listen_history),
