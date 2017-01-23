@@ -72,7 +72,9 @@ def format_ip_list(formatter, label):
     ip_counts = ip_counter.most_common(200)
 
     lookups = geoip_lookup_bulk([x for x, _ in ip_counts])
-    geo_index = {(x['lat'], x['lon']): x for x in lookups if x and x['zip']}
+    geo_index = {
+        (x['lat'], x['lon']): dict(**x, lat=float(x['lat']), lon=float(x['lon'])) for
+        x in lookups if x and x['zip']}
     c = collections.Counter()
     for i, x in enumerate(lookups):
         if not x or not x['zip']:
