@@ -1,14 +1,13 @@
-from __future__ import absolute_import
-
 import datetime
 import re
 
 from django.conf import settings
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext, ugettext_lazy
 
 from . import query
 from .constants import influx_databases, USER_TIMEFRAMES
 from .influx import escape, get_client, ident
+from .util import country_code_map
 from accounts.models import UserSettings
 from pinecast.types import StringTypes
 
@@ -194,15 +193,15 @@ class Format(object):
         sformat = '%H:%M' if interval_duration < DELTAS['daily'] else '%x'
         return [x.strftime(sformat) for x in self._get_parsed_dates(points)]
 
-    def format_country(self, label=None):
+    def format_country(self, label=ugettext_lazy('Series')):
         if not self.res: self._process()
         if not self.res: return []
 
-        header = [[ugettext('Country'), label or ugettext('Subscribers')]]
+        header = [[ugettext('Country Code'), ugettext('Country'), label]]
         key, value_key = self._get_keys()
 
         return header + [
-            [tags[key], list(v)[0][value_key]] for
+            [tags[key], country_code_map[tags[key]], list(v)[0][value_key]] for
             (_, tags), v in
             self.res.items()
         ]

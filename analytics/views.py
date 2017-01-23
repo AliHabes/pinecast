@@ -20,7 +20,7 @@ def podcast_subscriber_locations(req, pod):
             .during('yesterday')
             .group('country'))
 
-    return f.format_country()
+    return f.format_country(label=ugettext('Subscribers'))
 
 
 @restrict(plans.PLAN_PRO)
