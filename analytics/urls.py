@@ -29,20 +29,4 @@ urlpatterns = [
     url(r'^network/listens$', views_network.network_listen_history),
     url(r'^network/subscribers$', views_network.network_subscriber_history),
 
-    # Legacy
-    url(r'^podcast-subscriber-locations$', views.podcast_subscriber_locations),
-    url(r'^podcast-listener-locations$', views.podcast_listener_locations),
-    url(r'^podcast-listen-history$', views.podcast_listen_history),
-    url(r'^podcast-subscriber-history$', views.podcast_subscriber_history),
-    url(r'^podcast-listen-breakdown$', views.podcast_listen_breakdown),
-    url(r'^podcast-listen-platform-breakdown$', views.podcast_listen_platform_breakdown),
-    url(r'^podcast-listen-os-breakdown$', views.podcast_listen_os_breakdown),
-    url(r'^podcast-top-episodes$', views.podcast_top_episodes),
-
-    url(r'^episode-listen-history$', views_episode.episode_listen_history),
-    url(r'^episode-listen-breakdown$', views_episode.episode_listen_breakdown),
-    url(r'^episode-listener-locations$', views_episode.episode_listener_locations),
-
-    url(r'^network-listen-history$', views_network.network_listen_history),
-
 ]
