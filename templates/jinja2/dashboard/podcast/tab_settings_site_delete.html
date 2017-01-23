@@ -7,13 +7,13 @@
 </p>
 
 <p>{{ _('If you\'re sure you wish to do this, enter the slug of the podcast in the box below.') }}</p>
-<form action="{{ url('delete_site', podcast_slug=site.podcast.slug) }}" method="post">
+<form action="{{ url('delete_site', podcast_slug=podcast.slug) }}" method="post">
 
   <label class="col">
     <span>{{ _('Podcast Slug') }}</span>
     <input class="confirm-delete"
       data-confirming=".delete-confirm-button-site"
-      type="text" maxlength="512" placeholder="{{ site.podcast.slug }}" name="slug" required pattern="{{ site.podcast.slug }}">
+      type="text" maxlength="512" placeholder="{{ podcast.slug }}" name="slug" required pattern="{{ podcast.slug }}">
   </label>
 
   <menu class="toolbar">

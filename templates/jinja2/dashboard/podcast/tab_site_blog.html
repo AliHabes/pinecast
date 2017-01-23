@@ -6,7 +6,7 @@
 </div>
 {% endif %}
 
-<form class="panel write-post-panel" action="{{ url('site_add_blog_post', podcast_slug=site.podcast.slug) }}" method="post" {%- if blog_posts %} style="display: none" {%- endif %}>
+<form class="panel write-post-panel" action="{{ url('site_add_blog_post', podcast_slug=podcast.slug) }}" method="post" {%- if blog_posts %} style="display: none" {%- endif %}>
   <label class="segment-full">
     <span style="flex-basis: 80px; text-align: right">{{ _('Title') }}</span>
     <input type="text" required name="title" maxlength="512">
@@ -64,7 +64,7 @@
       {% for p in blog_posts %}
         <tr>
           <td class="primary">
-            <a href="{{ url('site_blog_post', podcast_slug=site.podcast.slug, post_slug=p.slug) }}">{{ p.title }}</a>
+            <a href="{{ url('site_blog_post', podcast_slug=podcast.slug, post_slug=p.slug) }}">{{ p.title }}</a>
           </td>
           <td>
             <abbr title="{{ (p.publish + tz_delta).isoformat() }}">

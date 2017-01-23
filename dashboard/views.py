@@ -534,7 +534,7 @@ def get_episodes(req):
         podcast__in=list(pods),
         publish__lt=datetime.datetime.now(),
         awaiting_import=False
-    )
+    ).select_related('podcast')
     if start_date:
         try:
             parsed_date = datetime.datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S')
