@@ -271,12 +271,17 @@ class Format(object):
         key, value_key = self._get_keys()
 
         return list(query.rotating_colors(
-            {
-                'label': groups.get(tags[key], tags[key]),
-                'value': list(v)[0][value_key],
-            } for
-            (_, tags), v in
-            self.res.items()
+            sorted(
+                (
+                    {
+                        'label': groups.get(tags[key], tags[key]),
+                        'value': list(v)[0][value_key],
+                    } for
+                    (_, tags), v in
+                    self.res.items()
+                ),
+                key=lambda x: float('inf') if x['label'] == 'Other' else -1 * x['value']
+            )
         ))
 
     def get_resulting_value(self, field):
