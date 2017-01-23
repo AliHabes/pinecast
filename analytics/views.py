@@ -51,7 +51,7 @@ def podcast_listener_locations(req, pod):
             .last_thirty()
             .group('country'))
 
-    return f.format_country(label=ugettext('Listeners'))
+    return f.format_country(label=ugettext('Listens'))
 
 
 @restrict(plans.PLAN_PRO)
@@ -81,7 +81,7 @@ def podcast_subscriber_history(req, pod):
             .last_thirty()
             .where(podcast=str(pod.id)))
 
-    return f.format_interval()
+    return f.format_interval(label=ugettext('Subscribers'))
 
 
 @restrict(plans.PLAN_DEMO)
@@ -92,7 +92,7 @@ def podcast_listen_history(req, pod):
             .group('podcast')
             .where(podcast=str(pod.id)))
 
-    return f.format_interval()
+    return f.format_interval(label=ugettext('Listens'))
 
 
 @restrict(plans.PLAN_DEMO)

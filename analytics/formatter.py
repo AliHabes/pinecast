@@ -206,7 +206,7 @@ class Format(object):
             self.res.items()
         ]
 
-    def format_interval(self, field='count'):
+    def format_interval(self, field='count', label=ugettext_lazy('Series')):
         if not self.interval_val: self.interval()
         if not self.res: self._process()
 
@@ -222,7 +222,7 @@ class Format(object):
             'datasets': list(query.rotating_colors(
                 [
                     {
-                        'label': 'Series',
+                        'label': label,
                         'data': [x[field] for x in points],
                         'pointStrokeColor': '#fff',
                     },

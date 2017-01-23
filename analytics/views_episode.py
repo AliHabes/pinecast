@@ -50,7 +50,7 @@ def episode_listen_history(req, pod, ep):
             .last_thirty()
             .where(episode=str(ep.id)))
 
-    return f.format_interval()
+    return f.format_interval(label=ugettext('Listens'))
 
 
 @restrict(plans.PLAN_DEMO)
