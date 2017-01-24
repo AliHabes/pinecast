@@ -87,7 +87,7 @@ def get_episode_sparklines(podcast, tz=None):
         counts = [float(x['count']) for x in v]
         greatest = max(counts)
         avg = sum(counts) / len(counts)
-        return greatest - avg > max(greatest * 0.35, 4)
+        return greatest - avg > max(greatest * 0.5, 5)
 
     return {
         tags['episode']: [x['count'] for x in v] for

@@ -9,7 +9,7 @@
     <thead>
       <tr>
         <th class="primary">{{ _('Episode Name') }}</th>
-        {% if is_pro %}
+        {% if is_pro and sparklines %}
           <th class="hide-on-mobile" style="text-align: center;">
             {{ _('30d Listens') }}
             <i class="pro-tag"></i>
@@ -41,6 +41,8 @@
                 />
               </svg>
             </td>
+          {%- elif is_pro and sparklines -%}
+            <td></td>
           {%- endif -%}
           {%- if ep.publish > now() -%}
             <td class="future-publish">
