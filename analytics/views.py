@@ -29,7 +29,7 @@ def podcast_subscriber_locations_specific_source(req, pod):
             Format(req, 'subscription-country')
                 .select(v='distinct')
                 .where(podcast=str(pod.id))
-                .during('sixmonth', force=True)
+                .during('yesterday', force=True)
                 .group('country')
                 .get_resulting_groups()}
 
@@ -39,7 +39,7 @@ def podcast_subscriber_locations_specific(req, pod, iso_code):
     f = (Format(req, 'subscription-country')
             .select(ip=True)
             .where(podcast=str(pod.id), country=iso_code)
-            .during('yesterday'))
+            .during('yesterday', force=True))
     return format_ip_list(f, 'city')
 
 
