@@ -92,7 +92,7 @@ def get_episode_sparklines(podcast, tz=None):
     return {
         tags['episode']: [x['count'] for x in v] for
         (_, tags), v in
-        result.items() if
+        [(k, list(v)) for k, v in result.items()] if
         qualifies(v)
     }
 
