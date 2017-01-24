@@ -168,8 +168,9 @@ def podcast_dashboard(req, podcast_slug):
         all_feedback = Feedback.objects.filter(podcast=pod)
         data['feedback_all'] = all_feedback
         data['feedback'] = all_feedback.filter(episode=None).order_by('-created')
-        data['feedback_episodes'] = all_feedback.exclude(episode=None).annotate(
-            Count('episode', distinct=True))
+        data['feedback_episodes'] = (all_feedback.exclude(episode=None)
+            .annotate(Count('episode', distinct=True))
+            .select_related('episode'))
 
     if payment_plans.minimum(owner_uset.plan, payment_plans.PLAN_PRO):
         sparkline_data = analytics_query.get_episode_sparklines(pod, tz)
