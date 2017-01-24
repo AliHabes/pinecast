@@ -20,7 +20,10 @@ def get_country(ip, req=None):
     if ip == '127.0.0.1':
         return 'US'
 
-    return geoip_lookup_bulk([ip])[0]['code']
+    lookup = geoip_lookup_bulk([ip])
+    if not lookup or not lookup[0] or not lookup[0]['code']:
+        return None
+    return lookup[0]['code']
 
 def geoip_lookup_bulk(ips):
     try:
