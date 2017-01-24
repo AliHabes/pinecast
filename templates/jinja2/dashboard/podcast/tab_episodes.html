@@ -19,12 +19,12 @@
       </tr>
     </thead>
     <tbody>
-      {% macro episode(ep) %}
+      {% macro episode(ep) -%}
         <tr>
           <td class="primary">
             <a href="{{ url('podcast_episode', podcast_slug=podcast.slug, episode_id=str(ep.id)) }}">{{ ep.title }}</a>
           </td>
-          {% if is_pro and str(ep.id) in sparklines %}
+          {%- if is_pro and str(ep.id) in sparklines -%}
             <td class="hide-on-mobile" style="text-align: center;">
               <svg width="90" height="22" style="display: inline-block; vertical-align: middle;">
                 <defs>
@@ -41,24 +41,24 @@
                 />
               </svg>
             </td>
-          {% endif %}
-          {% if ep.publish > now() %}
+          {%- endif -%}
+          {%- if ep.publish > now() -%}
             <td class="future-publish">
-          {% else %}
+          {%- else -%}
             <td>
-          {% endif %}
+          {%- endif -%}
             <abbr title="{{ ep.publish + tz_delta }}">
-              {{ ep.publish|pretty_date }}
+              {{- ep.publish|pretty_date -}}
             </abbr>
-            {% if ep.publish > now() %}
+            {%- if ep.publish > now() -%}
               <form action="{{ url('podcast_episode_publish_now', podcast_slug=podcast.slug, episode_id=str(ep.id)) }}" method="post">
                 <button class="btn">{{ _('Publish Now') }}</button>
                 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
               </form>
-            {% endif %}
+            {%- endif -%}
           </td>
         </tr>
-      {% endmacro %}
+      {%- endmacro %}
 
       {% if get_user_settings(podcast.owner).plan == PLANS.PLAN_DEMO %}
         {% for ep in episodes[:10] %}
