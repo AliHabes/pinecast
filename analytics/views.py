@@ -2,7 +2,7 @@ from django.utils.translation import ugettext
 
 import accounts.payment_plans as plans
 from . import query
-from .constants import SOURCE_MAP
+from .constants import AGENT_MAP, OS_MAP, SOURCE_MAP
 from .formatter import Format
 from .util import country_code_map, format_ip_list, restrict, specific_location_timeframe
 from accounts.models import UserSettings
@@ -116,7 +116,7 @@ def podcast_listen_platform_breakdown(req, pod):
             .last_thirty()
             .where(podcast=str(pod.id)))
 
-    return f.format_breakdown()
+    return f.format_breakdown(AGENT_MAP)
 
 @restrict(plans.PLAN_STARTER)
 def podcast_listen_os_breakdown(req, pod):
@@ -126,7 +126,7 @@ def podcast_listen_os_breakdown(req, pod):
             .last_thirty()
             .where(podcast=str(pod.id)))
 
-    return f.format_breakdown()
+    return f.format_breakdown(OS_MAP)
 
 
 @restrict(plans.PLAN_PRO)

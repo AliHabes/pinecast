@@ -19,6 +19,20 @@ influx_databases = {
     'notification': settings.INFLUXDB_DB_NOTIFICATION,
 }
 
+AGENT_MAP = {
+    'beyondpod': 'BeyondPod',
+    'chrome': 'Google Chrome',
+    'doggcatcher': 'DoggCatcher',
+    'downcast': 'Downcast',
+    'firefox': 'Firefox',
+    'itunes': 'iTunes',
+    'miro': 'Miro',
+    'opera': 'Opera',
+    'overcast': 'Overcast',
+    'pocketcasts': 'Pocket Casts',
+    'safari': 'Safari',
+}
+OS_MAP = {'Mac OS X': 'macOS'}
 SOURCE_MAP = {
     'direct': ugettext_lazy('Direct'),
     'rss': ugettext_lazy('Subscription'),
