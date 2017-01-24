@@ -83,10 +83,17 @@ def get_episode_sparklines(podcast, tz=None):
 
     result = get_client().query(query, database=settings.INFLUXDB_DB_LISTEN)
 
+    def qualifies(v):
+        counts = [float(x['count']) for x in v]
+        greatest = max(counts)
+        avg = sum(counts) / len(counts)
+        return greatest - avg > max(greatest * 0.35, 4)
+
     return {
-        tags['episode']: (x['count'] for x in v) for
+        tags['episode']: [x['count'] for x in v] for
         (_, tags), v in
-        result.items()
+        result.items() if
+        qualifies(v)
     }
 
 

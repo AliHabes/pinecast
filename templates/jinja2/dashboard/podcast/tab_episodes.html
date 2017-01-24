@@ -24,7 +24,7 @@
           <td class="primary">
             <a href="{{ url('podcast_episode', podcast_slug=podcast.slug, episode_id=str(ep.id)) }}">{{ ep.title }}</a>
           </td>
-          {% if is_pro %}
+          {% if is_pro and str(ep.id) in sparklines %}
             <td class="hide-on-mobile" style="text-align: center;">
               <svg width="90" height="22" style="display: inline-block; vertical-align: middle;">
                 <defs>
