@@ -17,6 +17,7 @@ from jinja2 import Environment, evalcontextfilter
 import accounts.payment_plans as payment_plans
 from . import helpers
 from accounts.models import UserSettings
+from podcasts.models import CATEGORIES
 
 
 def environment(**options):
@@ -57,6 +58,7 @@ def environment(**options):
         'PLAN_MAX_FILE_SIZE': payment_plans.MAX_FILE_SIZE,
         'PLAN_NAMES': payment_plans.PLANS_MAP,
         'PLANS': payment_plans.PLANS_RAW,
+        'PODCAST_CATEGORIES': CATEGORIES,
         'RECAPTCHA_KEY': settings.RECAPTCHA_KEY,
         'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY,
         'SUPPORT_URL': settings.SUPPORT_URL,
@@ -138,7 +140,7 @@ def safe_json(data):
         return 'true' if data else 'false'
     elif isinstance(data, (int, float)):
         return str(data)
-    elif isinstance(data, (tuple, list)):
+    elif isinstance(data, (tuple, list, set, frozenset)):
         return jinja2.Markup('[%s]' % ','.join(safe_json(x) for x in data))
     elif isinstance(data, dict):
         return jinja2.Markup('{%s}' % ','.join(

@@ -25,13 +25,14 @@ def podcast_subscriber_locations(req, pod):
 
 @restrict(plans.PLAN_PRO)
 def podcast_subscriber_locations_specific_source(req, pod):
-    return {x: country_code_map[x] for x in
-            Format(req, 'subscription-country')
-                .select(v='distinct')
+    return [
+        {'label': country_code_map[x], 'value': x} for x in
+        Format(req, 'subscription-country')
+                .select(v='count')
                 .where(podcast=str(pod.id))
                 .during('yesterday', force=True)
                 .group('country')
-                .get_resulting_groups()}
+                .get_resulting_groups()]
 
 @restrict(plans.PLAN_PRO)
 @specific_location_timeframe
@@ -56,13 +57,14 @@ def podcast_listener_locations(req, pod):
 
 @restrict(plans.PLAN_PRO)
 def podcast_listener_locations_specific_source(req, pod):
-    return {x: country_code_map[x] for x in
-            Format(req, 'listen-country')
-                .select(v='distinct')
-                .where(podcast=str(pod.id))
-                .during('sixmonth', force=True)
-                .group('country')
-                .get_resulting_groups()}
+    return [
+        {'label': country_code_map[x], 'value': x} for x in
+        Format(req, 'listen-country')
+            .select(v='count')
+            .where(podcast=str(pod.id))
+            .during('sixmonth', force=True)
+            .group('country')
+            .get_resulting_groups()]
 
 @restrict(plans.PLAN_PRO)
 @specific_location_timeframe

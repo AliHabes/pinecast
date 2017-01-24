@@ -6,7 +6,7 @@
 <section class="subheader">
   <div>
     <hgroup>
-      <h1 title="{{ podcast.id }}">{{ podcast.name }}</h1>
+      <h1>{{ podcast.name }}</h1>
       <h2>
         {% if is_still_importing %}
           {{ _('This podcast is still being imported') }}
@@ -210,7 +210,8 @@
 {% block after_content %}
 <script src="/static/js/markdown-editor.js"></script>
 <script>
-window.PODCAST_CATEGORIES = {{ PODCAST_CATEGORIES|safe }};
+console.log({{ podcast.id|safe_json }});
+window.PODCAST_CATEGORIES = {{ PODCAST_CATEGORIES|safe_json }};
 </script>
 <script>
 Array.from(document.querySelectorAll('.confirm-delete')).forEach(function(elem) {

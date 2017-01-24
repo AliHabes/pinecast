@@ -20,16 +20,14 @@ def total_listens(podcast, episode=None):
     podcast_is_str = isinstance(podcast, StringTypes)
     episode_is_str = isinstance(episode, StringTypes)
 
-    if episode_is_str:
-        episode_qualifier = ' AND episode = \'%s\'' % episode
-    elif episode:
-        episode_qualifier = ' AND episode = \'%s\'' % str(episode.id)
+    if episode:
+        condition = 'episode = \'%s\'' % settings.INFLUXDB_CONDITION_OVERRIDES.get(
+            'episode', episode if episode_is_str else str(episode.id))
     else:
-        episode_qualifier = ''
+        condition = 'podcast = \'%s\'' % settings.INFLUXDB_CONDITION_OVERRIDES.get(
+            'podcast', podcast if podcast_is_str else str(podcast.id))
 
-    query = 'SELECT COUNT(v) FROM "listen" WHERE podcast = \'%s\'%s;' % (
-        podcast if podcast_is_str else str(podcast.id),
-        episode_qualifier)
+    query = 'SELECT COUNT(v) FROM "listen" WHERE %s;' % condition
 
     base_listens = 0
     if not podcast_is_str:
@@ -43,7 +41,7 @@ def total_listens(podcast, episode=None):
 
 def total_listens_this_week(podcast, tz):
     query = 'SELECT COUNT(v) FROM "listen" WHERE podcast = \'%s\' AND %s;' % (
-        str(podcast.id),
+        settings.INFLUXDB_CONDITION_OVERRIDES.get('podcast', str(podcast.id)),
         USER_TIMEFRAMES['week'](tz))
 
     return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_LISTEN), 0)
@@ -51,7 +49,7 @@ def total_listens_this_week(podcast, tz):
 
 def total_subscribers(podcast):
     query = 'SELECT COUNT(v) FROM "subscription" WHERE podcast = \'%s\' AND %s;' % (
-        str(podcast.id),
+        settings.INFLUXDB_CONDITION_OVERRIDES.get('podcast', str(podcast.id)),
         USER_TIMEFRAMES['day'](0)) # tz offset of zero because it doesn't matter which day
 
     return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_SUBSCRIPTION), 0)
@@ -78,7 +76,9 @@ def get_top_episodes(podcasts, timeframe=None, tz=None):
     }
 
 def get_episode_sparklines(podcast, tz=None):
-    where_clause = "podcast = '%s' AND %s" % (str(podcast.id), USER_TIMEFRAMES['month'](tz))
+    where_clause = "podcast = '%s' AND %s" % (
+        settings.INFLUXDB_CONDITION_OVERRIDES.get('podcast', str(podcast.id)),
+        USER_TIMEFRAMES['month'](tz))
     query = 'SELECT COUNT(v) FROM "listen" WHERE %s GROUP BY episode, time(1d);' % where_clause
 
     result = get_client().query(query, database=settings.INFLUXDB_DB_LISTEN)

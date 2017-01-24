@@ -35,13 +35,14 @@ def episode_listener_locations(req, pod, ep):
 @restrict(plans.PLAN_PRO)
 @requires_episode
 def episode_listener_locations_specific_source(req, pod, ep):
-    return {x: country_code_map[x] for x in
-            Format(req, 'listen-country')
-                .select(v='distinct')
-                .where(episode=str(ep.id))
-                .during('sixmonth', force=True)
-                .group('country')
-                .get_resulting_groups()}
+    return [
+        {'label': country_code_map[x], 'value': x} for x in
+        Format(req, 'listen-country')
+            .select(v='distinct')
+            .where(episode=str(ep.id))
+            .during('sixmonth', force=True)
+            .group('country')
+            .get_resulting_groups()]
 
 @restrict(plans.PLAN_PRO)
 @specific_location_timeframe

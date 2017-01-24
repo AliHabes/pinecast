@@ -31,8 +31,7 @@ from feedback.models import Feedback, EpisodeFeedbackPrompt
 from notifications.models import NotificationHook
 from payments.stripe_lib import stripe
 from pinecast.helpers import get_object_or_404, json_response, reverse
-from podcasts.models import (CATEGORIES, Podcast, PodcastCategory,
-                             PodcastEpisode)
+from podcasts.models import Podcast, PodcastCategory, PodcastEpisode
 from sites.models import Site, SitePage
 
 
@@ -152,7 +151,6 @@ def podcast_dashboard(req, podcast_slug):
         'site': None,
 
         'LOCALES': constants.locales,
-        'PODCAST_CATEGORIES': json.dumps(list(CATEGORIES)),
         'SITE_PAGE_TYPES': SitePage.PAGE_TYPES,
         'SITE_THEMES': Site.SITE_THEMES,
 
@@ -195,7 +193,6 @@ def new_podcast(req):
 
     ctx = {
         'LOCALES': constants.locales,
-        'PODCAST_CATEGORIES': json.dumps(list(CATEGORIES)),
 
         'reached_podcast_limit': payment_plans.has_reached_podcast_limit(uset)
     }
@@ -240,8 +237,7 @@ def new_podcast(req):
 def edit_podcast(req, podcast_slug):
     pod = get_podcast(req, podcast_slug)
 
-    ctx = {'podcast': pod,
-           'PODCAST_CATEGORIES': json.dumps(list(CATEGORIES))}
+    ctx = {'podcast': pod}
 
     try:
         pod.name = req.POST.get('name')

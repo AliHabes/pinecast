@@ -132,7 +132,7 @@ class Format(object):
 
         if self.criteria:
             where = ' AND '.join(
-                where_format(k, v) for
+                where_format(k, settings.INFLUXDB_CONDITION_OVERRIDES.get(k, v)) for
                 k, v in
                 self.criteria.items()
             )
@@ -301,4 +301,10 @@ class Format(object):
 
     def get_resulting_groups(self):
         if not self.res: self._process()
-        return [groupings[self.group_by] for _, groupings in self.res.keys()]
+
+        key, value_key = self._get_keys()
+        return [
+            tags[key] for
+            (_, tags), _ in
+            sorted(self.res.items(), key=lambda x: -1 * list(x[1])[0][value_key])
+        ]
