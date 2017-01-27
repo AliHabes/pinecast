@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from functools import wraps
 
 from django.utils.translation import ugettext
@@ -15,7 +13,6 @@ from podcasts.models import PodcastEpisode
 def requires_episode(view):
     @wraps(view)
     def wrapper(req, pod, *args, **kwargs):
-        print(pod, req.GET.get('episode'))
         ep = get_object_or_404(PodcastEpisode, podcast=pod, id=req.GET.get('episode'))
         return view(req, pod, *args, ep=ep, **kwargs)
     return wrapper

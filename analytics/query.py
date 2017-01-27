@@ -36,7 +36,12 @@ def total_listens(podcast, episode=None):
         elif not episode:
             base_listens = podcast.stats_base_listens
 
-    return base_listens + _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_LISTEN), 0)
+    val = base_listens
+    try:
+        val += _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_LISTEN), 0)
+    except Exception:
+        return -1
+    return val
 
 
 def total_listens_this_week(podcast, tz):
@@ -44,7 +49,10 @@ def total_listens_this_week(podcast, tz):
         settings.INFLUXDB_CONDITION_OVERRIDES.get('podcast', str(podcast.id)),
         USER_TIMEFRAMES['week'](tz))
 
-    return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_LISTEN), 0)
+    try:
+        return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_LISTEN), 0)
+    except Exception:
+        return -1
 
 
 def total_subscribers(podcast):
@@ -52,7 +60,10 @@ def total_subscribers(podcast):
         settings.INFLUXDB_CONDITION_OVERRIDES.get('podcast', str(podcast.id)),
         USER_TIMEFRAMES['day'](0)) # tz offset of zero because it doesn't matter which day
 
-    return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_SUBSCRIPTION), 0)
+    try:
+        return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_SUBSCRIPTION), 0)
+    except Exception:
+        return -1
 
 
 def get_top_episodes(podcasts, timeframe=None, tz=None):
@@ -81,7 +92,10 @@ def get_episode_sparklines(podcast, tz=None):
         USER_TIMEFRAMES['month'](tz))
     query = 'SELECT COUNT(v) FROM "listen" WHERE %s GROUP BY episode, time(1d);' % where_clause
 
-    result = get_client().query(query, database=settings.INFLUXDB_DB_LISTEN)
+    try:
+        result = get_client().query(query, database=settings.INFLUXDB_DB_LISTEN)
+    except Exception:
+        return {}
 
     def qualifies(v):
         counts = [float(x['count']) for x in v]

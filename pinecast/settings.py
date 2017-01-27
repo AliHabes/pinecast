@@ -36,9 +36,6 @@ if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = ['pinecast.herokuapp.com', 'pinecast.com', 'pinecast.co', '.pinecast.co']
-    # The latter is for legacy purposes. Handled by the HostnameRedirect
-    # middleware. Remove in 2017.
-    ALLOWED_HOSTS.append('host.podmaster.io')
 
 
 if DEBUG_TOOLBAR:

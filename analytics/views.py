@@ -10,8 +10,6 @@ from pinecast.helpers import reverse
 from podcasts.models import PodcastEpisode
 
 
-
-
 @restrict(plans.PLAN_PRO)
 def podcast_subscriber_locations(req, pod):
     f = (Format(req, 'subscription-country')

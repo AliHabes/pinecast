@@ -144,7 +144,7 @@ def podcast_dashboard(req, podcast_slug):
             'subscribers': subscribers,
         },
         'next_milestone': next(x for x in constants.MILESTONES if x > total_listens),
-        'previous_milestone': [x for x in constants.MILESTONES if x <= total_listens][-1] if total_listens else 0,
+        'previous_milestone': [x for x in constants.MILESTONES if x <= total_listens][-1] if total_listens > 0 else 0,
         'hit_first_milestone': total_listens > constants.MILESTONES[1],  # The first "real" milestone
         'is_still_importing': pod.is_still_importing(),
 
