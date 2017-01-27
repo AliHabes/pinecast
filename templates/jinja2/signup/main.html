@@ -26,6 +26,12 @@
 
   <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>
 
+  <p style="font-size: 0.85em; margin-top: 10px;">
+    {% trans tou='https://github.com/Pinecast/legal' %}
+      By signing up, you agree to Pinecast's <a href="{{ tou }}">terms of use</a>.
+    {% endtrans %}
+  </p>
+
   <button type="submit">{{ _('Create Account') }}</button>
 
   <footer>
