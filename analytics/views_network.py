@@ -8,9 +8,9 @@ from pinecast.helpers import get_object_or_404, json_response
 
 def requires_network(view):
     @wraps(view)
-    def wrapper(req, pod, *args, **kwargs):
+    def wrapper(req, *args, **kwargs):
         net = get_object_or_404(Network, id=req.GET.get('network_id'), members__in=[req.user])
-        return view(req, pod, *args, net=net, **kwargs)
+        return view(req, *args, net=net, **kwargs)
     return json_response(wrapper)
 
 
