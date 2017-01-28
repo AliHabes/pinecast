@@ -21,7 +21,7 @@ def json_response(*args, **jr_kwargs):
         @wraps(view)
         def func(*args, **kwargs):
             resp = view(*args, **kwargs)
-            if not isinstance(resp, (dict, list, bool, int, float) + StringTypes):
+            if not isinstance(resp, (dict, list, bool, int, float) + StringTypes) and resp is not None:
                 # Handle HttpResponse/HttpResponseBadRequest/etc
                 return resp
             return JsonResponse(resp, safe=jr_kwargs.get('safe', True))

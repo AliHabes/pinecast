@@ -1,5 +1,7 @@
 from functools import wraps
 
+from django.utils.translation import ugettext
+
 from .formatter import Format
 from .util import country_code_map, format_ip_list, specific_location_timeframe
 from accounts.models import Network
@@ -11,7 +13,7 @@ def requires_network(view):
     def wrapper(req, *args, **kwargs):
         net = get_object_or_404(Network, id=req.GET.get('network_id'), members__in=[req.user])
         return view(req, *args, net=net, **kwargs)
-    return json_response(wrapper)
+    return json_response(safe=False)(wrapper)
 
 
 @requires_network
