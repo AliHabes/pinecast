@@ -54,7 +54,7 @@
               <a href="{{ url('podcast_episode', podcast_slug=podcast.slug, episode_id=str(feedback.episode.id)) }}">{{ feedback.episode.title }}</a>
             </td>
             <td>
-              {{ feedback.episode__count }}
+              {{ feedback.episode__count|intcomma }}
             </td>
           </tr>
         {% endfor %}

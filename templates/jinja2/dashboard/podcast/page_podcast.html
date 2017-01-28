@@ -71,7 +71,7 @@
           <span>{{ _('Total Listens') }}</span>
           <em>
             {% if analytics.total_listens > -1 %}
-              {{ analytics.total_listens }}
+              {{ analytics.total_listens|intcomma }}
             {% else %}
               <abbr title="{{ _('Our analytics are having trouble at the moment. Come back later.') }}">???</abbr>
             {% endif %}
@@ -81,7 +81,7 @@
           <span>{{ _('Listens This Week') }}</span>
           <em>
             {% if analytics.total_listens_this_week > -1 %}
-              {{ analytics.total_listens_this_week }}
+              {{ analytics.total_listens_this_week|intcomma }}
             {% else %}
               <abbr title="{{ _('Our analytics are having trouble at the moment. Come back later.') }}">???</abbr>
             {% endif %}
@@ -91,7 +91,7 @@
           <span>{{ ngettext('Subscriber', 'Subscribers', analytics.subscribers) }}</span>
           <em>
             {% if analytics.subscribers > -1 %}
-              {{ analytics.subscribers }}
+              {{ analytics.subscribers|intcomma }}
             {% else %}
               <abbr title="{{ _('Our analytics are having trouble at the moment. Come back later.') }}">???</abbr>
             {% endif %}
@@ -101,7 +101,7 @@
           <span>{{ _('Feedback') }}</span>
           <em>
             {% if feedback_all %}
-              {{ feedback_all.count() }}
+              {{ feedback_all.count()|intcomma }}
             {% else %}
               0
             {% endif %}

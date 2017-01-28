@@ -94,7 +94,7 @@
                 {{ e.podcast.name }}
               </a>
             </td>
-            <td>{{ e.count }}</td>
+            <td>{{ e.count|intcomma }}</td>
           </tr>
         {% endfor %}
       </tbody>

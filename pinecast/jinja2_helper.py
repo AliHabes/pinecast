@@ -10,6 +10,7 @@ import gfm
 import jinja2
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.humanize.templatetags.humanize import intcomma
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.translation import ugettext, ugettext_lazy, ungettext
 from jinja2 import Environment, evalcontextfilter
@@ -96,6 +97,7 @@ def environment(**options):
     })
     env.filters['format_tz'] = format_tz
     env.filters['https'] = lambda s: ('https:%s' % s[5:]) if s.startswith('http:') else s
+    env.filters['intcomma'] = lambda v: (lambda f: f if f != str(v) else intcomma(v, False))(intcomma(v))
     env.filters['json'] = json.dumps
     env.filters['json_parse'] = json.loads
     env.filters['markdown'] = gfm.markdown
