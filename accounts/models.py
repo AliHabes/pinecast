@@ -58,9 +58,18 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
 
     def set_plan(self, new_plan_val, coupon=None):
         orig_plan = self.plan
+        user = self.user
         customer = self.get_stripe_customer()
         if not customer:
             return False
+
+        was_upgrade = (
+            payment_plans.PLAN_RANKS[orig_plan] <= payment_plans.PLAN_RANKS[new_plan_val])
+
+        # Handle pro downgrades
+        if orig_plan == payment_plans.PLAN_PRO and not was_upgrade:
+            from dashboard.models import Collaborator
+            Collaborator.objects.filter(podcast__in=user.podcast_set.all()).delete()
 
         existing_subs = customer.subscriptions.all(limit=1)['data']
 
@@ -82,9 +91,6 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
             return True
 
         plan_stripe_id = payment_plans.STRIPE_PLANS[new_plan_val]
-
-        was_upgrade = (
-            payment_plans.PLAN_RANKS[orig_plan] <= payment_plans.PLAN_RANKS[new_plan_val])
 
         if existing_subs:
             existing_sub = existing_subs[0]
@@ -113,7 +119,7 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
         self.save()
 
         send_notification_email(
-            self.user,
+            user,
             ugettext('Your account has been %s') %
                 (ugettext('upgraded') if was_upgrade else ugettext('downgraded')),
             ugettext('Your Pinecast account has been updated successfully. '

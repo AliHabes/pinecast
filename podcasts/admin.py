@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from django.contrib import admin
 
 from .models import Podcast, PodcastEpisode, PodcastCategory
+from dashboard.models import Collaborator
 
 
 class PodcastCategoryInline(admin.TabularInline):
@@ -25,9 +26,20 @@ class PodcastEpisodeInline(admin.TabularInline):
     def get_fields(self, request, obj=None):
         return self.get_readonly_fields(request, obj)
 
+class CollaboratorInline(admin.TabularInline):
+    model = Collaborator
+    fk_name = 'podcast'
+    readonly_fields = ('collaborator', )
+    extra = 0
+    show_change_link = True
+    can_delete = False
+
+    def get_fields(self, request, obj=None):
+        return self.get_readonly_fields(request, obj)
+
 class PodcastAdmin(admin.ModelAdmin):
     list_display = ('slug', 'name', 'owner_email')
-    inlines = (PodcastEpisodeInline, PodcastCategoryInline, )
+    inlines = (PodcastEpisodeInline, PodcastCategoryInline, CollaboratorInline, )
 
 
     # TODO: This is probably not ideal. There's presumably some technical
