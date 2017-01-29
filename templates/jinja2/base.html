@@ -19,7 +19,12 @@
   <script>
     (function() {
       Array.prototype.slice.call(document.querySelectorAll('form')).forEach(function(f) {
-        f.addEventListener('submit', function() {
+        f.addEventListener('submit', function(e) {
+          if (f.querySelector('.required-placeholder')) {
+            alert(gettext('Make sure you have filled out all fields correctly.'));
+            e.preventDefault();
+            return;
+          }
           var button = f.querySelector('button[type="submit"]');
           if (button) button.disabled = true;
         });

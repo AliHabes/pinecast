@@ -73,10 +73,10 @@
   {% include 'dashboard/asides/aside_audio.html' %}
 
   <div class="upload-placeholder"
-    data-default-url="{{ sign(default.get('audio-url')) }}"
-    data-default-size="{{ default.get('audio-url-size') }}"
+    data-default-url="{{ sign(default.get('audio-url')) if default.get('audio-url') else '' }}"
+    data-default-size="{{ default.get('audio-url-size', '') }}"
     data-default-name="{{ default.get('audio-url-name', _('Previously uploaded episode audio')) }}"
-    data-default-type="{{ default.get('audio-url-type') }}"
+    data-default-type="{{ default.get('audio-url-type', '') }}"
     data-accept="audio/*"
     data-name="audio-url"
     data-type="audio"
