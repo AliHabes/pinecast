@@ -68,14 +68,14 @@ def start_import(req):
     try:
         p = Podcast(
             owner=req.user,
-            slug=req.POST.get('slug'),
-            name=req.POST.get('name'),
-            homepage=req.POST.get('homepage'),
+            slug=req.POST.get('slug')[:50],
+            name=req.POST.get('name')[:256],
+            homepage=req.POST.get('homepage')[:500],
             description=req.POST.get('description'),
-            language=req.POST.get('language'),
-            copyright=req.POST.get('copyright'),
-            subtitle=req.POST.get('subtitle'),
-            author_name=req.POST.get('author_name', 'Anonymous'),
+            language=req.POST.get('language')[:16],
+            copyright=req.POST.get('copyright')[:1024],
+            subtitle=req.POST.get('subtitle')[:512],
+            author_name=req.POST.get('author_name', 'Anonymous')[:1024],
             is_explicit=req.POST.get('is_explicit', 'false') == 'true',
 
             # This is just temporary for the feed, just so it's usable in the interim
