@@ -19,6 +19,8 @@ html {
 }
 
 body {
+    display: flex;
+    flex-direction: column;
     font-family: system, -apple-system, BlinkMacSystemFont, "Open Sans", sans-serif;
     font-size: 14px;
     height: 100%;
@@ -27,6 +29,7 @@ body {
 
 
 .main-container {
+    flex: 1;
     padding-top: 15vh;
 }
 
@@ -129,11 +132,11 @@ form .post-submit-links {
     margin: 20px 0;
 }
 
-form a {
+a {
     color: #5395D3;
     text-decoration: none;
 }
-form a:hover {
+a:hover {
     text-decoration: underline;
 }
 
@@ -161,4 +164,15 @@ form p {
     color: #fff;
     margin: 10px 0 20px;
     padding: 15px;
+}
+
+.main-footer {
+    height: 50px;
+    padding: 15px;
+    text-align: center;
+    width: 100%;
+}
+
+.main-footer a {
+    padding: 0 10px;
 }
