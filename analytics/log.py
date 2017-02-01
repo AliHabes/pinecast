@@ -34,13 +34,6 @@ def write_influx_many(db, items):
     influx_client = get_client()
 
     return influx_client.write_points(items, database=db)
-    try:
-        return influx_client.write_points(list(_strip_ts_raw(items)), database=db)
-    except Exception as e:
-        if settings.DEBUG: raise e
-        rollbar.report_message('Problem delivering logs to influx: %s' % e, 'error')
-        return None
-
 
 def write_listen(*args, **kwargs):
     obj = get_listen_obj(*args, **kwargs)
