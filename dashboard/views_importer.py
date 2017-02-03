@@ -165,7 +165,7 @@ def start_import(req):
 def import_progress(req, podcast_slug):
     p = get_object_or_404(Podcast, slug=podcast_slug, owner=req.user)
     ids = req.GET.get('ids')
-    reqs = AssetImportRequest.objects.filter(id__in=ids.split(','))
+    reqs = AssetImportRequest.objects.filter(id__in=ids.split(',')).select_related('episode', 'podcast')
     total = reqs.count()
     return {
         'elems': {x.id: x.get_json_payload() for x in reqs},

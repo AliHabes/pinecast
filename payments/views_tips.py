@@ -170,7 +170,7 @@ def _auth_subscription(req, podcast, amount):
 
 def confirm_sub(req, podcast_slug):
     if not validate_confirmation(req):
-        return _pmrender(req, 'payments/tip_jar/bad_link.html', ctx)
+        return _pmrender(req, 'payments/tip_jar/bad_link.html')
 
     pod = get_object_or_404(Podcast, slug=podcast_slug)
 
