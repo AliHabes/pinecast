@@ -48,23 +48,23 @@
   <ul class="card-list">
   {% for p in podcasts %}
     <li class="card"
-      {% if p.is_still_importing() %}data-still-importing="{{ _('Import in progress...') }}"{% endif %}>
+      {% if p.id in podcasts_still_importing %}data-still-importing="{{ _('Import in progress...') }}"{% endif %}>
 
       <a href="{{ url('podcast_dashboard', kwargs={'podcast_slug': p.slug}) }}">
         <strong>{{ p.name }}</strong>
         {%- if p.subtitle %}<span class="dashboard-item-subtitle">{{ p.subtitle }}</span>{% endif -%}
-        {%- if p.get_unpublished_count() -%}
+        {%- if p.id in podcasts_scheduled_episodes -%}
           <span class="icon-clock">
-            {% trans count=p.get_unpublished_count() %}
+            {% trans count=podcasts_scheduled_episodes[p.id] %}
               {{ count }} pending episode
             {% pluralize %}
               {{ count }} pending episodes
             {% endtrans %}
           </span>
         {%- endif -%}
-        {%- if p.get_most_recent_publish_date() -%}
+        {%- if p.id in podcasts_latest_episodes -%}
           <span>
-            {% trans timestamp=p.get_most_recent_publish_date()|pretty_date %}
+            {% trans timestamp=podcasts_latest_episodes[p.id]|pretty_date %}
               Last published {{ timestamp }}
             {% endtrans %}
           </span>

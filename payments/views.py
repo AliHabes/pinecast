@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-
 import json
 import sys
 import time
@@ -20,10 +17,9 @@ import accounts.payment_plans as payment_plans
 from .models import RecurringTip, TipEvent
 from .stripe_lib import stripe
 from accounts.models import UserSettings
-from dashboard.views import _pmrender
 from notifications.models import NotificationHook
 from pinecast.email import CONFIRMATION_PARAM, send_notification_email
-from pinecast.helpers import get_object_or_404, json_response, reverse
+from pinecast.helpers import get_object_or_404, json_response, render, reverse
 from podcasts.models import Podcast
 
 
@@ -44,7 +40,7 @@ def upgrade(req):
         'stripe_customer': customer,
         'success': 'success' in req.GET,
     }
-    return _pmrender(req, 'payments/main.html', ctx)
+    return render(req, 'payments/main.html', ctx)
 
 
 AVAILABLE_PLANS = {

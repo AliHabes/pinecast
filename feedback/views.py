@@ -9,10 +9,9 @@ import accounts.payment_plans as plans
 import analytics.analyze as analyze
 from .models import Feedback
 from accounts.models import UserSettings
-from dashboard.views import _pmrender
 from notifications.models import NotificationHook
 from pinecast.email import send_notification_email
-from pinecast.helpers import get_object_or_404, reverse, validate_recaptcha
+from pinecast.helpers import get_object_or_404, render, reverse, validate_recaptcha
 from podcasts.models import Podcast, PodcastEpisode
 
 
@@ -21,7 +20,7 @@ def podcast_comment_box(req, podcast_slug):
     if not UserSettings.user_meets_plan(pod.owner, plans.FEATURE_MIN_COMMENT_BOX):
         raise Http404()
     if not req.POST:
-        return _pmrender(req, 'feedback/comment_podcast.html', {'podcast': pod})
+        return render(req, 'feedback/comment_podcast.html', {'podcast': pod})
 
     try:
         if not _validate_recaptcha(req):
@@ -49,10 +48,10 @@ def podcast_comment_box(req, podcast_slug):
             trigger_type='feedback',
             data={'content': req.POST.get('message'), 'sender': req.POST.get('email')})
     except Exception:
-        return _pmrender(req, 'feedback/comment_podcast.html',
+        return render(req, 'feedback/comment_podcast.html',
                          {'podcast': pod, 'error': True, 'default': req.POST})
 
-    return _pmrender(req, 'feedback/thanks.html', {'podcast': pod})
+    return render(req, 'feedback/thanks.html', {'podcast': pod})
 
 
 def ep_comment_box(req, podcast_slug, episode_id):
@@ -61,7 +60,7 @@ def ep_comment_box(req, podcast_slug, episode_id):
         raise Http404()
     ep = get_object_or_404(PodcastEpisode, podcast=pod, id=episode_id)
     if not req.POST:
-        return _pmrender(req, 'feedback/comment_episode.html', {'podcast': pod, 'episode': ep})
+        return render(req, 'feedback/comment_episode.html', {'podcast': pod, 'episode': ep})
 
     try:
         if not _validate_recaptcha(req):
@@ -93,10 +92,10 @@ def ep_comment_box(req, podcast_slug, episode_id):
             trigger_type='feedback',
             data={'episode': ep, 'content': req.POST.get('message'), 'sender': req.POST.get('email')})
     except Exception:
-        return _pmrender(req, 'feedback/comment_episode.html',
+        return render(req, 'feedback/comment_episode.html',
                          {'podcast': pod, 'episode': ep, 'error': True, 'default': req.POST})
 
-    return _pmrender(req, 'feedback/thanks.html', {'podcast': pod})
+    return render(req, 'feedback/thanks.html', {'podcast': pod})
 
 
 def _validate_recaptcha(req):

@@ -14,7 +14,6 @@ from django.views.decorators.http import require_POST
 
 from .models import UserSettings
 from .payment_plans import PLAN_COMMUNITY, PLAN_DEMO
-from dashboard.views import _pmrender
 from payments.stripe_lib import stripe
 from pinecast.email import get_expired_page, get_signed_url, request_must_be_confirmed, send_confirmation_email, send_notification_email
 from pinecast.helpers import get_object_or_404, reverse

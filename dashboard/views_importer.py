@@ -21,7 +21,6 @@ import accounts.payment_plans as plans
 from . import importer as importer_lib
 from . import importer_worker
 from .models import AssetImportRequest
-from .views import _pmrender
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import UserSettings
 from pinecast.helpers import get_object_or_404, json_response

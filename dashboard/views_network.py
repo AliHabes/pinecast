@@ -10,10 +10,10 @@ from django.views.decorators.http import require_POST
 import accounts.payment_plans as plans
 import analytics.query as analytics_query
 import pinecast.email
-from .views import _pmrender, signer
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
-from pinecast.helpers import get_object_or_404, reverse, round_now
+from pinecast.helpers import get_object_or_404, render, reverse, round_now
+from pinecast.signatures import signer_nots as signer
 from podcasts.models import Podcast, PodcastEpisode
 
 
@@ -23,7 +23,7 @@ def new_network(req):
     uset = UserSettings.get_from_user(req.user)
 
     if not req.POST:
-        return _pmrender(req, 'dashboard/network/page_new.html')
+        return render(req, 'dashboard/network/page_new.html')
 
     try:
         img_url = req.POST.get('image-url')
@@ -36,7 +36,7 @@ def new_network(req):
         net.members.add(req.user)
         net.save()
     except Exception as e:
-        return _pmrender(req,
+        return render(req,
                          'dashboard/network/page_new.html',
                          {'error': ugettext('Error while saving network details'),
                           'default': req.POST})
@@ -69,7 +69,7 @@ def network_dashboard(req, network_id):
         podcast__in=net_podcasts,
         publish__gt=round_now())
 
-    return _pmrender(req,
+    return render(req,
                      'dashboard/network/page_dash.html',
                      {'error': req.GET.get('error'),
                       'network': net,

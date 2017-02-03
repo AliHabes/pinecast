@@ -7,10 +7,11 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.views.decorators.http import require_GET, require_POST
 
-from .views import _pmrender, get_podcast, signer
+from .views import get_podcast
 from accounts import payment_plans
 from accounts.models import Network, UserSettings
-from pinecast.helpers import get_object_or_404, json_response, reverse
+from pinecast.helpers import get_object_or_404, json_response, render, reverse
+from pinecast.signatures import signer_nots as signer
 from podcasts.models import Podcast
 from sites.models import Site, SiteBlogPost, SiteLink, SitePage
 
@@ -147,7 +148,7 @@ def edit_blog_post(req, podcast_slug, post_slug):
     post = get_object_or_404(SiteBlogPost, site=site, slug=post_slug)
 
     if not req.POST:
-        return _pmrender(req, 'dashboard/sites/blog/page_edit.html', {'site': site, 'post': post})
+        return render(req, 'dashboard/sites/blog/page_edit.html', {'site': site, 'post': post})
     try:
         naive_publish = datetime.datetime.strptime(req.POST.get('publish', '').split('.')[0], '%Y-%m-%dT%H:%M:%S') # 2015-07-09T12:00
         adjusted_publish = naive_publish - UserSettings.get_from_user(req.user).get_tz_delta()
@@ -159,7 +160,7 @@ def edit_blog_post(req, podcast_slug, post_slug):
         post.save()
     except Exception as e:
         data.update(error=True, default=req.POST)
-        return _pmrender(req, 'dashboard/sites/blog/page_edit.html', data)
+        return render(req, 'dashboard/sites/blog/page_edit.html', data)
     else:
         return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site,blog')
 
@@ -211,14 +212,14 @@ def edit_page(req, podcast_slug, page_slug):
     page = get_object_or_404(SitePage, site=site, slug=page_slug)
 
     if not req.POST:
-        return _pmrender(req, 'dashboard/sites/pages/page_edit.html', {'site': site, 'page': page})
+        return render(req, 'dashboard/sites/pages/page_edit.html', {'site': site, 'page': page})
     try:
         page.title = req.POST.get('title')
         page.body = SitePage.get_body_from_req(req, page.page_type)
         page.save()
     except Exception as e:
         data.update(error=True, default=req.POST)
-        return _pmrender(req, 'dashboard/sites/pages/page_edit.html', data)
+        return render(req, 'dashboard/sites/pages/page_edit.html', data)
     else:
         return redirect(reverse('podcast_dashboard', podcast_slug=podcast_slug) + '#site')
 

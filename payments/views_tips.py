@@ -12,13 +12,12 @@ from .models import RecurringTip, TipEvent, TipUser
 from .stripe_lib import stripe
 from accounts.payment_plans import PLAN_DEMO, PLAN_TIP_LIMITS
 from accounts.models import UserSettings
-from dashboard.views import _pmrender
 from notifications.models import NotificationHook
 from pinecast.email import (CONFIRMATION_PARAM,
                             send_anon_confirmation_email as send_email,
                             send_notification_email,
                             validate_confirmation)
-from pinecast.helpers import get_object_or_404, json_response, reverse
+from pinecast.helpers import get_object_or_404, json_response, render, reverse
 from podcasts.models import Podcast
 
 
@@ -47,7 +46,7 @@ def tip_flow(req, podcast_slug):
            'podcast': pod,
            'tipper': tipper}
 
-    return _pmrender(req, 'payments/tip_jar/main.html', ctx)
+    return render(req, 'payments/tip_jar/main.html', ctx)
 
 
 @require_POST
@@ -168,7 +167,7 @@ def _auth_subscription(req, podcast, amount):
 
 def confirm_sub(req, podcast_slug):
     if not validate_confirmation(req):
-        return _pmrender(req, 'payments/tip_jar/bad_link.html')
+        return render(req, 'payments/tip_jar/bad_link.html')
 
     pod = get_object_or_404(Podcast, slug=podcast_slug)
 
@@ -281,7 +280,7 @@ def subscriptions(req):
 
     tip_user = get_object_or_404(TipUser, id=req.session['pay_session'])
     ctx = {'tip_user': tip_user}
-    return _pmrender(req, 'payments/tip_jar/subscriptions.html', ctx)
+    return render(req, 'payments/tip_jar/subscriptions.html', ctx)
 
 
 def subscriptions_login(req):
@@ -301,7 +300,7 @@ def subscriptions_login(req):
         # fallthrough
 
     if not req.POST:
-        return _pmrender(req, 'payments/tip_jar/login.html')
+        return render(req, 'payments/tip_jar/login.html')
 
     send_email(
         req.POST.get('email'),
@@ -311,7 +310,7 @@ def subscriptions_login(req):
             'to see your podcast subscriptions.'),
         reverse('tip_jar_login') + '?email=%s' % quote(email))
 
-    return _pmrender(req, 'payments/tip_jar/check_email.html')
+    return render(req, 'payments/tip_jar/check_email.html')
 
 
 @require_POST

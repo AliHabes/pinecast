@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-from __future__ import division
-
+import collections
 import datetime
 from functools import wraps
 
@@ -10,9 +8,11 @@ import requests
 from django.conf import settings
 from django.core.urlresolvers import reverse as reverse_django
 from django.http import Http404, JsonResponse
-from django.shortcuts import get_object_or_404 as dj_get_object_or_404
+from django.shortcuts import get_object_or_404 as dj_get_object_or_404, render as dj_render
 from django.utils.translation import ugettext, ungettext
 
+from accounts import payment_plans
+from pinecast.signatures import signer_nots
 from pinecast.types import StringTypes
 
 
@@ -162,3 +162,57 @@ def pretty_date(time=None):
     if day_diff < 365:
         return ungettext('{n} month ago', '{n} months ago', day_diff // 30).format(n=day_diff // 30)
     return ungettext('{n} year ago', '{n} years ago', day_diff // 365).format(n=day_diff // 365)
+
+
+def populate_context(user, ctx=None):
+    ctx = ctx or {}
+    if not user.is_anonymous():
+        ctx['user'] = user
+
+        if 'networks' not in ctx:
+            networks = set(user.network_set.filter(deactivated=False))
+            ctx['networks'] = networks
+        else:
+            networks = ctx['networks']
+
+        if 'podcasts' not in ctx:
+            from dashboard.models import Collaborator
+            from podcasts.models import Podcast
+            podcasts = set(
+                user.podcast_set.all() |
+                Podcast.objects.filter(networks__in=networks)
+            )
+            podcasts |= {x.podcast for x in Collaborator.objects.filter(collaborator=user).select_related('podcast')}
+            ctx.setdefault('podcasts', sorted(podcasts, key=lambda p: p.name))
+
+        if 'user_settings' not in ctx:
+            from accounts.models import UserSettings
+            uset = UserSettings.get_from_user(user)
+            ctx['user_settings'] = uset
+        else:
+            uset = ctx['user_settings']
+
+        if 'tz_delta' not in ctx:
+            ctx['tz_delta'] = uset.get_tz_delta()
+
+        ctx.setdefault('max_upload_size', payment_plans.MAX_FILE_SIZE[uset.plan])
+
+    return ctx
+
+
+def render(req, template, data=None):
+    data = data or {}
+
+    class DefaultEmptyDict(collections.defaultdict):
+        def __init__(self):
+            super(DefaultEmptyDict, self).__init__(lambda: '')
+
+        def get(self, _, d=''):
+            return d
+
+    data.setdefault('settings', settings)
+    data.setdefault('default', DefaultEmptyDict())
+    data['sign'] = lambda x: signer_nots.sign(x.encode('utf-8')).decode('utf-8') if x else x
+    populate_context(req.user, data)
+    data['is_admin'] = req.user.is_staff and bool(req.GET.get('admin'))
+    return dj_render(req, template, data)

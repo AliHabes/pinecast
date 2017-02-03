@@ -15,66 +15,29 @@ import itsdangerous
 import rollbar
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count, Max, Q
 from django.http import Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.utils.translation import ugettext
 from django.views.decorators.http import require_GET, require_POST
 
 import accounts.payment_plans as payment_plans
 import analytics.query as analytics_query
 import pinecast.constants as constants
-from .models import Collaborator
+from .models import AssetImportRequest, Collaborator
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
 from feedback.models import Feedback, EpisodeFeedbackPrompt
 from notifications.models import NotificationHook
 from payments.stripe_lib import stripe
-from pinecast.helpers import get_object_or_404, json_response, reverse
+from pinecast.helpers import (get_object_or_404, json_response, populate_context,
+                              render as _pmrender, reverse, round_now)
+from pinecast.signatures import signer_nots as signer
 from podcasts.models import Podcast, PodcastCategory, PodcastEpisode
 from sites.models import Site, SitePage
 
 
-signer = itsdangerous.Signer(settings.SECRET_KEY)
-
 ISO_FORMAT = '%Y-%m-%dT%H:%M:%S'
-
-
-def _pmrender(req, template, data=None):
-    data = data or {}
-
-    class DefaultEmptyDict(collections.defaultdict):
-        def __init__(self):
-            super(DefaultEmptyDict, self).__init__(lambda: '')
-
-        def get(self, _, d=''):
-            return d
-
-    data.setdefault('settings', settings)
-    data.setdefault('default', DefaultEmptyDict())
-    data['sign'] = lambda x: signer.sign(x.encode('utf-8')).decode('utf-8') if x else x
-    if not req.user.is_anonymous():
-        data.setdefault('user', req.user)
-
-        networks = set(req.user.network_set.filter(deactivated=False))
-        data.setdefault('networks', networks)
-
-        podcasts = set(req.user.podcast_set.all())
-        podcasts |= set(Podcast.objects.filter(networks__in=networks))
-        podcasts |= {
-            x.podcast for x in
-            Collaborator.objects.filter(collaborator=req.user).select_related('podcast')}
-
-        data.setdefault('podcasts', list(podcasts))
-
-        uset = UserSettings.get_from_user(req.user)
-        data.setdefault('user_settings', uset)
-        data.setdefault('tz_delta', uset.get_tz_delta())
-        data.setdefault('max_upload_size', payment_plans.MAX_FILE_SIZE[uset.plan])
-
-    data['is_admin'] = req.user.is_staff and bool(req.GET.get('admin'))
-
-    return render(req, template, data)
 
 
 class EmptyStringDefaultDict(collections.defaultdict):
@@ -121,6 +84,29 @@ def dashboard(req):
         except Exception as e:
             if settings.DEBUG:
                 raise e
+
+    populate_context(req.user, ctx)
+
+    podcasts = ctx['podcasts']
+    now = round_now()
+
+    airs = (
+        AssetImportRequest.objects.filter(Q(podcast__in=podcasts) | Q(episode__podcast__in=podcasts), resolved=False, failed=False)
+            .values('podcast', 'episode__podcast')
+            .distinct())
+    ctx['podcasts_still_importing'] = {x.get('podcast', x.get('episode__podcast')) for x in airs}
+
+    ctx['podcasts_scheduled_episodes'] = {
+        x['podcast']: x['unpublished'] for x in
+        PodcastEpisode.objects.filter(podcast__in=podcasts, publish__gt=now)
+            .values('podcast')
+            .annotate(unpublished=Count('podcast'))}
+
+    ctx['podcasts_latest_episodes'] = {
+        x['podcast']: x['newest'] for x in
+        PodcastEpisode.objects.filter(podcast__in=podcasts, publish__lte=now)
+            .values('podcast')
+            .annotate(newest=Max('publish'))}
 
     return _pmrender(req, 'dashboard/dashboard.html', ctx)
 

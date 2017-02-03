@@ -8,8 +8,7 @@ from django.utils.translation import ugettext
 
 import analytics.analyze as analyze
 from accounts.models import UserSettings
-from dashboard.views import _pmrender
-from pinecast.helpers import reverse, validate_recaptcha
+from pinecast.helpers import render, reverse, validate_recaptcha
 
 
 def signup(req):
@@ -17,7 +16,7 @@ def signup(req):
         return redirect('dashboard')
 
     if not req.POST:
-        return _pmrender(
+        return render(
             req,
             'signup/main.html',
             {'email': req.GET.get('email', '')}
@@ -37,7 +36,7 @@ def signup(req):
         error = ugettext('That email address is already associated with an account')
 
     if error:
-        return _pmrender(req, 'signup/main.html', {
+        return render(req, 'signup/main.html', {
             'error': error,
             'email': req.POST.get('email'),
         })
@@ -50,7 +49,7 @@ def signup(req):
         )
         u.save()
     except Exception as e:
-        return _pmrender(req, 'signup/main.html', {
+        return render(req, 'signup/main.html', {
             'error': str(e),
             'email': req.POST.get('email'),
         })
