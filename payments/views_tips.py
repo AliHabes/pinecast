@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-from __future__ import division
-
+import sys
 from urllib.parse import quote
 
 import rollbar
@@ -252,10 +250,11 @@ def _finish_sub(req, pod, amount, email, token):
         customer = stripe.Customer.create(
             email=email,
             plan='tipsub',
-            quantity=amount / 100,
+            quantity=int(amount / 100),
             source=token,
             stripe_account=managed_account)
-    except stripe.error.InvalidRequestError:
+    except stripe.error.InvalidRequestError as e:
+        rollbar.report_exc_info(sys.exc_info())
         return True
     sub.stripe_customer_id = customer.id
     sub.stripe_subscription_id = customer.subscriptions.data[0].id
