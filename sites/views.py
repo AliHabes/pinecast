@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import datetime
 
 import gfm
+from django.conf import settings
 from django.contrib.syndication.views import Feed
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponse
@@ -31,6 +32,9 @@ def _srender(req, site, template, data=None):
     if 'site_hostname' in req.META:
         data['url'] = _subdomain_reverse
         data['url_global'] = reverse
+
+        base_url = 'https://pinecast.com%s' if not settings.DEBUG else 'http://localhost:8000%s'
+        data['player_url'] = lambda ep: base_url % reverse('player', episode_id=str(ep.id))
     return render(req, 'sites/%s/%s' % (site.theme, template), data)
 
 

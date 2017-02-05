@@ -16,7 +16,7 @@
 
     <img src="{{ episode.image_url }}" alt="">
 
-    <iframe src="https://pinecast.com{{ url_global('player', episode_id=str(episode.id)) }}" seamless height="60" style="border:0" class="pinecast-embed"></iframe>
+    <iframe src="{{ player_url(episode) }}" seamless height="60" style="border:0" class="pinecast-embed"></iframe>
 
     <div>
       {{ episode.get_html_description()|safe }}
