@@ -86,9 +86,15 @@ def round_now():
     return now - datetime.timedelta(microseconds=now.microsecond)
 
 
-def get_object_or_404(*args, **kwargs):
+def get_object_or_404(model, *args, select_related=None, **kwargs):
+    if select_related:
+        if isinstance(select_related, tuple):
+            model = model.objects.select_related(*select_related)
+        else:
+            model = model.objects.select_related(select_related)
+
     try:
-        return dj_get_object_or_404(*args, **kwargs)
+        return dj_get_object_or_404(model, *args, **kwargs)
     except ValueError:
         raise Http404()
 

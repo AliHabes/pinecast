@@ -27,4 +27,4 @@
 
 {% endblock %}
 
-{% block feedbackurl %}https://pinecast.com{{ url_global('ep_comment_box', podcast_slug=site.podcast.slug, episode_id=str(episode.id)) }}{% endblock %}
+{% block feedbackurl %}https://pinecast.com{{ url_global('ep_comment_box', podcast_slug=podcast.slug, episode_id=str(episode.id)) }}{% endblock %}

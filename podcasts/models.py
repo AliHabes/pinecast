@@ -98,13 +98,21 @@ class Podcast(models.Model):
         return PodcastEpisode.objects.filter(podcast=self)
 
     @cached_method
-    def get_episodes(self):
+    def get_episodes(self, select_related=None):
         episodes = self.get_all_episodes_raw().filter(
             publish__lt=round_now(),
             awaiting_import=False).order_by('-publish')
+        if select_related:
+            episodes = episodes.select_related(select_related)
         us = UserSettings.get_from_user(self.owner)
         if us.plan == payment_plans.PLAN_DEMO:
             episodes = episodes[:10]
+
+        # This is a clever little optimization to prevent `episode.podcast`
+        # from doing a db query, and avoiding needing to `select_related('podcast')`,
+        # which also does extra work.
+        for ep in episodes:
+            setattr(ep, 'podcast', self)
         return episodes
 
     @cached_method

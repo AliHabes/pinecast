@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from .. import urls_internal
 from ..models import Site
 from accounts.models import UserSettings
-from accounts.payment_plans import FEATURE_MIN_CNAME, minimum
+from accounts.payment_plans import FEATURE_MIN_CNAME, FEATURE_MIN_SITES, minimum
 from podcasts.models import Podcast
 
 
@@ -30,9 +30,12 @@ class SubdomainMiddleware(object):
         if pc_forward:
             try:
                 site = Site.objects.get(custom_cname__iexact=pc_forward)
-                us = UserSettings.get_from_user(site.podcast.owner)
-                if not minimum(us.plan, FEATURE_MIN_CNAME):
-                    raise NotCNAMEReadyException()
+
+                if FEATURE_MIN_SITES != FEATURE_MIN_CNAME:
+                    us = UserSettings.get_from_user(site.podcast.owner)
+                    if not minimum(us.plan, FEATURE_MIN_CNAME):
+                        raise NotCNAMEReadyException()
+
                 return self._resolve(req, site.podcast.slug)
             except (Site.DoesNotExist, NotCNAMEReadyException):
                 pass
@@ -50,8 +53,10 @@ class SubdomainMiddleware(object):
         except (Site.DoesNotExist, Podcast.DoesNotExist):
             return None
 
-        us = UserSettings.get_from_user(pod.owner)
-        if minimum(us.plan, FEATURE_MIN_CNAME) and site.custom_cname:
+        can_have_cname = (
+            True if FEATURE_MIN_CNAME == FEATURE_MIN_SITES else
+            minimum(UserSettings.get_from_user(pod.owner).plan, FEATURE_MIN_CNAME))
+        if can_have_cname and site.custom_cname:
             return redirect(
                 '%s://%s%s' % (scheme, site.custom_cname, req.get_full_path()),
                 permanent=True)
@@ -62,5 +67,7 @@ class SubdomainMiddleware(object):
         path = req.get_full_path()
         path_to_resolve = path if '?' not in path else path[:path.index('?')]
         func, args, kwargs = resolve(path_to_resolve, urls_internal)
+        if settings.DEBUG_TOOLBAR and path.startswith('/__debug__/'):
+            return func(req, *args, **kwargs)
         req.META['site_hostname'] = True
         return func(req, podcast_slug=podcast_slug, *args, **kwargs)

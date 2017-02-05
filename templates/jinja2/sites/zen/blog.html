@@ -5,7 +5,7 @@
   {% for post in pager %}
     <article class="blog-post">
       <div>
-        <h1><a href="{{ url('site_post', podcast_slug=site.podcast.slug, post_slug=post.slug) }}">{{ post.title }}</a></h1>
+        <h1><a href="{{ url('site_post', podcast_slug=podcast.slug, post_slug=post.slug) }}">{{ post.title }}</a></h1>
         <div>
           {{ post.body|markdown|sanitize|safe }}
         </div>
@@ -20,11 +20,11 @@
   {% if pager.has_other_pages() %}
     <div class="pagination">
       {% if pager.has_next() %}
-        <a href="{{ url('site_home', podcast_slug=site.podcast.slug) }}?page={{ pager.next_page_number() }}">{{ _('Back in time') }}</a>
+        <a href="{{ url('site_home', podcast_slug=podcast.slug) }}?page={{ pager.next_page_number() }}">{{ _('Back in time') }}</a>
       {% endif %}
       {% if pager.has_next() and pager.has_previous() %}&bull;{% endif %}
       {% if pager.has_previous() %}
-        <a href="{{ url('site_home', podcast_slug=site.podcast.slug) }}?page={{ pager.previous_page_number() }}">{{ _('Onwards to the future') }}</a>
+        <a href="{{ url('site_home', podcast_slug=podcast.slug) }}?page={{ pager.previous_page_number() }}">{{ _('Onwards to the future') }}</a>
       {% endif %}
     </div>
   {% endif %}

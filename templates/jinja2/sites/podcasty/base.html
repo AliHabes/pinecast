@@ -1,7 +1,7 @@
 {% extends 'sites/base.html' %}
 
 {% block title %}
-  {{ site.podcast.name }}
+  {{ podcast.name }}
 {% endblock %}
 
 {% block head %}
@@ -11,11 +11,11 @@
 {% block body %}
   <header>
     <div>
-      <a href="{{ url('site_home', podcast_slug=site.podcast.slug) }}">
+      <a href="{{ url('site_home', podcast_slug=podcast.slug) }}">
         {% if site.logo_url %}
           <img src="{{ site.logo_url|thumbnail(height=60, width=60) }}" alt="" class="logo" height="60" width="60">
         {% else %}
-          {{ site.podcast.name }}
+          {{ podcast.name }}
         {% endif %}
       </a>
     </div>
@@ -25,30 +25,30 @@
   </main>
   <footer>
     {% block footer_blog %}
-      {% if site.siteblogpost_set.count() %}
+      {% if posts %}
         <section class="footer-blog">
           <div>
             <h1>{{ _('Written just for you') }}</h1>
             <ul>
-              {% for post in site.siteblogpost_set.all()[:5] %}
+              {% for post in posts[:5] %}
                 <li>
-                  <a href="{{ url('site_post', podcast_slug=site.podcast.slug, post_slug=post.slug) }}">
+                  <a href="{{ url('site_post', podcast_slug=podcast.slug, post_slug=post.slug) }}">
                     {{ post.title }}
                   </a>
                 </li>
               {% endfor %}
             </ul>
-            <p>{% trans blog_link=url('site_blog', podcast_slug=site.podcast.slug) %}Read more on <a href="{{ blog_link }}">our blog</a>.{% endtrans %}</p>
+            <p>{% trans blog_link=url('site_blog', podcast_slug=podcast.slug) %}Read more on <a href="{{ blog_link }}">our blog</a>.{% endtrans %}</p>
           </div>
         </section>
       {% endif %}
     {% endblock %}
     <section class="footer-copyright">
       <div>
-        <p>{{ site.podcast.copyright }}</p>
+        <p>{{ podcast.copyright }}</p>
       </div>
     </section>
-    {% if site.sitelink_set.count() or site.sitepage_set.count() %}
+    {% if links or pages %}
       <section class="footer-links">
         <div>
           {% include 'sites/menu.html' %}

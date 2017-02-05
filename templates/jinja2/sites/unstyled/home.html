@@ -2,8 +2,8 @@
 
 {% block main %}
 
-  {% if not pager.has_previous() and site.siteblogpost_set.count() %}
-    {% set post = site.siteblogpost_set.all().order_by('-publish')[0] %}
+  {% if not pager.has_previous() and posts %}
+    {% set post = posts[0] %}
     <article class="blog-post">
       <h1 class="teaser"><span>{{ _('From the blog') }}</span></h1>
       <div class="published right">
@@ -13,7 +13,7 @@
       <div class="body">
         {{ post.body|markdown|sanitize|safe }}
       </div>
-      <a href="{{ url('site_post', podcast_slug=site.podcast.slug, post_slug=post.slug) }}" class="read-more"><span>{{ _('Read More') }}</span></a>
+      <a href="{{ url('site_post', podcast_slug=podcast.slug, post_slug=post.slug) }}" class="read-more"><span>{{ _('Read More') }}</span></a>
     </article>
   {% endif %}
 
@@ -32,7 +32,7 @@
         </a>
       </hgroup>
 
-      {% if episode.image_url != site.podcast.cover_image %}
+      {% if episode.image_url != podcast.cover_image %}
         <img class="episode-image" src="{{ episode.image_url }}" alt="">
       {% else %}
         <iframe src="{{ player_url(episode) }}" seamless height="60" style="border:0" class="pinecast-embed"></iframe>
@@ -48,11 +48,11 @@
   {% if pager.has_other_pages() %}
     <div class="pagination">
       {% if pager.has_next() %}
-        <a href="{{ url('site_home', podcast_slug=site.podcast.slug) }}?page={{ pager.next_page_number() }}"><span>{{ _('Back in time') }}</span></a>
+        <a href="{{ url('site_home', podcast_slug=podcast.slug) }}?page={{ pager.next_page_number() }}"><span>{{ _('Back in time') }}</span></a>
       {% endif %}
       {% if pager.has_next() and pager.has_previous() %}<span>&bull;</span>{% endif %}
       {% if pager.has_previous() %}
-        <a href="{{ url('site_home', podcast_slug=site.podcast.slug) }}?page={{ pager.previous_page_number() }}"><span>{{ _('Onwards to the future') }}</span></a>
+        <a href="{{ url('site_home', podcast_slug=podcast.slug) }}?page={{ pager.previous_page_number() }}"><span>{{ _('Onwards to the future') }}</span></a>
       {% endif %}
     </div>
   {% endif %}

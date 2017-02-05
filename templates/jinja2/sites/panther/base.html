@@ -1,7 +1,7 @@
 {% extends 'sites/base.html' %}
 
 {% block title %}
-  {{ site.podcast.name }}
+  {{ podcast.name }}
 {% endblock %}
 
 {% block head %}
@@ -13,15 +13,15 @@
     {% if site.logo_url %}
       <img src="{{ site.logo_url|thumbnail(height=100, width=100) }}" alt="" class="logo" height="100" width="100">
     {% endif %}
-    <h1><a href="{{ url('site_home', podcast_slug=site.podcast.slug) }}">{{ site.podcast.name }}</a></h1>
-    <h2>{{ site.podcast.subtitle }}</h2>
+    <h1><a href="{{ url('site_home', podcast_slug=podcast.slug) }}">{{ podcast.name }}</a></h1>
+    <h2>{{ podcast.subtitle }}</h2>
   </header>
   <main>
     {% block main %}{% endblock %}
   </main>
   <footer>
     <div class="footer-row">
-      {% if site.sitelink_set.count() or site.sitepage_set.count() %}
+      {% if links or pages %}
         <div class="footer-col">
           <strong>{{ _('Menu') }}</strong>
           <ul>
@@ -34,7 +34,7 @@
         <strong>{{ _('Subscribe') }}</strong>
         <ul>
           <li>
-            <a href="https://pinecast.com{{ url_global('feed', podcast_slug=site.podcast.slug) }}">{{ _('RSS Feed') }}</a>
+            <a href="https://pinecast.com{{ url_global('feed', podcast_slug=podcast.slug) }}">{{ _('RSS Feed') }}</a>
           </li>
           {% if site.itunes_url %}
             <li>
@@ -48,13 +48,13 @@
           {% endif %}
         </ul>
       </div>
-      {% if site.siteblogpost_set.count() %}
+      {% if posts %}
         <div class="footer-col">
           <strong>{{ _('Blog Posts') }}</strong>
             <ul>
-              {% for post in site.siteblogpost_set.all()[:5] %}
+              {% for post in posts[:5] %}
                 <li>
-                  <a href="{{ url('site_post', podcast_slug=site.podcast.slug, post_slug=post.slug) }}">
+                  <a href="{{ url('site_post', podcast_slug=podcast.slug, post_slug=post.slug) }}">
                     {{ post.title }}
                   </a>
                 </li>

@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
-from django.conf.urls import url
+from django.conf import settings
+from django.conf.urls import include, url
 from django.http import HttpResponse
 
 from . import views
@@ -17,3 +18,7 @@ urlpatterns = [
     url(r'^favicon.ico$', views.favicon, name='site_favicon'),
     url(r'^(?P<page_slug>[\w-]+)$', views.site_page, name='site_page'),
 ]
+
+if settings.DEBUG_TOOLBAR:
+    import debug_toolbar
+    urlpatterns += (url(r'^__debug__/', include(debug_toolbar.urls)), )

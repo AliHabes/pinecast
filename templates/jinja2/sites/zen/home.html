@@ -2,21 +2,21 @@
 
 {% block main %}
 
-  {% if not pager.has_previous() and site.siteblogpost_set.count() %}
+  {% if not pager.has_previous() and posts %}
     <section class="home-blog">
       <ol>
-        {% for post in site.siteblogpost_set.all()[:2] %}
+        {% for post in posts[:2] %}
           <li>
-            <a href="{{ url('site_post', podcast_slug=site.podcast.slug, post_slug=post.slug) }}">{{ post.title }}</a>
+            <a href="{{ url('site_post', podcast_slug=podcast.slug, post_slug=post.slug) }}">{{ post.title }}</a>
           </li>
         {% endfor %}
       </ol>
-      <p>{% trans blog_link=url('site_blog', podcast_slug=site.podcast.slug) %}Read more on <a href="{{ blog_link }}">our blog</a>.{% endtrans %}</p>
+      <p>{% trans blog_link=url('site_blog', podcast_slug=podcast.slug) %}Read more on <a href="{{ blog_link }}">our blog</a>.{% endtrans %}</p>
     </section>
   {% endif %}
 
   <div class="subscribe-buttons">
-    <a class="btn" href="https://pinecast.com{{ url_global('feed', podcast_slug=site.podcast.slug) }}">
+    <a class="btn" href="https://pinecast.com{{ url_global('feed', podcast_slug=podcast.slug) }}">
       {{ _('Subscribe with RSS') }}
     </a>
     {%- if site.itunes_url -%}
@@ -48,10 +48,10 @@
   {% if pager.has_other_pages() %}
     <div class="pagination">
       {% if pager.has_next() %}
-        <a class="btn" href="{{ url('site_home', podcast_slug=site.podcast.slug) }}?page={{ pager.next_page_number() }}">{{ _('Back in time') }}</a>
+        <a class="btn" href="{{ url('site_home', podcast_slug=podcast.slug) }}?page={{ pager.next_page_number() }}">{{ _('Back in time') }}</a>
       {% endif %}
       {% if pager.has_previous() %}
-        <a class="btn" href="{{ url('site_home', podcast_slug=site.podcast.slug) }}?page={{ pager.previous_page_number() }}">{{ _('Onwards to the future') }}</a>
+        <a class="btn" href="{{ url('site_home', podcast_slug=podcast.slug) }}?page={{ pager.previous_page_number() }}">{{ _('Onwards to the future') }}</a>
       {% endif %}
     </div>
   {% endif %}

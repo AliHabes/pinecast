@@ -25,9 +25,9 @@ def _subdomain_reverse(*args, **kwargs):
     from . import urls_internal
     return reverse(urlconf=urls_internal, *args, **kwargs)
 
-def _srender(req, site, template, data=None):
-
+def _srender(req, podcast, site, template, data=None):
     data = data or {}
+    data.setdefault('podcast', podcast)
     data.setdefault('site', site)
     if 'site_hostname' in req.META:
         data['url'] = _subdomain_reverse
@@ -35,13 +35,19 @@ def _srender(req, site, template, data=None):
 
         base_url = 'https://pinecast.com%s' if not settings.DEBUG else 'http://localhost:8000%s'
         data['player_url'] = lambda ep: base_url % reverse('player', episode_id=str(ep.id))
+
+        data['links'] = site.sitelink_set.all()
+        data['pages'] = site.sitepage_set.all()
+        if 'posts' not in data:
+            data['posts'] = (site.siteblogpost_set.filter(publish__lt=datetime.datetime.now())
+                .order_by('-publish'))
     return render(req, 'sites/%s/%s' % (site.theme, template), data)
 
 
 def site_home(req, podcast_slug):
-    pod = get_object_or_404(Podcast, slug=podcast_slug)
+    pod = get_object_or_404(Podcast, slug=podcast_slug, select_related='owner')
     site = get_object_or_404(models.Site, podcast=pod)
-    episodes = pod.get_episodes()
+    episodes = pod.get_episodes('podcast')
     paginator = Paginator(episodes, SITE_EPISODES_PER_PAGE)
     try:
         pager = paginator.page(req.GET.get('page'))
@@ -49,11 +55,11 @@ def site_home(req, podcast_slug):
         pager = paginator.page(1)
     except EmptyPage:
         return redirect('site_home', podcast_slug=pod.slug)
-    return _srender(req, site, 'home.html', {'pager': pager})
+    return _srender(req, pod, site, 'home.html', {'pager': pager})
 
 
 def site_blog(req, podcast_slug):
-    pod = get_object_or_404(Podcast, slug=podcast_slug)
+    pod = get_object_or_404(Podcast, slug=podcast_slug, select_related='owner')
     site = get_object_or_404(models.Site, podcast=pod)
     posts = site.siteblogpost_set.filter(
         publish__lt=datetime.datetime.now()).order_by('-publish')
@@ -64,27 +70,27 @@ def site_blog(req, podcast_slug):
         pager = paginator.page(1)
     except EmptyPage:
         return redirect('site_home', podcast_slug=pod.slug)
-    return _srender(req, site, 'blog.html', {'pager': pager})
+    return _srender(req, pod, site, 'blog.html', {'posts': posts, 'pager': pager})
 
 def site_post(req, podcast_slug, post_slug):
-    pod = get_object_or_404(Podcast, slug=podcast_slug)
+    pod = get_object_or_404(Podcast, slug=podcast_slug, select_related='owner')
     site = get_object_or_404(models.Site, podcast=pod)
     post = get_object_or_404(models.SiteBlogPost, site=site, slug=post_slug)
-    return _srender(req, site, 'post.html', {'post': post})
+    return _srender(req, pod, site, 'post.html', {'post': post})
 
 def site_episode(req, podcast_slug, episode_id):
-    pod = get_object_or_404(Podcast, slug=podcast_slug)
+    pod = get_object_or_404(Podcast, slug=podcast_slug, select_related='owner')
     site = get_object_or_404(models.Site, podcast=pod)
     episode = get_object_or_404(PodcastEpisode, podcast=site.podcast, id=episode_id)
-    return _srender(req, site, 'episode.html', {'episode': episode})
+    return _srender(req, pod, site, 'episode.html', {'episode': episode})
 
 
 def site_page(req, podcast_slug, page_slug):
-    pod = get_object_or_404(Podcast, slug=podcast_slug)
+    pod = get_object_or_404(Podcast, slug=podcast_slug, select_related='owner')
     site = get_object_or_404(models.Site, podcast=pod)
     page = get_object_or_404(models.SitePage, site=site, slug=page_slug)
 
-    return _srender(req, site, 'page.html', {'page': page})
+    return _srender(req, pod, site, 'page.html', {'page': page})
 
 
 class BlogRSS(Feed):

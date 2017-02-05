@@ -19,7 +19,7 @@
 
         <div class="subscribe">
           <strong>{{ _('Subscribe to keep up') }}</strong>
-          <a class="btn" href="https://pinecast.com{{ url_global('feed', podcast_slug=site.podcast.slug) }}">
+          <a class="btn" href="https://pinecast.com{{ url_global('feed', podcast_slug=podcast.slug) }}">
             {{ _('RSS') }}
           </a>
           {%- if site.itunes_url -%}
@@ -68,11 +68,11 @@
   {% if pager.has_other_pages() %}
     <div class="pagination">
       {% if pager.has_next() %}
-        <a class="btn" href="{{ url('site_home', podcast_slug=site.podcast.slug) }}?page={{ pager.next_page_number() }}">{{ _('Back in time') }}</a>
+        <a class="btn" href="{{ url('site_home', podcast_slug=podcast.slug) }}?page={{ pager.next_page_number() }}">{{ _('Back in time') }}</a>
       {% endif %}
       {% if pager.has_next() and pager.has_previous() %}&bull;{% endif %}
       {% if pager.has_previous() %}
-        <a class="btn" href="{{ url('site_home', podcast_slug=site.podcast.slug) }}?page={{ pager.previous_page_number() }}">{{ _('Onwards to the future') }}</a>
+        <a class="btn" href="{{ url('site_home', podcast_slug=podcast.slug) }}?page={{ pager.previous_page_number() }}">{{ _('Onwards to the future') }}</a>
       {% endif %}
     </div>
   {% endif %}

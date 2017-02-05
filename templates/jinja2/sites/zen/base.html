@@ -1,7 +1,7 @@
 {% extends 'sites/base.html' %}
 
 {% block title %}
-  {{ site.podcast.name }}
+  {{ podcast.name }}
 {% endblock %}
 
 {% block head %}
@@ -11,11 +11,11 @@
 {% block body %}
   <header>
     <div style="{{ site.get_cover_style(bgcolor='#2196F3') }}">
-      <a href="{{ url('site_home', podcast_slug=site.podcast.slug) }}">
+      <a href="{{ url('site_home', podcast_slug=podcast.slug) }}">
         {% if site.logo_url %}
           <img src="{{ site.logo_url|thumbnail(height=60, width=60) }}" alt="" class="logo" height="60" width="60">
         {% else %}
-          {{ site.podcast.name }}
+          {{ podcast.name }}
         {% endif %}
       </a>
     </div>
@@ -28,7 +28,7 @@
       <div>
         {% include 'sites/menu.html' %}
 
-        <a href="https://pinecast.com{{ url_global('feed', podcast_slug=site.podcast.slug) }}">
+        <a href="https://pinecast.com{{ url_global('feed', podcast_slug=podcast.slug) }}">
           {{ _('RSS Feed') }}
         </a>
         {%- if site.itunes_url -%}
@@ -44,7 +44,7 @@
       </div>
     </section>
     <section class="footer-copyright">
-        <p>{{ site.podcast.copyright }}</p>
+        <p>{{ podcast.copyright }}</p>
     </section>
   </footer>
 {% endblock %}

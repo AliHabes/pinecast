@@ -3,9 +3,9 @@
   <head>
     <title>{% block title %}{% endblock %}</title>
     {% block head %}{% endblock %}
-    <link rel="alternate" type="application/rss+xml" title="{{ _('Podcast Feed') }}" href="https://pinecast.com{{ url_global('feed', podcast_slug=site.podcast.slug) }}">
-    {% if site.siteblogpost_set.all().count() %}
-      <link rel="alternate" type="application/rss+xml" title="{{ _('Blog RSS Feed') }}" href="{{ url('blog_rss', podcast_slug=site.podcast.slug) }}">
+    <link rel="alternate" type="application/rss+xml" title="{{ _('Podcast Feed') }}" href="https://pinecast.com{{ url_global('feed', podcast_slug=podcast.slug) }}">
+    {% if posts %}
+      <link rel="alternate" type="application/rss+xml" title="{{ _('Blog RSS Feed') }}" href="{{ url('blog_rss', podcast_slug=podcast.slug) }}">
     {% endif %}
     {% if site.favicon_url %}
       <link type="image/png" rel="icon" href="{{ site.favicon_url }}">
@@ -21,9 +21,9 @@
     {% endif %}
   </head>
   <body>
-    {% if minimum_plan(site.podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
+    {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
       <aside class="leave-feedback">
-        <a href="{% block feedbackurl %}https://pinecast.com{{ url_global('podcast_comment_box', podcast_slug=site.podcast.slug) }}{% endblock %}">
+        <a href="{% block feedbackurl %}https://pinecast.com{{ url_global('podcast_comment_box', podcast_slug=podcast.slug) }}{% endblock %}">
           <span>{{ _('Leave a note in the comment box') }}</span>
         </a>
       </aside>
