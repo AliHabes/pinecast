@@ -54,7 +54,7 @@
       </div>
       <div class="segment">
         <span>{{ _('Size') }}</span>
-        <em>{{ episode.audio_size|filesizeformat }}</em>
+        <em title="{{ _('%d bytes') % episode.audio_size }}">{{ episode.audio_size|filesizeformat }}</em>
       </div>
       <div class="segment">
         <span>{{ _('Duration') }}</span>
