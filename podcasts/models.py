@@ -22,11 +22,13 @@ FLAIR_FEEDBACK = 'flair_feedback'
 FLAIR_SITE_LINK = 'flair_site_link'
 FLAIR_POWERED_BY = 'flair_powered_by'
 FLAIR_TIP_JAR = 'flair_tip_jar'
+FLAIR_REFERRAL_CODE = 'flair_referral_code'
 FLAIR_FLAGS = (
     (FLAIR_FEEDBACK, ugettext_lazy('Feedback form link')),
     (FLAIR_SITE_LINK, ugettext_lazy('Link to podcast website')),
     (FLAIR_POWERED_BY, ugettext_lazy('Powered By Pinecast')),
     (FLAIR_TIP_JAR, ugettext_lazy('Tip Jar link')),
+    (FLAIR_REFERRAL_CODE, ugettext_lazy('Pinecast referral code')),
 )
 FLAIR_FLAGS_MAP = {k: v for k, v in FLAIR_FLAGS}
 
@@ -137,15 +139,18 @@ class Podcast(models.Model):
             # This is inside a conditional because it's forced on for free
             # users.
             flags.append(FLAIR_POWERED_BY)
-        if payment_plans.minimum(
-                plan, payment_plans.FEATURE_MIN_COMMENT_BOX):
+        if payment_plans.minimum(plan, payment_plans.FEATURE_MIN_COMMENT_BOX):
             flags.append(FLAIR_FEEDBACK)
         if us.stripe_payout_managed_account:
             flags.append(FLAIR_TIP_JAR)
 
-        if payment_plans.minimum(
-                plan, payment_plans.FEATURE_MIN_SITES) and self.get_site():
+        if payment_plans.minimum(plan, payment_plans.FEATURE_MIN_SITES) and self.get_site():
             flags.append(FLAIR_SITE_LINK)
+
+        if (plan != payment_plans.PLAN_DEMO and
+            plan != payment_plans.PLAN_COMMUNITY and
+            us.coupon_code):
+            flags.append(FLAIR_REFERRAL_CODE)
 
         if flatten:
             return flags
@@ -241,6 +246,7 @@ class PodcastEpisode(models.Model):
     flair_site_link = models.BooleanField(default=False)
     flair_powered_by = models.BooleanField(default=False)
     flair_tip_jar = models.BooleanField(default=False)
+    flair_referral_code = models.BooleanField(default=False)
 
     EXPLICIT_OVERRIDE_CHOICE_NONE = 'none'
     EXPLICIT_OVERRIDE_CHOICE_EXPLICIT = 'expl'
@@ -276,8 +282,8 @@ class PodcastEpisode(models.Model):
 
     def get_html_description(self, is_demo=None):
         raw = self.description
+        us = UserSettings.get_from_user(self.podcast.owner)
         if is_demo is None:
-            us = UserSettings.get_from_user(self.podcast.owner)
             is_demo = us.plan == payment_plans.PLAN_DEMO
         available_flags = self.podcast.get_available_flair_flags(flatten=True)
 
@@ -286,10 +292,9 @@ class PodcastEpisode(models.Model):
             raw += '\n\nSupport %s by donating to the [tip jar](https://pinecast.com/payments/tips/%s).' % (
                 self.podcast.name, self.podcast.slug)
 
-        if (self.flair_site_link and
-            FLAIR_SITE_LINK in available_flags):
-            raw += '\n\nFind out more at [%s](http://%s.pinecast.co).' % (
-                self.podcast.name, self.podcast.slug)
+        if self.flair_site_link and FLAIR_SITE_LINK in available_flags:
+            site_url = self.podcast.get_site().get_domain()
+            raw += '\n\nFind out more at [%s](%s).' % (self.podcast.name, site_url)
 
         if (self.flair_feedback and
             FLAIR_FEEDBACK in available_flags):
@@ -300,11 +305,27 @@ class PodcastEpisode(models.Model):
                 episode_id=str(self.id))
             raw += '\n\n%s [%s](%s)' % (prompt, fb_url, fb_url)
 
-        if (is_demo or
-                self.flair_powered_by and
-                FLAIR_SITE_LINK in available_flags):
+        has_powered_by = is_demo or self.flair_powered_by and FLAIR_POWERED_BY in available_flags
+        if has_powered_by:
             raw += ('\n\nThis podcast is powered by '
                     '[Pinecast](https://pinecast.com).')
+
+        if self.flair_referral_code and FLAIR_REFERRAL_CODE in available_flags:
+            if has_powered_by:
+                raw += ' Try Pinecast for free, forever, no credit card required. '
+            else:
+                raw += (
+                    '\n\nCheck out our podcasting host, '
+                    '[Pinecast](https://pinecast.com). Start your own podcast '
+                    'for free, no credit card required, forever. ')
+
+            raw += (
+                'If you decide to upgrade, use coupon code **%s** for %d%% off '
+                'for %d months, and support %s.') % (
+                    us.coupon_code,
+                    settings.REFERRAL_DISCOUNT,
+                    settings.REFERRAL_DISCOUNT_DURATION,
+                    self.podcast.name)
 
         markdown = gfm.markdown(raw)
         return sanitize(markdown)
