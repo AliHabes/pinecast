@@ -83,14 +83,23 @@ https://pinecast.com{url}
 def validate_confirmation(req, max_age=settings.EMAIL_CONFIRMATION_MAX_AGE):
     full_path = req.get_full_path()
     if CONFIRMATION_PARAM not in full_path:
+        rollbar.report_message('Confirmation URL without param (%s): %s' % (CONFIRMATION_PARAM, full_path), 'warning')
         return False
     param_loc = full_path.index(CONFIRMATION_PARAM)
     trimmed_path = full_path[:param_loc - 1]
     signed = req.GET.get(CONFIRMATION_PARAM)
     try:
         signature = signer.unsign(signed, max_age=max_age).decode('utf-8')
-        return hashlib.sha1(trimmed_path.encode('utf-8')).hexdigest() == signature
-    except itsdangerous.BadTimeSignature:
+        hashed_path = hashlib.sha1(trimmed_path.encode('utf-8')).hexdigest()
+        success = hashed_path == signature
+        if not success:
+            rollbar.report_message(
+                'Failed confirmation with mismatched hashes: %s != %s (via %s)' % (
+                    signature, hashed_path, trimmed_path),
+                'warning')
+        return success
+    except itsdangerous.BadTimeSignature as e:
+        rollbar.report_message('Failed confirmation with bad time signature: %s' % str(e), 'warning')
         return False
 
 
