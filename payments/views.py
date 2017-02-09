@@ -148,7 +148,6 @@ def set_tip_cashout(req):
             'line1': req.POST.get('addressStreet'),
             'line2': req.POST.get('addressSecond'),
         },
-        'ssn_last_4': req.POST.get('ssnLastFour'),
         'dob': {
             'day': dob.day,
             'month': dob.month,
@@ -159,16 +158,30 @@ def set_tip_cashout(req):
         'type': 'individual',
     }
 
+    address_country = req.POST.get('addressCountry', '').upper()
+    if address_country and address_country != 'undefined':
+        legal_entity['address']['country'] = address_country[:2]
+
+    if address_country == 'US':
+        legal_entity['ssn_last_4'] = req.POST.get('ssnLastFour')
+
     us = UserSettings.get_from_user(req.user)
     account = us.get_stripe_managed_account()
+    token = req.POST.get('token')
     if account:
-        account.external_account = req.POST.get('token')
+        account.external_account = token
         for key in legal_entity:
             setattr(account.legal_entity, key, legal_entity[key])
-        account.save()
+        try:
+            account.save()
+        except stripe.error.InvalidRequestError as e:
+            if settings.DEBUG:
+                print(e)
+            else:
+                rollbar.report_exc_info(sys.exc_info(), req)
+            return {'success': False, 'error': e._message}
     else:
-        us.create_stripe_managed_account(
-            req.POST.get('token'), ip, legal_entity)
+        us.create_stripe_managed_account(token, ip, legal_entity)
 
     return {'success': True}
 

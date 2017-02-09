@@ -1103,7 +1103,7 @@ menu.toolbar-right li {
 }
 
 .form-block .select,
-.form-block form label input,
+.form-block form label input:not([role=combobox]),
 .form-block form label textarea {
     background: rgba(255, 255, 255, 0.8);
     border: 2px solid #777;
@@ -1157,7 +1157,7 @@ menu.toolbar-right li {
         white-space: nowrap;
     }
     .form-block form:not(.inline-form) label:not(.checkbox) input {
-        flex: 1 1 2.5em;
+        flex: 1 1 2.5em !important /* important to override inline styles from React */;
     }
 }
 

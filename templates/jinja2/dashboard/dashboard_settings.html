@@ -326,10 +326,10 @@
 
   <hr>
 
-  {% if user_settings.stripe_payout_managed_account %}
+  {% set existing_acc = user_settings.get_account_info() %}
+  {% if existing_acc %}
     <strong>{{ _('Existing Bank Account') }}</strong>
 
-    {% set existing_acc = user_settings.get_account_info() %}
 
     <p>{{ _('A bank account is already linked to your account. You are all set to accept tips for your podcast!') }}</p>
 
@@ -360,7 +360,14 @@
     <p>{{ _('Adding a bank account will allow your podcasts to begin accepting tips. All information provided will stored securely by our payment processor and will never pass through Pinecast servers.') }}</p>
   {% endif %}
   <div class="bank-info-form"
-      data-has-existing="{{ 'true' if user_settings.stripe_payout_managed_account else 'false'}}"
+      {% if existing_acc %}
+        data-has-existing="true"
+        data-entity-country="{{ existing_acc['entity_country'] }}"
+        data-bank-country="{{ existing_acc['country'] }}"
+        data-currency="{{ existing_acc['currency'] }}"
+      {% else %}
+        data-has-existing="false"
+      {% endif %}
       data-publishable-key="{{ STRIPE_PUBLISHABLE_KEY }}"></div>
   <p>
     <small>

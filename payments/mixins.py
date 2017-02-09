@@ -72,7 +72,6 @@ class StripeManagedAccountMixin(object):
     def get_stripe_managed_account(self):
         if self.stripe_payout_managed_account:
             return stripe.Account.retrieve(self.stripe_payout_managed_account)
-
         return None
 
     def create_stripe_managed_account(self, token, user_ip, legal_entity):
@@ -80,28 +79,7 @@ class StripeManagedAccountMixin(object):
             self.get_stripe_managed_account().delete()
 
         account = stripe.Account.create(
-            email=self.get_email(),
-            external_account=token,
-            legal_entity=legal_entity,
-            managed=True,
-            tos_acceptance={
-                'date': datetime.datetime.now(),
-                'ip': user_ip,
-            },
-            transfer_schedule={
-                'delay_days': 7,
-                'interval': 'weekly',
-                'weekly_anchor': 'friday',
-            })
-
-        self.stripe_payout_managed_account = account.id
-        self.save()
-
-    def update_stripe_managed_account(self, token, user_ip, legal_entity):
-        if self.stripe_payout_managed_account:
-            self.get_stripe_managed_account().delete()
-
-        account = stripe.Account.create(
+            country=legal_entity['address']['country'],
             email=self.get_email(),
             external_account=token,
             legal_entity=legal_entity,
@@ -130,7 +108,9 @@ class StripeManagedAccountMixin(object):
         bank_account = account.external_accounts.data[0]
         return {
             'bank_name': bank_account.bank_name,
+            'entity_country': account.country,
             'country': bank_account.country,
+            'currency': bank_account.currency,
             'name': bank_account.account_holder_name,
         }
 
