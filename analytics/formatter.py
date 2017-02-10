@@ -84,6 +84,7 @@ class Format(object):
         self.criteria = {}
         self.timeframe = None
         self.force_timeframe = False
+        self._no_timezones = False
         self.interval_val = None
         self.group_by = None
         self.res = None
@@ -118,6 +119,10 @@ class Format(object):
             self.interval_val = 'daily'
         return self
 
+    def no_timezones(self):
+        self._no_timezones = True
+        return self
+
     def _process(self):
         assert self.selection
 
@@ -128,7 +133,10 @@ class Format(object):
         where = ''
         group_by = ''
 
-        tz = UserSettings.get_from_user(self.req.user).tz_offset
+        if self._no_timezones:
+            tz = 0
+        else:
+            tz = UserSettings.get_from_user(self.req.user).tz_offset
 
         if self.criteria:
             where = ' AND '.join(
@@ -158,15 +166,13 @@ class Format(object):
         if self.interval_val:
             if group_by:
                 group_by += ', '
-            group_by += INTERVALS[self.interval_val] % (-1 * self._get_tz_offset().total_seconds() // 3600)
+            group_by += INTERVALS[self.interval_val] % (-1 * tz)
 
         query = 'SELECT %s FROM %s' % (select, ident(self.event_type))
         if where:
             query += ' WHERE %s' % where
         if group_by:
             query += ' GROUP BY %s' % group_by
-
-        query += ';'
 
         if settings.DEBUG:
             print(query)
@@ -181,6 +187,8 @@ class Format(object):
         return key, value_key
 
     def _get_tz_offset(self):
+        if self._no_timezones:
+            return datetime.timedelta()
         tz = UserSettings.get_from_user(self.req.user).tz_offset
         return datetime.timedelta(hours=tz)
 

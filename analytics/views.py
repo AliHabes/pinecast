@@ -38,7 +38,8 @@ def podcast_subscriber_locations_specific(req, pod, iso_code):
     f = (Format(req, 'subscription-country')
             .select(ip=True)
             .where(podcast=str(pod.id), country=iso_code)
-            .during('yesterday', force=True))
+            .during('yesterday', force=True)
+            .no_timezones())
     return format_ip_list(f, 'city')
 
 
@@ -79,7 +80,8 @@ def podcast_subscriber_history(req, pod):
     f = (Format(req, 'subscription')
             .select(podcast_f='count')
             .last_thirty()
-            .where(podcast=str(pod.id)))
+            .where(podcast=str(pod.id))
+            .no_timezones())
 
     return f.format_interval(label=ugettext('Subscribers'))
 
