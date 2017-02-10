@@ -27,7 +27,9 @@ class SubdomainMiddleware(object):
             domain = domain[:domain.index(':')]
 
         pc_forward = req.META.get('HTTP_X_PINECAST_FORWARD')
-        if pc_forward:
+        if pc_forward.endswith('.pinecast.co'):
+            domain = pc_forward
+        elif pc_forward:
             try:
                 site = Site.objects.get(custom_cname__iexact=pc_forward)
 
