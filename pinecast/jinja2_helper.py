@@ -164,7 +164,7 @@ def thumbnail(url, width=100, height=100):
         return url
     key = url.split(bucket_host)[1]
     encoded_key = urlencode(key)
-    return 'https://thumb.service.pinecast.com/resize?h=%d&w=%d&key=%s' % (
+    return 'https://thumb.service.pinecast.com:444/resize?h=%d&w=%d&key=%s' % (
         height, width, encoded_key)
 
 def pop_until_lt(arr, field, comp, max=-1):
