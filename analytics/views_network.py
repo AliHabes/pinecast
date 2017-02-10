@@ -43,7 +43,8 @@ def network_subscriber_history(req, net):
             .last_thirty()
             .interval()
             .group('podcast')
-            .where(podcast=[str(p.id) for p in pods]))
+            .where(podcast=[str(p.id) for p in pods])
+            .no_timezones())
 
     return f.format_intervals(
         labels_map={str(p.id): p.name for p in pods},
