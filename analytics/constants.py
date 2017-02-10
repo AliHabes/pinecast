@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy
@@ -47,7 +47,12 @@ def dtnow(tz):
     return now - timedelta(hours=tz)
 
 def ftime(ts):
-    return escape(ts.isoformat() + 'Z')
+    if isinstance(ts, datetime):
+        return escape(ts.isoformat() + 'Z')
+    elif isinstance(ts, date):
+        return escape(ts.isoformat())
+    else:
+        raise Exception('Unknown timestamp type requested for formatting')
 
 USER_TIMEFRAMES = {
     'day': lambda tz: 'time >= %s' % ftime(dtnow(tz) - timedelta(days=1)),

@@ -5,7 +5,7 @@ import json
 
 from django.conf import settings
 
-from .constants import USER_TIMEFRAMES
+from .constants import ftime, USER_TIMEFRAMES
 from .influx import escape, get_client, ident
 from pinecast.types import StringTypes
 
@@ -29,6 +29,9 @@ def total_listens(podcast, episode=None):
 
     query = 'SELECT COUNT(v) FROM "listen" WHERE %s;' % condition
 
+    if settings.DEBUG:
+        print(query)
+
     base_listens = 0
     if not podcast_is_str:
         if episode and not episode_is_str:
@@ -49,6 +52,9 @@ def total_listens_this_week(podcast, tz):
         settings.INFLUXDB_CONDITION_OVERRIDES.get('podcast', str(podcast.id)),
         USER_TIMEFRAMES['week'](tz))
 
+    if settings.DEBUG:
+        print(query)
+
     try:
         return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_LISTEN), 0)
     except Exception:
@@ -56,9 +62,16 @@ def total_listens_this_week(podcast, tz):
 
 
 def total_subscribers(podcast):
+    today = datetime.date.today()
+    yesterday = today - datetime.timedelta(days=1)
+    time_range = 'time >= %s and time < %s' % (ftime(yesterday), ftime(today))
+
     query = 'SELECT COUNT(v) FROM "subscription" WHERE podcast = \'%s\' AND %s;' % (
         settings.INFLUXDB_CONDITION_OVERRIDES.get('podcast', str(podcast.id)),
-        USER_TIMEFRAMES['day'](0)) # tz offset of zero because it doesn't matter which day
+        time_range)
+
+    if settings.DEBUG:
+        print(query)
 
     try:
         return _get_lone(get_client().query(query, database=settings.INFLUXDB_DB_SUBSCRIPTION), 0)
@@ -77,6 +90,9 @@ def get_top_episodes(podcasts, timeframe=None, tz=None):
         where_clause = '(%s) AND %s' % (where_clause, USER_TIMEFRAMES[timeframe](tz))
 
     query = 'SELECT COUNT(episode_f) FROM "listen" WHERE %s GROUP BY episode;' % where_clause
+
+    if settings.DEBUG:
+        print(query)
 
     result = get_client().query(query, database=settings.INFLUXDB_DB_LISTEN)
 
