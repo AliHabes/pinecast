@@ -27,7 +27,7 @@ def get_country(ip, req=None):
 
 def geoip_lookup_bulk(ips):
     try:
-        res = requests.post('https://geoip.service.pinecast.com:445/bulk', json=ips, timeout=4)
+        res = requests.post('https://geoip.service.pinecast.com:444/bulk', json=ips, timeout=4)
         return res.json()
     except Exception as e:
         rollbar.report_message('[pinecast geoip] Error resolving country IP (%s): %s' % (ip, str(e)), 'error')
