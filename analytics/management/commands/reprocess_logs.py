@@ -34,13 +34,15 @@ class Command(BaseCommand):
             dest='region',
             default='us-east-1',
             help='The AWS Lambda region')
+        parser.add_argument('--prefix',
+            action='store',
+            dest='prefix',
+            help='The object prefix, for performance')
 
     def handle(self, *args, **options):
         session = Session(aws_access_key_id=settings.S3_ACCESS_ID,
                           aws_secret_access_key=settings.S3_SECRET_KEY,
                           region_name=options['region'])
-
-        to_reprocess = []
 
         self.stdout.write('Processing bucket: %s' % settings.S3_LOGS_BUCKET)
         self.stdout.write('Downloading S3 manifest...')
@@ -52,8 +54,17 @@ class Command(BaseCommand):
         start_date = datetime.datetime.strptime(options['start'], '%Y-%m-%d')
         end_date = datetime.datetime.strptime(options['end'], '%Y-%m-%d')
 
+        lambda_client = session.client('lambda')
+
         hits = 0
-        for f in bucket.objects.all():
+        found = 0
+
+        if options.get('prefix'):
+            source = bucket.objects.filter(Prefix=options.get('prefix'))
+        else:
+            source = bucket.objects.all()
+
+        for f in source:
             hits += 1
 
             if hits % 500 == 0:
@@ -67,28 +78,25 @@ class Command(BaseCommand):
             if filename.endswith('.gz'):
                 continue
 
-            datestamp = '-'.join(filename.split('-')[:-1])
-            parsed_ds = datetime.datetime.strptime(datestamp, '%Y-%m-%d-%H-%M-%S')
+            try:
+                datestamp = '-'.join(filename.split('-')[:-1])
+                parsed_ds = datetime.datetime.strptime(datestamp, '%Y-%m-%d-%H-%M-%S')
+            except e:
+                print(e)
+                continue
 
             if parsed_ds < start_date or parsed_ds > end_date:
                 continue
 
-            to_reprocess.append(f.key)
+            found += 1
 
-        self.stdout.write('Finished analysis')
-        self.stdout.write('%s logs need to be reprocessed' % len(to_reprocess))
-
-        if not to_reprocess:
-            return
-
-        if options['run']:
-            lambda_client = session.client('lambda')
-            for f in to_reprocess:
+            if options['run']:
+                self.stdout.write('Reprocessing log file %s' % f.key)
                 blob = json.dumps({
                     'Records': [{
                         's3': {
                             'bucket': {'name': settings.S3_LOGS_BUCKET},
-                            'object': {'key': f},
+                            'object': {'key': f.key},
                         }
                     }]
                 })
@@ -97,6 +105,14 @@ class Command(BaseCommand):
                     InvocationType='Event',
                     Payload=blob
                 )
+            else:
+                self.stdout.write('Found log file %s' % f.key)
+
+        self.stdout.write('Finished analysis')
+        self.stdout.write('%s logs found' % hits)
+        self.stdout.write('%s logs need to be reprocessed' % found)
+
+        if options['run']:
             self.stdout.write('Lambda invoked for each log file. See CloudWatch for output')
         else:
             self.stdout.write('No additional action was performed. Use --run to actually reprocess')
