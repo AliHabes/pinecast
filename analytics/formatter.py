@@ -143,11 +143,13 @@ class Format(object):
                 group_by = ident(self.group_by)
 
         if self.timeframe:
-            tf = USER_TIMEFRAMES.get(
-                self.req.GET.get('timeframe', self.timeframe) if
-                    not self.force_timeframe else
-                    self.timeframe,
-                lambda tz: None)(tz)
+            if self.force_timeframe:
+                tf_raw = self.timeframe
+            else:
+                tf_raw = self.req.GET.get('timeframe', self.timeframe)
+
+            tf_uncalled = USER_TIMEFRAMES.get(tf_raw, lambda tz: None)
+            tf = tf_uncalled(tz)
             if tf:
                 if where:
                     where += ' AND '
@@ -203,7 +205,8 @@ class Format(object):
         return header + [
             [tags[key], country_code_map[tags[key]], list(v)[0][value_key]] for
             (_, tags), v in
-            self.res.items()
+            self.res.items() if
+            tags[key] in country_code_map
         ]
 
     def format_interval(self, field='count', label=ugettext_lazy('Series')):
