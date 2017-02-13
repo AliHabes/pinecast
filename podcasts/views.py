@@ -25,13 +25,9 @@ def _asset(url):
 
 def listen(req, episode_id):
     ep = get_object_or_404(PodcastEpisode, id=episode_id)
-    if req.method == 'GET':
-        analytics_log.write_listen(
-            ep=ep,
-            source='embed' if req.GET.get('embed') else 'direct',
-            req=req)
-
-    return redirect(_asset(ep.audio_url))
+    return redirect(
+        _asset(ep.get_url('embed' if req.GET.get('embed') else 'direct'))
+    )
 
 
 def feed(req, podcast_slug):
@@ -44,7 +40,7 @@ def feed(req, podcast_slug):
     channel_explicit_tag = '<itunes:explicit>%s</itunes:explicit>' % ('yes' if pod.is_explicit else 'no')
 
     for ep in episodes:
-        ep_url = _asset(ep.audio_url + '?x-source=rss&x-episode=%s' % str(ep.id))
+        ep_url = _asset(ep.get_url('rss'))
 
         md_desc = ep.get_html_description(is_demo=is_demo)
 

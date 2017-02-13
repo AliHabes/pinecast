@@ -344,6 +344,9 @@ class PodcastEpisode(models.Model):
         except ObjectDoesNotExist:
             pass
 
+    def get_url(self, source):
+        return self.audio_url + '?x-source=%s&x-episode=%s' % (source, str(self.id))
+
     def __str__(self):
         return '%s - %s' % (self.title, self.subtitle)
 
