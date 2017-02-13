@@ -4,6 +4,26 @@
     <a class="btn" href="{{ url('new_episode', podcast_slug=podcast.slug)}}">{{ _('Upload One Now') }}</a>
   </div>
 {% else %}
+
+  {% if len(episodes) == 1 %}
+    <div class="card card-block">
+      <strong>{{ _("You've uploaded your first episode!") }}</strong>
+      <p>
+        {{ _('Now that you have uploaded your first episodes, make sure your show is submitted to Google Play and iTunes. This will help you increase your subscriber count, building your audience.') }}
+      </p>
+      <p>
+        <a href="https://podcastsconnect.apple.com/" title="{{ _('Submit to iTunes') }}">
+          {{ _('Submit to iTunes') }}
+        </a>
+      </p>
+      <p>
+        <a href="https://play.google.com/music/podcasts/portal/" title="{{ _('Submit to Google Play') }}">
+          {{ _('Submit to Google Play') }}
+        </a>
+      </p>
+    </div>
+  {% endif %}
+
   {% set is_pro = minimum_plan(podcast.owner, PLANS.PLAN_PRO) %}
   <table class="card">
     <thead>

@@ -96,7 +96,7 @@
   </table>
 {% endif %}
 
-{% set tip_eps = list(episodes.filter(publish__lte=now())) %}
+{% set tip_eps = future_episodes %}
 {% set podcast_tips = podcast.tip_events.order_by('-occurred_at').select_related('tipper', 'recurring_tip') %}
 {% if podcast_tips.count() %}
   <div class="form-block" style="max-width: initial; padding: 0; margin-left: calc(-20% + 2em)">
@@ -148,10 +148,10 @@
       {% for ep in tip_eps[:3] %}
         {{ tip_ep(ep) }}
       {% endfor %}
-      {% if tip_eps %}
+      {% if tip_eps[3:] %}
         <tr>
           <td colspan="4" class="released-episode">
-            {{ ngettext('%d episode not shown', '%d episodes not shown', len(tip_eps)) % len(tip_eps) }}
+            {{ ngettext('%d episode not shown', '%d episodes not shown', len(tip_eps)) % (len(tip_eps) - 3) }}
           </td>
         </tr>
       {% endif %}

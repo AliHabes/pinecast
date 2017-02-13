@@ -123,7 +123,8 @@ def podcast_dashboard(req, podcast_slug):
 
     data = {
         'podcast': pod,
-        'episodes': pod.podcastepisode_set.order_by('-publish'),
+        'episodes': list(pod.podcastepisode_set.order_by('-publish')),
+        'future_episodes': list(pod.podcastepisode_set.filter(publish__lte=datetime.datetime.now()).order_by('-publish')),
         'analytics': {
             'total_listens': total_listens,
             'total_listens_this_week': total_listens_this_week,

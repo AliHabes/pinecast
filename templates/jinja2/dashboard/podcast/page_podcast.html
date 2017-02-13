@@ -11,7 +11,7 @@
         {% if is_still_importing %}
           {{ _('This podcast is still being imported') }}
         {% else %}
-          {% set episodes_count = episodes.count() %}
+          {% set episodes_count = len(episodes) %}
           {% if episodes_count > 1 %}
             {% trans n=episodes_count %}
               {{ n }} Published Episode
