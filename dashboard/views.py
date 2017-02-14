@@ -189,7 +189,9 @@ def new_podcast(req):
         return _pmrender(req, 'dashboard/podcast/page_new.html', ctx)
 
     # Basic validation
-    if (not req.POST.get('slug') or not req.POST.get('name')):
+    if (not req.POST.get('slug') or
+        not req.POST.get('name') or
+        not Podcast.is_slug_valid(req.POST.get('slug'))):
         ctx.update(default=req.POST, error=True)
         return _pmrender(req, 'dashboard/podcast/page_new.html', ctx)
 
@@ -394,8 +396,12 @@ def podcast_episode(req, podcast_slug, episode_id):
 @login_required
 @json_response
 def slug_available(req):
+    slug = req.GET.get('slug')
+    if not slug or not Podcast.is_slug_valid(slug):
+        return {'valid': False}
+
     try:
-        Podcast.objects.get(slug=req.GET.get('slug'))
+        Podcast.objects.get(slug=slug)
     except Podcast.DoesNotExist:
         return {'valid': True}
     else:

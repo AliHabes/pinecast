@@ -62,6 +62,10 @@ class Podcast(models.Model):
         help_text=ugettext_lazy(
             'Tips collected over podcast lifetime in cents'))
 
+    @staticmethod
+    def is_slug_valid(slug):
+        return bool(re.match(r'^\w[\w-]*$', slug))
+
     @cached_method
     def get_site(self):
         try:
