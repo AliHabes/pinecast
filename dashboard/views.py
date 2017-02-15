@@ -288,6 +288,15 @@ def podcast_new_ep(req, podcast_slug):
         ctx['default'] = base_default
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
 
+    ctx['default'] = req.POST
+
+    if (not req.POST.get('title') or
+        not req.POST.get('publish') or
+        not req.POST.get('duration-seconds') or
+        not req.POST.get('audio-url')):
+        ctx['error'] = True
+        return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
+
     try:
         publish_parsed = datetime.datetime.strptime(req.POST.get('publish').split('.')[0], ISO_FORMAT)
         image_url = req.POST.get('image-url')
@@ -318,7 +327,6 @@ def podcast_new_ep(req, podcast_slug):
     except Exception as e:
         rollbar.report_exc_info(sys.exc_info(), req)
         ctx['error'] = True
-        ctx['default'] = req.POST
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
     return redirect('podcast_dashboard', podcast_slug=pod.slug)
 
