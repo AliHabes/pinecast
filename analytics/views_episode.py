@@ -72,4 +72,4 @@ def episode_listen_breakdown(req, pod, ep):
             .last_thirty()
             .where(episode=str(ep.id)))
 
-    return f.format_breakdown(SOURCE_MAP)
+    return f.format_intervals(SOURCE_MAP)

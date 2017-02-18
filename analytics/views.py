@@ -109,7 +109,7 @@ def podcast_listen_breakdown(req, pod):
             .last_thirty()
             .where(podcast=str(pod.id)))
 
-    return f.format_breakdown(SOURCE_MAP)
+    return f.format_intervals(SOURCE_MAP)
 
 
 @restrict(plans.PLAN_STARTER)

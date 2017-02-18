@@ -180,6 +180,8 @@
 }
 
 .main-footer a {
+    color: #aaa;
+    font-size: 0.8em;
     padding: 0 10px;
 }
 
