@@ -11,7 +11,10 @@ from pinecast.helpers import get_object_or_404, json_response
 def requires_network(view):
     @wraps(view)
     def wrapper(req, *args, **kwargs):
-        net = get_object_or_404(Network, id=req.GET.get('network_id'), members__in=[req.user])
+        if req.user.is_staff:
+            net = get_object_or_404(Network, id=req.GET.get('network_id'))
+        else:
+            net = get_object_or_404(Network, id=req.GET.get('network_id'), members__in=[req.user])
         return view(req, *args, net=net, **kwargs)
     return json_response(safe=False)(wrapper)
 
