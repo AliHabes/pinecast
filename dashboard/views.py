@@ -522,7 +522,10 @@ def get_episodes(req):
         pods.add(get_podcast(req, pod_slug))
 
     if network:
-        net = get_object_or_404(Network, id=network, members__in=[req.user])
+        if req.user.is_staff:
+            net = get_object_or_404(Network, id=network)
+        else:
+            net = get_object_or_404(Network, id=network, members__in=[req.user])
         pods = pods | set(net.podcast_set.all())
 
     if not pods:
