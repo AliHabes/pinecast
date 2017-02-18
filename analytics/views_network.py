@@ -37,8 +37,6 @@ def network_listen_history(req, net):
 
 @requires_network
 def network_subscriber_history(req, net):
-    net = get_object_or_404(Network, id=req.GET.get('network_id'), members__in=[req.user])
-
     pods = net.podcast_set.all()
 
     f = (Format(req, 'subscription')
