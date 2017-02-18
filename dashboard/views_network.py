@@ -12,7 +12,7 @@ import analytics.query as analytics_query
 import pinecast.email
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
-from pinecast.helpers import get_object_or_404, render, reverse, round_now
+from pinecast.helpers import get_object_or_404, populate_context, render, reverse, round_now
 from pinecast.signatures import signer_nots as signer
 from podcasts.models import Podcast, PodcastEpisode
 
@@ -76,14 +76,20 @@ def network_dashboard(req, network_id):
         podcast__in=net_podcasts,
         publish__gt=round_now())
 
-    return render(req,
-                     'dashboard/network/page_dash.html',
-                     {'error': req.GET.get('error'),
-                      'network': net,
-                      'net_podcasts': net_podcasts,
-                      'net_podcasts_map': pod_map,
-                      'top_episodes': top_episodes,
-                      'upcoming_episodes': list(upcoming_episodes)})
+    ctx = {
+        'error': req.GET.get('error'),
+        'network': net,
+        'net_podcasts': net_podcasts,
+        'net_podcasts_map': pod_map,
+        'top_episodes': top_episodes,
+        'upcoming_episodes': list(upcoming_episodes),
+    }
+    populate_context(req.user, ctx)
+    net_pod_ids = [x.id for x in net_podcasts]
+    ctx['net_pod_ids'] = net_pod_ids
+    ctx['has_pods_to_add'] = any(pod.id not in net_pod_ids for pod in ctx['podcasts'])
+
+    return render(req, 'dashboard/network/page_dash.html', ctx)
 
 @require_POST
 @login_required
@@ -99,7 +105,7 @@ def network_add_show(req, network_id):
             return redirect(reverse('network_dashboard', network_id=net.id) + '?error=nown#shows,add-show')
         pod.networks.add(net)
         pod.save()
-    return redirect('network_dashboard', network_id=net.id)
+    return redirect(reverse('network_dashboard', network_id=net.id) + '#shows')
 
 
 @require_POST

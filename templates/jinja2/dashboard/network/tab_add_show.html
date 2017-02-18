@@ -10,17 +10,27 @@
   </div>
 {% endif %}
 
-<form class="inline-form panel" action="{{ url('network_add_show', network_id=network.id) }}" method="post">
+{% if has_pods_to_add %}
+  <form class="inline-form panel" action="{{ url('network_add_show', network_id=network.id) }}" method="post">
+    <label>
+      <strong>{{ _('Podcast') }}</strong>
+      <div class="select">
+        <select name="slug">
+          {% for pod in podcasts %}
+            {%- if pod.owner == user and pod.id not in net_pod_ids -%}
+              <option value="{{ pod.slug }}">{{ pod.name }}</option>
+            {%- endif -%}
+          {% endfor %}
+        </select>
+      </div>
+    </label>
 
+    <menu class="toolbar">
+      <button class="btn" type="submit">{{ _('Add') }}</button>
+    </menu>
 
-  <label>
-    <strong>{{ _('Podcast Slug') }}</strong>
-    <input type="text" name="slug" pattern="[\w-]+" required placeholder="my-awesome-show">
-  </label>
-
-  <menu class="toolbar">
-    <button class="btn" type="submit">{{ _('Add') }}</button>
-  </menu>
-
-  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-</form>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+  </form>
+{% else %}
+  <p>{{ _('You do not own any podcasts that you can add to this network.') }}</p>
+{% endif %}
