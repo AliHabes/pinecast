@@ -17,6 +17,13 @@ from pinecast.signatures import signer_nots as signer
 from podcasts.models import Podcast, PodcastEpisode
 
 
+def get_network(req, id):
+    if req.user.is_staff:
+        return get_object_or_404(Network, deactivated=False, id=id)
+    else:
+        return get_object_or_404(Network, deactivated=False, id=id, members__in=[req.user])
+
+
 @login_required
 @restrict_minimum_plan(plans.PLAN_PRO)
 def new_network(req):
@@ -46,7 +53,7 @@ def new_network(req):
 
 @login_required
 def network_dashboard(req, network_id):
-    net = get_object_or_404(Network, deactivated=False, id=network_id, members__in=[req.user])
+    net = get_network(req, network_id)
 
     net_podcasts = net.podcast_set.all()
     pod_map = {str(p.id): p for p in net_podcasts}
@@ -81,7 +88,7 @@ def network_dashboard(req, network_id):
 @require_POST
 @login_required
 def network_add_show(req, network_id):
-    net = get_object_or_404(Network, deactivated=False, id=network_id, members__in=[req.user])
+    net = get_network(req, network_id)
     slug = req.POST.get('slug')
     try:
         pod = Podcast.objects.get(slug=slug)
@@ -98,7 +105,7 @@ def network_add_show(req, network_id):
 @require_POST
 @login_required
 def network_add_member(req, network_id):
-    net = get_object_or_404(Network, deactivated=False, id=network_id, members__in=[req.user])
+    net = get_network(req, network_id)
 
     try:
         user = User.objects.get(email=req.POST.get('email'))
@@ -124,7 +131,7 @@ network, and will be able to add your own podcasts to the network.
 @require_POST
 @login_required
 def network_edit(req, network_id):
-    net = get_object_or_404(Network, deactivated=False, id=network_id, members__in=[req.user])
+    net = get_network(req, network_id)
 
     try:
         net.name = req.POST.get('name')
@@ -154,7 +161,7 @@ def network_deactivate(req, network_id):
 @require_POST
 @login_required
 def network_remove_podcast(req, network_id, podcast_slug):
-    net = get_object_or_404(Network, deactivated=False, id=network_id, members__in=[req.user])
+    net = get_network(req, network_id)
     pod = get_object_or_404(Podcast, slug=podcast_slug, networks__in=[net])
 
     # We don't need to confirm if the user is the owner.
@@ -176,7 +183,7 @@ def network_remove_podcast(req, network_id, podcast_slug):
 @require_POST
 @login_required
 def network_remove_member(req, network_id, member_id):
-    net = get_object_or_404(Network, deactivated=False, id=network_id, members__in=[req.user])
+    net = get_network(req, network_id)
     user = get_object_or_404(User, id=member_id)
 
     if not net.members.filter(username=user.username).count():
