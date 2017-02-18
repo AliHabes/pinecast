@@ -83,7 +83,9 @@ def podcast_subscriber_history(req, pod):
             .where(podcast=str(pod.id))
             .no_timezones())
 
-    return f.format_interval(label=ugettext('Subscribers'))
+    return f.format_interval(
+        label=ugettext('Subscribers'),
+        extra_data={'slug': pod.slug})
 
 
 @restrict(plans.PLAN_DEMO)
@@ -94,7 +96,9 @@ def podcast_listen_history(req, pod):
             .group('podcast')
             .where(podcast=str(pod.id)))
 
-    return f.format_interval(label=ugettext('Listens'))
+    return f.format_interval(
+        label=ugettext('Listens'),
+        extra_data={'slug': pod.slug})
 
 
 @restrict(plans.PLAN_DEMO)

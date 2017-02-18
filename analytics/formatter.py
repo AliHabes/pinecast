@@ -217,7 +217,7 @@ class Format(object):
             tags[key] in country_code_map
         ]
 
-    def format_interval(self, field='count', label=ugettext_lazy('Series')):
+    def format_interval(self, field='count', label=ugettext_lazy('Series'), extra_data={}):
         if not self.interval_val: self.interval()
         if not self.res: self._process()
 
@@ -232,11 +232,12 @@ class Format(object):
             'labels': self._get_date_labels(points),
             'datasets': list(query.rotating_colors(
                 [
-                    {
-                        'label': label,
-                        'data': [x[field] for x in points],
-                        'pointStrokeColor': '#fff',
-                    },
+                    dict(
+                        label=label,
+                        data=[x[field] for x in points],
+                        pointStrokeColor='#fff',
+                        **extra_data,
+                    ),
                 ],
                 key='strokeColor',
                 highlight_key='pointColor',
