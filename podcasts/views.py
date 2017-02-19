@@ -156,3 +156,10 @@ def player(req, episode_id):
     if UserSettings.user_meets_plan(ep.podcast.owner, plans.FEATURE_MIN_PLAYER):
         resp.xframe_options_exempt = True
     return resp
+
+def player_latest(req, podcast_slug):
+    pod = get_object_or_404(Podcast, slug__iexact=podcast_slug)
+    eps = pod.get_episodes()
+    if not eps:
+        raise Http404()
+    return redirect('player', episode_id=str(eps[0].id))
