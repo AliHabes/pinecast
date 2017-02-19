@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^podcast/listens/location$', views.podcast_listener_locations),
     url(r'^podcast/listens/location/options$', views.podcast_listener_locations_specific_source),
     url(r'^podcast/listens/location/(?P<iso_code>[A-Z0-9]{2})$', views.podcast_listener_locations_specific),
+    url(r'^podcast/listens/episode$', views.podcast_listen_by_episode),
     url(r'^podcast/listens/breakdown$', views.podcast_listen_breakdown),
     url(r'^podcast/listens/agent$', views.podcast_listen_platform_breakdown),
     url(r'^podcast/listens/os$', views.podcast_listen_os_breakdown),

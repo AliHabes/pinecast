@@ -113,6 +113,18 @@ def podcast_listen_breakdown(req, pod):
 
 
 @restrict(plans.PLAN_STARTER)
+def podcast_listen_by_episode(req, pod):
+    f = (Format(req, 'listen')
+            .select(podcast_f='count')
+            .group('episode')
+            .last_thirty()
+            .where(podcast=str(pod.id)))
+
+    return f.format_intervals(
+        labels_map={str(ep.id): ep.title for ep in pod.podcastepisode_set.all()})
+
+
+@restrict(plans.PLAN_STARTER)
 def podcast_listen_platform_breakdown(req, pod):
     f = (Format(req, 'listen-platform')
             .select(podcast_f='count')
