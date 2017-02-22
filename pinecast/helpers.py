@@ -43,13 +43,13 @@ def reverse(viewname, kwargs=None, **kw):
 
 def cached_method(func):
     @wraps(func)
-    def memoized(self, *args):
+    def memoized(self, *args, **kwargs):
         cache = getattr(self, '__pccache__%s__' % func.__name__, None)
         if not cache:
             cache = {}
             setattr(self, '__pccache__%s__' % func.__name__, cache)
 
-        targs = tuple(args)
+        targs = tuple(args) + tuple(kwargs.items())
         if targs not in cache:
             cache[targs] = func(self, *args)
         return cache[targs]
