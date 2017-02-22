@@ -58,9 +58,14 @@ class Podcast(models.Model):
     networks = models.ManyToManyField(Network, blank=True)
 
     total_tips = models.PositiveIntegerField(
-        default=0,
-        help_text=ugettext_lazy(
+        default=0, help_text=ugettext_lazy(
             'Tips collected over podcast lifetime in cents'))
+
+    private_after_nth = models.PositiveIntegerField(default=None, null=True)
+    private_after_age = models.PositiveIntegerField(
+        default=None, null=True, help_text=ugettext_lazy('Age in seconds'))
+    private_access_min_subscription = models.PositiveIntegerField(
+        default=None, null=True, help_text=ugettext_lazy('Min sub value in cents'))
 
     @staticmethod
     def is_slug_valid(slug):
@@ -104,10 +109,18 @@ class Podcast(models.Model):
         return PodcastEpisode.objects.filter(podcast=self)
 
     @cached_method
-    def get_episodes(self, select_related=None):
+    def get_episodes(self, select_related=None, include_private=False):
         episodes = self.get_all_episodes_raw().filter(
             publish__lt=round_now(),
             awaiting_import=False).order_by('-publish')
+        if not include_private:
+            episodes = episodes.filter(is_private=False)
+            if self.private_after_age:
+                max_age = rount_now() - datetime.timedelta(seconds=self.private_after_age)
+                episodes = episodes.filter(publish__gt=max_age)
+            if self.private_after_nth:
+                episodes = episodes[:self.private_after_nth]
+
         if select_related:
             episodes = episodes.select_related(select_related)
         us = UserSettings.get_from_user(self.owner)
@@ -266,6 +279,9 @@ class PodcastEpisode(models.Model):
     )
 
     stats_base_listens = models.PositiveIntegerField(default=0)
+
+    is_private = models.BooleanField(
+        default=False, help_text=ugettext_lazy('Overrides other settings when true'))
 
     @cached_method
     def formatted_duration(self):
