@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import datetime
+from math import ceil
 
 import gfm
 from django.conf import settings
@@ -47,14 +48,14 @@ def _srender(req, podcast, site, template, data=None):
 def site_home(req, podcast_slug):
     pod = get_object_or_404(Podcast, slug=podcast_slug, select_related='owner')
     site = get_object_or_404(models.Site, podcast=pod)
-    episodes = pod.get_episodes('podcast')
+    episodes = pod.get_episodes(select_related='podcast')
     paginator = Paginator(episodes, SITE_EPISODES_PER_PAGE)
     try:
         pager = paginator.page(req.GET.get('page'))
     except PageNotAnInteger:
         pager = paginator.page(1)
     except EmptyPage:
-        return redirect('site_home', podcast_slug=pod.slug)
+        return redirect(_subdomain_reverse('site_home', podcast_slug=pod.slug))
     return _srender(req, pod, site, 'home.html', {'pager': pager})
 
 
@@ -63,7 +64,7 @@ def site_blog(req, podcast_slug):
     site = get_object_or_404(models.Site, podcast=pod)
     posts = site.siteblogpost_set.filter(
         publish__lt=datetime.datetime.now()).order_by('-publish')
-    paginator = Paginator(posts, 5)
+    paginator = Paginator(posts, SITE_EPISODES_PER_PAGE)
     try:
         pager = paginator.page(req.GET.get('page'))
     except PageNotAnInteger:
@@ -141,7 +142,7 @@ def sitemap(req, podcast_slug):
     '''
 
     pages = pod.podcastepisode_set.all().count()
-    for i in range(pages):
+    for i in range(ceil(float(pages) / SITE_EPISODES_PER_PAGE)):
         output += '''
         <url>
             <loc>{url}</loc>
