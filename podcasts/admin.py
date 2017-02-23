@@ -51,3 +51,4 @@ class PodcastAdmin(admin.ModelAdmin):
 
 admin.site.register(Podcast, PodcastAdmin)
 admin.site.register(PodcastEpisode)
+admin.site.register(PodcastCategory)
