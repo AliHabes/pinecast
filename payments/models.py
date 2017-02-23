@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import datetime
+import uuid
 
 from django.conf import settings
 from django.db import models
@@ -13,7 +14,7 @@ from podcasts.models import Podcast
 
 
 class TipUser(models.Model):
-    uuid = models.UUIDField(null=True)
+    uuid = models.UUIDField(null=True, default=uuid.uuid4)
     email_address = models.EmailField(blank=True, null=True)
 
     created = models.DateTimeField(auto_now_add=True)

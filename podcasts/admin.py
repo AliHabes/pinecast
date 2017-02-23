@@ -47,7 +47,6 @@ class PodcastAdmin(admin.ModelAdmin):
         return obj.owner.email
 
 
-
 def fix_category_ampersand(modeladmin, request, queryset):
     for cat in queryset:
         cat.category = cat.category.replace('&amp;', '&')
