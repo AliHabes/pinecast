@@ -49,6 +49,10 @@ class PodcastAdmin(admin.ModelAdmin):
         return obj.owner.email
 
 
+class PodcastCategoryAdmin(admin.ModelAdmin):
+    search_fields = ('category', )
+
+
 admin.site.register(Podcast, PodcastAdmin)
 admin.site.register(PodcastEpisode)
-admin.site.register(PodcastCategory)
+admin.site.register(PodcastCategory, PodcastCategoryAdmin)
