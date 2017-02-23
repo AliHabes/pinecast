@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.contrib import admin
 
 from .models import Podcast, PodcastEpisode, PodcastCategory
@@ -49,8 +47,16 @@ class PodcastAdmin(admin.ModelAdmin):
         return obj.owner.email
 
 
+
+def fix_category_ampersand(modeladmin, request, queryset):
+    for cat in queryset:
+        cat.category = cat.category.replace('&amp;', '&')
+        cat.save()
+fix_category_ampersand.short_description = 'Fix ampersands'
+
 class PodcastCategoryAdmin(admin.ModelAdmin):
     search_fields = ('category', )
+    actions = (fix_category_ampersand, )
 
 
 admin.site.register(Podcast, PodcastAdmin)
