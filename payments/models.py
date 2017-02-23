@@ -14,7 +14,7 @@ from podcasts.models import Podcast
 
 
 class TipUser(models.Model):
-    uuid = models.UUIDField(null=True, default=uuid.uuid4)
+    uuid = models.UUIDField(default=uuid.uuid4)
     email_address = models.EmailField(blank=True, null=True)
 
     created = models.DateTimeField(auto_now_add=True)
