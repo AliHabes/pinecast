@@ -38,8 +38,9 @@ def feed(req, podcast_slug):
 
 def feed_private(req, podcast_slug, subscriber):
     pod = get_object_or_404(Podcast, slug=podcast_slug)
-    recurring_tip = get_object_or_404(RecurringTip, podcast=pod, tipper__id=subscriber)
-    if pod.private_access_min_subscription and pod.private_access_min_subscription < recurring_tip.amount:
+    recurring_tip = get_object_or_404(RecurringTip, podcast=pod, tipper__uuid=subscriber)
+    setattr(recurring_tip, 'podcast', pod)  # ✨magic optimization ✨
+    if not recurring_tip.eligible_to_access_private():
         raise Http404()
     episodes = pod.get_episodes(include_private=True)
     return _gen_feed(req, pod, episodes)

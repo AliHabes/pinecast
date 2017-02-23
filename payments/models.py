@@ -49,7 +49,8 @@ class RecurringTip(models.Model):
     deactivated = models.BooleanField(default=False)
 
     def __str__(self):
-        return '%s - %s' % (self.tipper.email_address, self.amount)
+        return '"%s" donates $%.2f to %s' % (
+            self.tipper.email_address, float(self.amount) / 100, self.podcast.name)
 
     def get_subscription(self):
         us = UserSettings.get_from_user(self.podcast.owner)
@@ -73,6 +74,11 @@ class RecurringTip(models.Model):
         finally:
             self.deactivated = True
             self.save()
+
+    def eligible_to_access_private(self):
+        if not self.podcast.private_access_min_subscription:
+            return True
+        return self.amount >= self.podcast.private_access_min_subscription
 
 
 class TipEvent(models.Model):
