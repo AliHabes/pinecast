@@ -211,7 +211,7 @@
 <script src="/static/js/markdown-editor.js"></script>
 <script>
 console.log({{ podcast.id|safe_json }});
-window.PODCAST_CATEGORIES = {{ PODCAST_CATEGORIES|safe_json }};
+window.PODCAST_CATEGORIES = {{ list(PODCAST_CATEGORIES)|json|safe }};
 </script>
 <script>
 Array.from(document.querySelectorAll('.confirm-delete')).forEach(function(elem) {

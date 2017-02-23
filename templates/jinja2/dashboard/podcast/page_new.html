@@ -199,7 +199,7 @@
 
 {% block after_content %}
 <script>
-window.PODCAST_CATEGORIES = {{ PODCAST_CATEGORIES|safe_json }};
+window.PODCAST_CATEGORIES = {{ list(PODCAST_CATEGORIES)|json|safe }};
 
 (function() {
   var nameField = document.querySelector('.name-field');
