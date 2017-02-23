@@ -12,6 +12,7 @@ import accounts.payment_plans as plans
 import analytics.log as analytics_log
 from .models import Podcast, PodcastEpisode
 from accounts.models import UserSettings
+from payments.models import RecurringTip
 from pinecast.helpers import get_object_or_404
 
 
@@ -32,9 +33,20 @@ def listen(req, episode_id):
 
 def feed(req, podcast_slug):
     pod = get_object_or_404(Podcast, slug=podcast_slug)
-
-    items = []
     episodes = pod.get_episodes()
+    return _gen_feed(req, pod, episodes)
+
+def feed_private(req, podcast_slug, subscriber):
+    pod = get_object_or_404(Podcast, slug=podcast_slug)
+    recurring_tip = get_object_or_404(RecurringTip, podcast=pod, tipper__id=subscriber)
+    if pod.private_access_min_subscription and pod.private_access_min_subscription < recurring_tip.amount:
+        raise Http404()
+    episodes = pod.get_episodes(include_private=True)
+    return _gen_feed(req, pod, episodes)
+
+
+def _gen_feed(req, pod, episodes):
+    items = []
     is_demo = UserSettings.get_from_user(pod.owner).plan == plans.PLAN_DEMO
 
     channel_explicit_tag = '<itunes:explicit>%s</itunes:explicit>' % ('yes' if pod.is_explicit else 'no')
