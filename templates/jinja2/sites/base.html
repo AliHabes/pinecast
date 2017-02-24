@@ -12,6 +12,11 @@
     {% else %}
       <link type="image/png" rel="icon" href="https://pinecast.com/static/img/favicon.png">
     {% endif %}
+    {% if episode %}
+      <link rel="alternate" type="application/json+oembed"
+        href="https://pinecast.com/services/oembed.json?url=https://pinecast.com{{ url_global('listen', episode_id=str(episode.id)) }}"
+        title="Pinecast oEmbed Profile" />
+    {% endif %}
     {% if site.custom_css %}
       <style>{{ site.custom_css }}</style>
     {% endif %}

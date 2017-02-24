@@ -1,16 +1,20 @@
-from __future__ import absolute_import
-from __future__ import print_function
-
 import datetime
 import json
+import re
+from urllib.parse import urlparse
 
 import rollbar
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 import analytics.log as analytics_log
+from .jinja2_helper import thumbnail
+from .helpers import get_object_or_404, json_response, reverse
+from accounts.models import UserSettings
+from accounts.payment_plans import PLAN_DEMO
 from podcasts.models import PodcastEpisode
+from podcasts.urls import LISTEN_REGEX
 
 
 ts_formats = ['[%d/%b/%Y:%H:%M:%S %z]',
@@ -62,7 +66,55 @@ def log(req):
         if lo:
             listens_to_log.append(lo)
 
-    print(('Logging %d listen records' % len(listens_to_log)))
     analytics_log.commit_listens(listens_to_log)
 
     return HttpResponse(status=204)
+
+
+@json_response
+def oembed(req):
+    url = req.GET.get('url')
+    if not url:
+        raise Http404()
+
+    try:
+        path = urlparse(url).path
+    except Exception:
+        raise Http404()
+
+    if path.startswith('/listen/'):
+        try:
+            ep_id = re.match(LISTEN_REGEX, path[1:]).group('episode_id')
+        except Exception:
+            raise Http404()
+
+        ep = get_object_or_404(PodcastEpisode.objects.select_related('podcast'), id=ep_id)
+        print(ep)
+
+    else:
+        raise Http404()
+
+    us = UserSettings.get_from_user(ep.podcast.owner)
+    if us.plan == PLAN_DEMO:
+        raise Http404()
+
+    return {
+        'version': '1.0',
+        'type': 'rich',
+        'provider_name': 'Pinecast',
+        'provider_url': 'https://pinecast.com',
+
+        'title': ep.title,
+        'description': ep.get_html_description(),
+        'html': '''
+            <iframe src="https://pinecast.com{player}" seamless height="60" style="border:0" class="pinecast-embed" frameborder="0"></iframe>
+        '''.format(player=reverse('player', episode_id=str(ep.id))).strip(),
+        'height': 60,
+        'width': '100%',
+
+        'author_name': ep.podcast.author_name,
+
+        'thumbnail_url': thumbnail(ep.image_url or ep.podcast.cover_image, 500, 500),
+        'thumbnail_width': 500,
+        'thumbnail_height': 500,
+    }

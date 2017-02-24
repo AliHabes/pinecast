@@ -39,6 +39,7 @@ urlpatterns = (
 
         url(r'^logout$', logout_view, name='logout'),
         url(r'^services/log$', views.log),
+        url(r'^services/oembed\.json$', views.oembed),
 
         url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript_catalog'),
 
