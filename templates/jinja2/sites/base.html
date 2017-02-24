@@ -16,6 +16,16 @@
       <link rel="alternate" type="application/json+oembed"
         href="https://pinecast.com/services/oembed.json?url=https://pinecast.com{{ url_global('listen', episode_id=str(episode.id)) }}"
         title="Pinecast oEmbed Profile" />
+      <meta name="twitter:card" content="player" />
+      <meta name="twitter:site" content="@getpinecast" />
+      <meta name="twitter:title" content="{{ episode.title }}" />
+      <meta name="twitter:description" content="{{ episode.subtitle or episode.description[:140].replace('\n', ' ') }}" />
+      <meta name="twitter:image" content="{{ episode.image_url or podcast.cover_image }}" />
+      <meta name="twitter:player" content="https://pinecast.com{{ url_global('player', episode_id=str(episode.id)) }}" />
+      <meta name="twitter:player:width" content="480" />
+      <meta name="twitter:player:height" content="60" />
+      <meta name="twitter:player:stream" content="https://pinecast.com{{ url_global('listen', episode_id=str(episode.id)) }}" />
+      <meta name="twitter:player:stream:content_type" content="{{ episode.audio_type }}" />
     {% endif %}
     {% if site.custom_css %}
       <style>{{ site.custom_css }}</style>
