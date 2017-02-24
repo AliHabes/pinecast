@@ -73,7 +73,7 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
             Collaborator.objects.filter(podcast__in=user.podcast_set.all()).delete()
 
             # Remove private threshold on episodes
-            self.user.podcast_set.update(private_access_min_subscription=None)
+            user.podcast_set.update(private_access_min_subscription=None)
 
         existing_subs = customer.subscriptions.all(limit=1)['data']
 
@@ -83,9 +83,13 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
                 existing_sub = existing_subs[0]
                 existing_sub.delete()
 
-            for podcast in self.user.podcast_set.all():
+            for podcast in user.podcast_set.all():
                 for tip in podcast.recurring_tips.all():
                     tip.cancel()
+
+                podcast.private_after_nth = None
+                podcast.private_after_age = None
+                podcast.save()
 
             self.plan = payment_plans.PLAN_DEMO
             if self.coupon_code:
