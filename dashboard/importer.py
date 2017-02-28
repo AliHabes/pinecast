@@ -64,7 +64,10 @@ def get_details(req, parsed):
             continue
 
         duration = first_tag_text(node, 'itunes:duration', '0:00')
-        dur_tup = list(map(int, duration.split(':')))
+        try:
+            dur_tup = list(map(int, duration.split(':').replace('::', ':')))
+        except Exception as e:
+            dur_tup = (0, )
         if len(dur_tup) == 1:
             dur_seconds = dur_tup[0]
         elif len(dur_tup) == 2:
