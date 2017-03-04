@@ -39,9 +39,12 @@
       </tr>
     </thead>
     <tbody>
-      {% macro episode(ep) -%}
+      {% macro episode(ep, is_private) -%}
         <tr>
           <td class="primary">
+            {% if is_private or ep.is_private %}
+              <i class="icon icon-eye-off" title="{{ _('Private') }}"></i>
+            {% endif %}
             <a href="{{ url('podcast_episode', podcast_slug=podcast.slug, episode_id=str(ep.id)) }}">{{ ep.title }}</a>
           </td>
           {%- if is_pro and str(ep.id) in sparklines -%}
@@ -62,7 +65,7 @@
               </svg>
             </td>
           {%- elif is_pro and sparklines -%}
-            <td></td>
+            <td class="hide-on-mobile"></td>
           {%- endif -%}
           {%- if ep.publish > now() -%}
             <td class="future-publish">
@@ -82,15 +85,20 @@
         </tr>
       {%- endmacro %}
 
-      {% if get_user_settings(podcast.owner).plan == PLANS.PLAN_DEMO %}
-        {% for ep in episodes[:10] %}
+      {% if get_user_settings(podcast.owner).plan == PLANS.PLAN_DEMO -%}
+        {% for ep in episodes[:10] -%}
           {{ episode(ep) }}
-        {% endfor %}
-      {% else %}
-        {% for ep in episodes %}
-          {{ episode(ep) }}
-        {% endfor %}
-      {% endif %}
+        {%- endfor %}
+      {%- else -%}
+        {% for i, ep in privep_enumerate(episodes) -%}
+          {% set ep_is_private = (
+            ep.is_private or
+            podcast.private_after_nth and i >= podcast.private_after_nth or
+            podcast.private_after_age and ep.publish < now() - timedelta(seconds=podcast.private_after_age)
+          ) %}
+          {{ episode(ep, ep_is_private) }}
+        {%- endfor %}
+      {%- endif %}
     </tbody>
   </table>
   {% if get_user_settings(podcast.owner).plan == PLANS.PLAN_DEMO %}

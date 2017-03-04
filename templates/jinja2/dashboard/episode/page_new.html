@@ -89,28 +89,7 @@
   <hr>
 
   {% include 'dashboard/episode/snippet_metadata.html' %}
-
-  {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
-    <hr>
-
-    <a class="expander" href="#">
-      {{ _('Add custom feedback prompt...') }}
-    </a><div style="display: none">
-
-      <strong>{{ _('Feedback') }}</strong>
-
-      <p>{{ _('Ask your listeners for specific feedback with a feedback prompt. This will be shown on the episode feedback page and in feedback flair, if enabled.') }}</p>
-
-      <label>
-        <span>{{ _('Custom Prompt') }}</span>
-        <input type="text"
-          name="feedback_prompt"
-          maxlength="1024"
-          value="{{ default.get('feedback_prompt') }}">
-      </label>
-    </div>
-
-  {% endif %}
+  {% include 'dashboard/episode/snippet_private.html' %}
 
   <hr>
 

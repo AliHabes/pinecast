@@ -86,6 +86,8 @@
   <hr>
 
   {% include 'dashboard/episode/snippet_metadata.html' %}
+  {% include 'dashboard/episode/snippet_private.html' %}
+
 
   {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
     <hr>

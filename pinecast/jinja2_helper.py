@@ -33,6 +33,7 @@ def environment(**options):
     env.globals.update({
         'bool': bool,
         'dir': dir,
+        'enumerate': enumerate,
         'float': float,
         'getattr': getattr,
         'int': int,
@@ -50,6 +51,7 @@ def environment(**options):
         'minimum_plan': minimum_plan,
         'now': lambda hours=0: datetime.datetime.now() + datetime.timedelta(hours=hours),
         'pop_until_lt': pop_until_lt,
+        'timedelta': datetime.timedelta,
         'url': helpers.reverse,
 
         '_': ugettext,

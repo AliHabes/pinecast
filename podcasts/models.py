@@ -303,7 +303,7 @@ class PodcastEpisode(models.Model):
         pod = self.podcast
         now = round_now()
         if (pod.private_after_age and
-            now - self.publish > datetime.timedelta(seconds=pod.private_after_age)):
+            self.publish < now - datetime.timedelta(seconds=pod.private_after_age)):
             return True
 
         if pod.private_after_nth:

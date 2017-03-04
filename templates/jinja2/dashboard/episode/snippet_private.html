@@ -1,0 +1,38 @@
+{% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_PRIVATE_EPS) %}
+  <hr>
+
+  {% set has_made_private = bool(default.get('is_private', episode.is_private if episode else None)) %}
+  {% if not has_made_private %}
+    <a class="expander" href="#">
+      {{ _('Make episode available to paid subscribers only...') }}
+    </a><div style="display: none">
+  {% endif %}
+
+  <strong>{{ _('Private') }}</strong>
+
+  <p>{{ _('Making an episode private will make it available only to listeners with recurring subscriptions to your tip jar.') }}</p>
+
+  {% if not user_settings.has_connected_account() %}
+    <p style="color: #b00">
+      {% trans settings_url=(url('dashboard') + '#settings,tip-jar') %}
+        You do not currently have a tip jar set up. Nobody will be able to
+        listen to this episode if it is made private without an active tip
+        jar. You can <a target="_blank" href="{{ settings_url }}">configure
+        your tip jar now</a>.
+      {% endtrans %}
+    </p>
+  {% endif %}
+
+  <label class="checkbox checkbox-standalone">
+    <input type="checkbox"
+      {% if default.get('is_private', episode.is_private if episode else None) %}checked{% endif %}
+      name="is_private"
+      value="true">
+    <span>{{ _('Make episode private') }}</span>
+  </label>
+
+  {% if not has_made_private %}
+    </div>
+  {% endif %}
+
+{% endif %}

@@ -43,7 +43,7 @@
 {% block subheader %}{% endblock %}
 
 <div class="main-container">
-  <main data-max-upload-size="{% if podcast %}{% set owner_max_file_size = PLAN_MAX_FILE_SIZE[get_user_settings(podcast.owner).plan] %}{{ owner_max_file_size + podcast.get_remaining_surge(owner_max_file_size) }}{% else %}{{ max_upload_size }}{% endif %}">
+  <main data-max-upload-size="{% if podcast %}{% set owner_max_file_size = PLAN_MAX_FILE_SIZE[(user_settings if podcast.owner == user else get_user_settings(podcast.owner)).plan] %}{{ owner_max_file_size + podcast.get_remaining_surge(owner_max_file_size) }}{% else %}{{ max_upload_size }}{% endif %}">
     <noscript>
       <div class="error">
         {% trans %}

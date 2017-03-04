@@ -51,7 +51,7 @@ class EmptyStringDefaultDict(collections.defaultdict):
 
 def get_podcast(req, slug):  # TODO: move to the Podcast model
     try:
-        pod = Podcast.objects.get(slug=slug)
+        pod = Podcast.objects.select_related().get(slug=slug)
     except Podcast.DoesNotExist:
         raise Http404()
 
@@ -121,6 +121,13 @@ def podcast_dashboard(req, podcast_slug):
     total_listens_this_week = analytics_query.total_listens_this_week(pod, tz)
     subscribers = analytics_query.total_subscribers(pod)
 
+    def privep_enumerate(it):
+        i = 0
+        for ep in it:
+            yield i, ep
+            if not ep.is_private:
+                i += 1
+
     data = {
         'podcast': pod,
         'episodes': list(pod.podcastepisode_set.order_by('-publish')),
@@ -143,6 +150,8 @@ def podcast_dashboard(req, podcast_slug):
 
         'N_DESTINATIONS': NotificationHook.DESTINATIONS,
         'N_TRIGGERS': NotificationHook.TRIGGERS,
+
+        'privep_enumerate': privep_enumerate,
     }
 
     try:
@@ -280,12 +289,6 @@ def podcast_new_ep(req, podcast_slug):
         'latest_ep': latest_episode,
     }
     if not req.POST:
-        base_default = EmptyStringDefaultDict()
-        base_default['publish'] = datetime.datetime.strftime(
-            datetime.datetime.now() + tz_delta,
-            '%Y-%m-%dT%H:%M'  # 2015-07-09T12:00
-        )
-        ctx['default'] = base_default
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
 
     ctx['default'] = req.POST
@@ -318,13 +321,18 @@ def podcast_new_ep(req, podcast_slug):
             copyright=req.POST.get('copyright'),
             license=req.POST.get('license'),
 
-            explicit_override=req.POST.get('explicit_override'))
+            explicit_override=req.POST.get('explicit_override'),
+
+            is_private=req.POST.get('is_private') == 'true',
+        )
         ep.set_flair(req.POST, no_save=True)
         ep.save()
         if req.POST.get('feedback_prompt'):
             prompt = EpisodeFeedbackPrompt(episode=ep, prompt=req.POST.get('feedback_prompt'))
             prompt.save()
     except Exception as e:
+        if settings.DEBUG:
+            print(e)
         rollbar.report_exc_info(sys.exc_info(), req)
         ctx['error'] = True
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
@@ -361,6 +369,10 @@ def edit_podcast_episode(req, podcast_slug, episode_id):
 
         ep.explicit_override = req.POST.get('explicit_override')
 
+        # I could check whether the user has access to set this or not, but
+        # it's not enforced for free users, so meh
+        ep.is_private = bool(req.POST.get('is_private'))
+
         ep.set_flair(req.POST, no_save=True)
         ep.save()
 
@@ -388,6 +400,7 @@ def podcast_episode_publish_now(req, podcast_slug, episode_id):
 def podcast_episode(req, podcast_slug, episode_id):
     pod = get_podcast(req, podcast_slug)
     ep = get_object_or_404(PodcastEpisode, id=episode_id, podcast=pod)
+    ep.podcast = pod  # Performance optimization
 
     total_listens = analytics_query.total_listens(pod, episode=ep)
 

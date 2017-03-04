@@ -86,8 +86,22 @@
   <iframe src="/player/{{ str(episode.id) }}" seamless height="60" style="border:0" class="pinecast-embed"></iframe>
 
   <section class="row">
-    <div class="card-block card markdown-editor-preview">
-      {{ episode.get_html_description()|safe }}
+    <div>
+      {% if episode.check_is_private() %}
+        <div class="card card-block card-dark">
+          <span>
+            <i class="icon icon-eye-off"></i>
+            {% if episode.is_private %}
+              {{ _('This episode is private. It will be visible to paid subscribers only.') }}
+            {% else %}
+              {{ _('This episode is now private because of the settings on your podcast. It will be visible to paid subscribers only.') }}
+            {% endif %}
+          </span>
+        </div>
+      {% endif %}
+      <div class="card-block card markdown-editor-preview">
+        {{ episode.get_html_description()|safe }}
+      </div>
     </div>
     <div class="sidebar">
       <div class="card-block card">
