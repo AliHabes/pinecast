@@ -37,6 +37,7 @@
           if (button) button.disabled = true;
         });
       });
+
       Array.prototype.slice.call(document.querySelectorAll('.publish-now')).forEach(function(f) {
         f.addEventListener('click', function(e) {
           e.preventDefault();
@@ -46,6 +47,15 @@
           e.target.parentNode.querySelector('input').value = localDate.toISOString().replace(/:\d+\.\d+z/ig, '');
         });
       });
+
+      Array.prototype.slice.call(document.querySelectorAll('.expander')).forEach(function(f) {
+        f.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.target.nextSibling.style.display = 'block';
+          e.target.style.display = 'none';
+        });
+      });
+
     }());
   </script>
   {% include 'ga.html' %}

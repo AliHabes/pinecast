@@ -25,40 +25,6 @@
       value="{{ default.get('subtitle', episode.subtitle) }}">
   </label>
 
-  <label>
-    <span>{{ _('Explicit Override') }}</span>
-    <div class="select">
-      <select name="explicit_override">
-        {% set exp_ov = default.get('explicit_override', episode.explicit_override) %}
-        <option value="none" {{ 'selected' if exp_ov == 'none' else '' }}>
-          {{ _('Default for podcast (%s)') % (_('explicit') if podcast.is_explicit else _('clean')) }}
-        </option>
-        <option value="expl" {{ 'selected' if exp_ov == 'expl' else '' }}>{{ _('Explicit') }}</option>
-        <option value="clen" {{ 'selected' if exp_ov == 'clen' else '' }}>{{ _('Clean') }}</option>
-      </select>
-    </div>
-  </label>
-
-  <hr>
-
-  <label>
-    <span>{{ _('Copyright') }}</span>
-    <input type="text"
-      name="copyright"
-      maxlength="1024"
-      value="{{ default.get('copyright', episode.copyright) }}"
-      placeholder="{{ _('Copyright 2015 Foo Bar Inc.') }}">
-  </label>
-
-  <label>
-    <span>{{ _('License') }}</span>
-    <input type="text"
-      name="license"
-      maxlength="1024"
-      placeholder="{{ _('Creative Commons 4.0') }}"
-      value="{{ default.get('license', episode.license) }}">
-  </label>
-
   <hr>
 
   <strong>{{ _('Audio File') }}</strong>
@@ -82,6 +48,14 @@
     <input type="number" class="duration-minutes" name="duration-minutes" value="{{ default.get('duration-minutes', (episode.duration % 3600 / 60)|round(1, 'floor')|int) }}" title="{{ _('Minutes') }}" required min="0" max="59">:
     <input type="number" class="duration-seconds" name="duration-seconds" value="{{ default.get('duration-seconds', (episode.duration % 60)|round(1, 'floor')|int) }}" title="{{ _('Seconds') }}" required min="0" max="59">
   </label>
+
+  <hr>
+
+  <a class="expander" href="#">
+    {{ _('Change publish date (published %s)...') % (episode.publish|pretty_date) }}
+  </a><div style="display: none">
+    {% include 'dashboard/episode/snippet_publish.html' %}
+  </div>
 
   <hr>
 
@@ -109,8 +83,19 @@
     </div>
   {% endif %}
 
+  <hr>
+
+  {% include 'dashboard/episode/snippet_metadata.html' %}
+
   {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
     <hr>
+
+    {% set has_feedback_prompt = bool(default.get('feedback_prompt', episode.get_feedback_prompt(''))) %}
+    {% if not has_feedback_prompt %}
+      <a class="expander" href="#">
+        {{ _('Add custom feedback prompt...') }}
+      </a><div style="display: none">
+    {% endif %}
 
     <strong>{{ _('Feedback') }}</strong>
 
@@ -123,31 +108,20 @@
         maxlength="1024"
         value="{{ default.get('feedback_prompt', episode.get_feedback_prompt('')) }}">
     </label>
+
+    {% if not has_feedback_prompt %}
+      </div>
+    {% endif %}
   {% endif %}
 
   <hr>
 
-  <strong>{{ _('Publish Time') }}</strong>
-
-  <p>
-    {% if podcast.site %}
-      {{ _('The publish time is when the podcast will become visible to your listeners in your podcast feed and on your podcast website.') }}
-    {% else %}
-      {{ _('The publish time is when the podcast will become visible to your listeners in your podcast feed.') }}
-    {% endif %}
-  </p>
-
-  <div
-    class="input-datetime"
-    data-name="publish"
-    data-default-value="{{ default.get('publish', episode.publish.isoformat()) }}"
-    data-label-now="{{ _('Publish Now') }}"
-    data-label-datetime="{{ _('Publish At...') }}"
-    data-label-date="{{ _('Publish Date') }}"
-    data-label-time="{{ _('Publish Time') }}"
-  ></div>
-
-  <hr>
+  {% set has_episode_art = episode.image_url != podcast.cover_image %}
+  {% if not has_episode_art %}
+    <a class="expander" href="#">
+      {{ _('Add episode artwork...') }}
+    </a><div style="display: none">
+  {% endif %}
 
   <strong>{{ _('Episode Image') }}</strong>
 
@@ -167,6 +141,10 @@
     data-type="image"
     data-optional="true"
     data-podcast="{{ podcast.slug }}"></div>
+
+  {% if not has_episode_art %}
+    </div>
+  {% endif %}
 
   <hr>
 

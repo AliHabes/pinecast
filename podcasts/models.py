@@ -280,6 +280,8 @@ class PodcastEpisode(models.Model):
 
     stats_base_listens = models.PositiveIntegerField(default=0)
 
+    # This is just an override. Use check_is_private() to determine if it is
+    # private because of podcast-level settings.
     is_private = models.BooleanField(
         default=False, help_text=ugettext_lazy('Overrides other settings when true'))
 
@@ -293,6 +295,30 @@ class PodcastEpisode(models.Model):
     def is_published(self):
         return not self.awaiting_import and self.publish <= round_now()
 
+    @cached_method
+    def check_is_private(self):
+        if self.is_private:
+            return True
+
+        pod = self.podcast
+        now = round_now()
+        if (pod.private_after_age and
+            now - self.publish > datetime.timedelta(seconds=pod.private_after_age)):
+            return True
+
+        if pod.private_after_nth:
+            ep_count = (
+                pod.get_all_episodes_raw()
+                .filter(
+                    publish__lt=now,
+                    publish__gt=self.publish,
+                    is_private=False,
+                    awaiting_import=False)
+                .count())
+            if ep_count > pod.private_after_nth:
+                return True
+
+        return False
 
     def set_flair(self, post, no_save=False):
         for flag, _ in FLAIR_FLAGS:

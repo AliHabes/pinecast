@@ -162,7 +162,9 @@ def _gen_feed(req, pod, episodes):
 
 
 def player(req, episode_id):
-    ep = get_object_or_404(PodcastEpisode, id=episode_id)
+    ep = get_object_or_404(PodcastEpisode.objects.select_related('podcast'), id=episode_id)
+    if (not req.user or req.user != ep.podcast.owner) and ep.check_is_private():
+        raise Http404()
     resp = render(req, 'player.html', {'episode': ep})
 
     # If the user is not a demo user, allow the player to be used outside the app.

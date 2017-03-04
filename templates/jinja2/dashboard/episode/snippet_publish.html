@@ -1,0 +1,19 @@
+<strong>{{ _('Publish Time') }}</strong>
+
+<p>
+  {% if podcast.site %}
+    {{ _('The publish time is when the podcast will become visible to your listeners in your podcast feed and on your podcast website.') }}
+  {% else %}
+    {{ _('The publish time is when the podcast will become visible to your listeners in your podcast feed.') }}
+  {% endif %}
+</p>
+
+<div
+  class="input-datetime"
+  data-name="publish"
+  {% if episode or default.get('publish') %}data-default-value="{{ default.get('publish', episode.publish.isoformat() if episode else None) }}"{% endif %}
+  data-label-now="{{ _('Publish Now') }}"
+  data-label-datetime="{{ _('Publish At...') }}"
+  data-label-date="{{ _('Publish Date') }}"
+  data-label-time="{{ _('Publish Time') }}"
+></div>

@@ -31,6 +31,7 @@ def environment(**options):
 
     env = Environment(**options)
     env.globals.update({
+        'bool': bool,
         'dir': dir,
         'float': float,
         'getattr': getattr,

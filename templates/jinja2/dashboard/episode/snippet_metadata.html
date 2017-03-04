@@ -1,0 +1,43 @@
+{% set has_explicit_metadata = default.get('explicit_override') or default.get('copyright') or default.get('license') %}
+
+{% if not has_explicit_metadata %}
+  <a class="expander" href="#">
+    {{ _('Show Explicit Override, Copyright, License...') }}
+  </a><div style="display: none">
+{% endif %}
+
+  <label>
+    <span>{{ _('Explicit Override') }}</span>
+    <div class="select">
+      <select name="explicit_override">
+        {% set exp_ov = default.get('explicit_override', episode.explicit_override if episode else None) %}
+        <option value="none" {{ 'selected' if exp_ov == 'none' else '' }}>
+          {{ _('Default for podcast (%s)') % (_('explicit') if podcast.is_explicit else _('clean')) }}
+        </option>
+        <option value="expl" {{ 'selected' if exp_ov == 'expl' else '' }}>{{ _('Explicit') }}</option>
+        <option value="clen" {{ 'selected' if exp_ov == 'clen' else '' }}>{{ _('Clean') }}</option>
+      </select>
+    </div>
+  </label>
+
+  <label>
+    <span>{{ _('Copyright') }}</span>
+    <input type="text"
+      name="copyright"
+      maxlength="1024"
+      value="{{ default.get('copyright', episode.copyright if episode else None) }}"
+      placeholder="{{ _('Copyright 2015 Foo Bar Inc.') }}">
+  </label>
+
+  <label>
+    <span>{{ _('License') }}</span>
+    <input type="text"
+      name="license"
+      maxlength="1024"
+      placeholder="{{ _('Creative Commons 4.0') }}"
+      value="{{ default.get('license', episode.license if episode else None) }}">
+  </label>
+
+{% if not has_explicit_metadata %}
+  </div>
+{% endif %}

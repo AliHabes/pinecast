@@ -7,7 +7,7 @@ import gfm
 from django.conf import settings
 from django.contrib.syndication.views import Feed
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 
 from . import models
@@ -83,6 +83,8 @@ def site_episode(req, podcast_slug, episode_id):
     pod = get_object_or_404(Podcast, slug=podcast_slug, select_related='owner')
     site = get_object_or_404(models.Site, podcast=pod)
     episode = get_object_or_404(PodcastEpisode, podcast=site.podcast, id=episode_id)
+    if episode.check_is_private():
+        raise Http404()
     return _srender(req, pod, site, 'episode.html', {'episode': episode})
 
 

@@ -3,8 +3,8 @@
   <p>
     {% set def_max_size = PLAN_MAX_FILE_SIZE[owner_uset.plan] %}
     {% trans max_size=def_max_size|filesizeformat(true) %}
-      Your account can upload Mp3 and AAC files up to <b>{{ max_size }}</b>.
-      We recommend saving audio as mono at 128kbps constant bitrate (CBR).
+      You can upload MP3s up to <b>{{ max_size }}</b>.
+      Mono 128kbps CBR encoding is recommended.
     {% endtrans %}
   </p>
   {% set surge_max_size = podcast.get_remaining_surge(def_max_size) %}
