@@ -72,8 +72,8 @@
   </div>
 </section>
 
-{% set recurring_tips = podcast.recurring_tips.filter(deactivated=False).order_by('-created').select_related('tipper') %}
-{% if recurring_tips.count() %}
+{% set recurring_tips = list(podcast.recurring_tips.filter(deactivated=False).order_by('-created').select_related('tipper')) %}
+{% if recurring_tips %}
   <table class="card">
     <thead>
       <tr>

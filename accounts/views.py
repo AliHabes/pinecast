@@ -151,7 +151,7 @@ def user_settings_page_savetz(req):
 @login_required
 @require_POST
 def user_settings_page_changeemail(req):
-    if User.objects.filter(email=req.POST.get('new_email')).count():
+    if User.objects.filter(email=req.POST.get('new_email')).exists():
         return redirect(reverse('dashboard') + '?error=eae#settings')
     send_confirmation_email(
         req.user,

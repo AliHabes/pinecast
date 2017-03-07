@@ -28,7 +28,7 @@ def _get_podcast(req, **kwargs):
         return podcast
 
     pods = Network.objects.filter(deactivated=False, members__in=[req.user], podcast__in=[podcast])
-    if not pods.count():
+    if not pods.exists():
         raise Http404()
 
     return podcast

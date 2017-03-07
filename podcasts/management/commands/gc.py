@@ -52,26 +52,26 @@ class Command(BaseCommand):
 
             if (f.key.startswith('networks/covers/') and
                 Network.objects.filter(
-                    Q(image_url=canon_url) | Q(image_url=https_canon_url)).count()):
+                    Q(image_url=canon_url) | Q(image_url=https_canon_url)).exists()):
                 self.stdout.write('     Still in use by Network')
                 continue
 
             elif (f.key.startswith('podcasts/covers/') and
                 Podcast.objects.filter(
-                    Q(cover_image=canon_url) | Q(cover_image=https_canon_url)).count()):
+                    Q(cover_image=canon_url) | Q(cover_image=https_canon_url)).exists()):
                 self.stdout.write('     Still in use by Podcast')
                 continue
 
             if PodcastEpisode.objects.filter(Q(audio_url=canon_url) |
                                              Q(image_url=canon_url) |
                                              Q(audio_url=https_canon_url) |
-                                             Q(image_url=https_canon_url)).count():
+                                             Q(image_url=https_canon_url)).exists():
                 self.stdout.write('     Still in use by PodcastEpisode')
                 continue
 
             if Site.objects.filter(
                     Q(cover_image_url=canon_url) | Q(cover_image_url=https_canon_url) |
-                    Q(logo_url=canon_url) | Q(logo_url=https_canon_url)).count():
+                    Q(logo_url=canon_url) | Q(logo_url=https_canon_url)).exists():
                 self.stdout.write('     Still in use by Site')
                 continue
 

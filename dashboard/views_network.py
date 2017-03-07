@@ -192,7 +192,7 @@ def network_remove_member(req, network_id, member_id):
     net = get_network(req, network_id)
     user = get_object_or_404(User, id=member_id)
 
-    if not net.members.filter(username=user.username).count():
+    if not net.members.filter(username=user.username).exists():
         raise Http404()
 
     # We don't need to confirm if the user is the owner.

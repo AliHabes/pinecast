@@ -60,11 +60,11 @@ def get_podcast(req, slug):  # TODO: move to the Podcast model
 
     if pod.owner == req.user:
         return pod
-    elif pod.collaborators.filter(collaborator=req.user).count():
+    elif pod.collaborators.filter(collaborator=req.user).exists():
         return pod
 
     pods = Network.objects.filter(deactivated=False, members__in=[req.user], podcast__in=[pod])
-    if not pods.count():
+    if not pods.exists():
         raise Http404()
 
     return pod

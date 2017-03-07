@@ -32,7 +32,7 @@ def signup(req):
         error = ugettext('Come on, you need a password')
     elif len(req.POST.get('password')) < 8:
         error = ugettext('Your password needs to be at least 8 characters long')
-    elif User.objects.filter(email=req.POST.get('email')).count():
+    elif User.objects.filter(email=req.POST.get('email')).exists():
         error = ugettext('That email address is already associated with an account')
 
     if error:

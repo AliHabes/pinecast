@@ -7,12 +7,12 @@
       <h1>{{ _('Podcast Subscriptions') }}</h1>
     </hgroup>
 
-    {% set rts = tip_user.recurring_tips.filter(deactivated=False) %}
-    {% if rts.count() %}
+    {% set rts = list(tip_user.recurring_tips.filter(deactivated=False)) %}
+    {% if rts %}
       <p>{{ _('These are the podcasts that you currently contribute to every month.') }}</p>
 
       <ul class="existing-tips">
-        {% for rt in rts.all() %}
+        {% for rt in rts %}
           <li class="card existing-tip">
             <strong>{{ rt.podcast.name }}</strong>
             <div>

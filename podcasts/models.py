@@ -99,10 +99,9 @@ class Podcast(models.Model):
 
     @cached_method
     def is_still_importing(self):
-        return bool(
-            self.assetimportrequest_set
-                .filter(failed=False, resolved=False)
-                .count())
+        return (self.assetimportrequest_set
+            .filter(failed=False, resolved=False)
+            .exists())
 
     @cached_method
     def get_all_episodes_raw(self):
