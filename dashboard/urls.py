@@ -2,7 +2,12 @@ from __future__ import absolute_import
 
 from django.conf.urls import url
 
-from . import views, views_collaborators, views_importer, views_network, views_sites
+from . import views
+from . import views_collaborators
+from . import views_importer
+from . import views_network
+from . import views_sites
+from . import views_tip_jar
 
 
 urlpatterns = [
@@ -19,6 +24,7 @@ urlpatterns = [
     url(r'^/podcast/(?P<podcast_slug>[\w-]+)/episode/(?P<episode_id>[\w-]+)/edit$', views.edit_podcast_episode, name='edit_podcast_episode'),
     url(r'^/podcast/(?P<podcast_slug>[\w-]+)/new_collaborator$', views_collaborators.new_collaborator, name='new_collaborator'),
     url(r'^/podcast/(?P<podcast_slug>[\w-]+)/delete_collaborator$', views_collaborators.delete_collaborator, name='delete_collaborator'),
+    url(r'^/podcast/(?P<podcast_slug>[\w-]+)/set_tip_jar_options$', views_tip_jar.set_tip_jar_options, name='set_tip_jar_options'),
 
     url(r'^/network/new$', views_network.new_network, name='new_network'),
     url(r'^/network/(?P<network_id>[\w-]+)$', views_network.network_dashboard, name='network_dashboard'),

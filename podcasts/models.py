@@ -115,10 +115,10 @@ class Podcast(models.Model):
             awaiting_import=False).order_by('-publish')
         if not include_private:
             episodes = episodes.filter(is_private=False)
-            if self.private_after_age:
+            if self.private_after_age is not None:
                 max_age = rount_now() - datetime.timedelta(seconds=self.private_after_age)
                 episodes = episodes.filter(publish__gt=max_age)
-            if self.private_after_nth:
+            if self.private_after_nth is not None:
                 episodes = episodes[:self.private_after_nth]
 
         if select_related:
@@ -302,11 +302,11 @@ class PodcastEpisode(models.Model):
 
         pod = self.podcast
         now = round_now()
-        if (pod.private_after_age and
+        if (pod.private_after_age is not None and
             self.publish < now - datetime.timedelta(seconds=pod.private_after_age)):
             return True
 
-        if pod.private_after_nth:
+        if pod.private_after_nth is not None:
             ep_count = (
                 pod.get_all_episodes_raw()
                 .filter(

@@ -1,0 +1,55 @@
+<form action="{{ url('set_tip_jar_options', podcast_slug=podcast.slug) }}" method="post">
+
+  <strong>{{ _('Minimum Contribution') }}</strong>
+
+  <p>
+    {{ _('By specifying a minimum contribution level, you will require your paid listeners to contribute a minimum dollar amount to access private episodes.') }}
+  </p>
+
+  <label>
+    <span>{{ _('Dollar Amount') }}</span>
+    <div class="select">
+      <select name="min_dollar_amount">
+        <option value="" {{ 'selected' if podcast.private_access_min_subscription is none }}>{{ _('No minimum') }}</option>
+        <option value="300" {{ 'selected' if podcast.private_access_min_subscription == 300 }}>{{ _('$3.00') }}</option>
+        <option value="500" {{ 'selected' if podcast.private_access_min_subscription == 500 }}>{{ _('$5.00') }}</option>
+        <option value="1000" {{ 'selected' if podcast.private_access_min_subscription == 1000 }}>{{ _('$10.00') }}</option>
+        <option value="2000" {{ 'selected' if podcast.private_access_min_subscription == 2000 }}>{{ _('$20.00') }}</option>
+        <option value="5000" {{ 'selected' if podcast.private_access_min_subscription == 5000 }}>{{ _('$50.00') }}</option>
+      </select>
+    </div>
+  </label>
+
+  <hr>
+
+  <strong>{{ _('Automatic Privatization') }}</strong>
+
+  <label class="checkbox checkbox-standalone">
+    <input type="checkbox" name="enable_age" value="true" {{ 'checked' if podcast.private_after_age is not none }}>
+    <span>{{ _('Make episodes private after a certain amount of time') }}</span>
+  </label>
+  <label>
+    <span>{{ _('Days') }}</span>
+    <input type="number" step="0" min="0" name="amount_age" value="{{ int(podcast.private_after_age / 86400) if podcast.private_after_age is not none else 1 }}">
+  </label>
+
+
+  <label class="checkbox checkbox-standalone">
+    <input type="checkbox" name="enable_nth" value="true" {{ 'checked' if podcast.private_after_nth is not none }}>
+    <span>{{ _('Make episodes private after enough new episodes are published') }}</span>
+  </label>
+  <label>
+    <span>{{ _('Episodes') }}</span>
+    <input type="number" step="0" min="0" name="amount_nth" value="{{ podcast.private_after_nth if podcast.private_after_nth is not none else 5 }}">
+  </label>
+
+  <hr>
+
+  <menu class="toolbar">
+    <button type="submit" class="btn">
+      {{ _('Save Options') }}
+    </button>
+  </menu>
+
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>

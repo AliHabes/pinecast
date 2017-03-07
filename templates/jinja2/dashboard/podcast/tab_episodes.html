@@ -93,8 +93,8 @@
         {% for i, ep in privep_enumerate(episodes) -%}
           {% set ep_is_private = (
             ep.is_private or
-            podcast.private_after_nth and i >= podcast.private_after_nth or
-            podcast.private_after_age and ep.publish < now() - timedelta(seconds=podcast.private_after_age)
+            podcast.private_after_nth is not none and i >= podcast.private_after_nth or
+            podcast.private_after_age is not none and ep.publish < now() - timedelta(seconds=podcast.private_after_age)
           ) %}
           {{ episode(ep, ep_is_private) }}
         {%- endfor %}
