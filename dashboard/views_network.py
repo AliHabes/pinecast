@@ -61,10 +61,15 @@ def network_dashboard(req, network_id):
     top_episodes_data = analytics_query.get_top_episodes([str(p.id) for p in net_podcasts])
 
     top_episodes = []
-    for ep_id, count in sorted(top_episodes_data.items(), key=lambda x: -1 * x[1])[:75]:
-        try:
-            episode = PodcastEpisode.objects.get(id=ep_id)
-        except PodcastEpisode.DoesNotExist:
+    top_episodes_listing = sorted(top_episodes_data.items(), key=lambda x: -1 * x[1])[:75]
+    fetched_eps_map = {
+        str(ep.id): ep for
+        ep in
+        PodcastEpisode.objects.filter(id__in=[x for x, _ in top_episodes_listing])
+    }
+    for ep_id, count in top_episodes_listing:
+        episode = fetched_eps_map.get(ep_id)
+        if not episode:
             continue
         top_episodes.append({
             'count': count,
