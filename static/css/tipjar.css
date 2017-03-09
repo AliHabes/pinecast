@@ -4,6 +4,7 @@
 
 
 main {
+    flex: 1 1;
     font-size: 15px;
     margin: 0 auto;
     max-width: 560px;
@@ -97,7 +98,6 @@ label > span,
 .tip-frequency-selector p a {
     color: #bbb;
 }
-
 
 input[type=radio] {
     -moz-appearance: none;
@@ -195,6 +195,7 @@ input[type=radio]:focus:checked + span:before {
 .existing-tip-banner {
     border: 1px solid #bbb;
     border-radius: 2px;
+    color: #666;
     margin: 0 50px 40px;
     padding: 20px;
     text-align: center;
@@ -207,4 +208,23 @@ input[type=radio]:focus:checked + span:before {
 }
 .existing-tip-login a {
     color: #bbb;
+}
+
+@media (max-width: 700px) {
+    .existing-tip-banner {
+        font-size: 13px;
+        margin: 0 0 15px;
+        padding: 15px 10px;
+    }
+    .tip-frequency {
+        flex-direction: column;
+    }
+    .tip-frequency button + button {
+        margin-top: 15px;
+    }
+}
+
+footer a {
+    color: #ccc;
+    font-size: 11px;
 }
