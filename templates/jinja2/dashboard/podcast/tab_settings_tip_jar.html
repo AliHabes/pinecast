@@ -10,12 +10,12 @@
     <span>{{ _('Dollar Amount') }}</span>
     <div class="select">
       <select name="min_dollar_amount">
-        <option value="" {{ 'selected' if podcast.private_access_min_subscription is none }}>{{ _('No minimum') }}</option>
-        <option value="300" {{ 'selected' if podcast.private_access_min_subscription == 300 }}>{{ _('$3.00') }}</option>
-        <option value="500" {{ 'selected' if podcast.private_access_min_subscription == 500 }}>{{ _('$5.00') }}</option>
-        <option value="1000" {{ 'selected' if podcast.private_access_min_subscription == 1000 }}>{{ _('$10.00') }}</option>
-        <option value="2000" {{ 'selected' if podcast.private_access_min_subscription == 2000 }}>{{ _('$20.00') }}</option>
-        <option value="5000" {{ 'selected' if podcast.private_access_min_subscription == 5000 }}>{{ _('$50.00') }}</option>
+        <option value="" {{ 'selected' if podcast.private_access_min_subscription is none else ''}}>{{ _('No minimum') }}</option>
+        <option value="300" {{ 'selected' if podcast.private_access_min_subscription == 300 else ''}}>{{ _('$3.00') }}</option>
+        <option value="500" {{ 'selected' if podcast.private_access_min_subscription == 500 else ''}}>{{ _('$5.00') }}</option>
+        <option value="1000" {{ 'selected' if podcast.private_access_min_subscription == 1000 else ''}}>{{ _('$10.00') }}</option>
+        <option value="2000" {{ 'selected' if podcast.private_access_min_subscription == 2000 else ''}}>{{ _('$20.00') }}</option>
+        <option value="5000" {{ 'selected' if podcast.private_access_min_subscription == 5000 else ''}}>{{ _('$50.00') }}</option>
       </select>
     </div>
   </label>

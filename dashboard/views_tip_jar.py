@@ -17,7 +17,7 @@ def set_tip_jar_options(req, podcast_slug):
 
     if req.POST.get('min_dollar_amount'):
         amount = int(req.POST.get('min_dollar_amount'))
-        pod.private_access_min_subscription = max(min(amount, 50), 0)
+        pod.private_access_min_subscription = max(min(amount, 5000), 100)
     else:
         pod.private_access_min_subscription = None
 
