@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import datetime
 import re
 import uuid
+from datetime import timedelta
 
 import gfm
 import requests
@@ -115,7 +116,7 @@ class Podcast(models.Model):
         if not include_private:
             episodes = episodes.filter(is_private=False)
             if self.private_after_age is not None:
-                max_age = rount_now() - datetime.timedelta(seconds=self.private_after_age)
+                max_age = rount_now() - timedelta(seconds=self.private_after_age)
                 episodes = episodes.filter(publish__gt=max_age)
             if self.private_after_nth is not None:
                 episodes = episodes[:self.private_after_nth]
@@ -132,6 +133,23 @@ class Podcast(models.Model):
         for ep in episodes:
             setattr(ep, 'podcast', self)
         return episodes
+
+    @cached_method
+    def has_private_episodes(self):
+        rn = round_now()
+        episodes = self.get_all_episodes_raw().filter(
+            publish__lt=rn,
+            awaiting_import=False).order_by('-publish')
+
+        if episodes.filter(is_private=True).exists():
+            return True
+
+        return (
+            self.private_after_nth is not None and
+                episodes.count() > self.private_after_nth or
+            self.private_after_age is not None and
+                episodes.filter(publish__lt=rn - timedelta(seconds=self.private_after_age)).exists()
+        )
 
     @cached_method
     def get_unpublished_count(self):
@@ -179,14 +197,14 @@ class Podcast(models.Model):
     def last_eligible_payout_date(self):
         today = datetime.date.today()
         days_since_friday = (today.isoweekday() - 5) % 7
-        return today - datetime.timedelta(days=days_since_friday)
+        return today - timedelta(days=days_since_friday)
 
 
     def last_payout_date(self):
         last_eligible_payout_date = self.last_eligible_payout_date()
 
         last_day_for_charges_in_last_payout = (
-            last_eligible_payout_date - datetime.timedelta(days=7))
+            last_eligible_payout_date - timedelta(days=7))
 
         last_tip = (self.tip_events
             .filter(occurred_at__lte=last_day_for_charges_in_last_payout)
@@ -202,7 +220,7 @@ class Podcast(models.Model):
         last_eligible_payout_date = self.last_eligible_payout_date()
         last_tip = (self.tip_events
                         .filter(occurred_at__gt=last_eligible_payout_date -
-                                datetime.timedelta(days=7))
+                                timedelta(days=7))
                         .order_by('-occurred_at')
                         .first())
 
@@ -213,7 +231,7 @@ class Podcast(models.Model):
 
     def average_tip_value_this_month(self):
         events = (self.tip_events
-            .filter(occurred_at__gt=round_now() - datetime.timedelta(days=30)))
+            .filter(occurred_at__gt=round_now() - timedelta(days=30)))
         return events.aggregate(models.aggregates.Avg('amount'))['amount__avg']
 
     def tip_fees_paid(self):
@@ -226,7 +244,7 @@ class Podcast(models.Model):
         uset = UserSettings.get_from_user(self.owner)
         if not payment_plans.minimum(uset.plan, payment_plans.PLAN_STARTER):
             return 0
-        thirty_ago = datetime.datetime.now() - datetime.timedelta(days=30)
+        thirty_ago = datetime.datetime.now() - timedelta(days=30)
         last_thirty_eps = self.podcastepisode_set.filter(created__gt=thirty_ago, audio_size__gt=max_size)
         surge_count = last_thirty_eps.count()
         surge_amt = last_thirty_eps.aggregate(models.Sum('audio_size'))['audio_size__sum'] or 0
@@ -302,7 +320,7 @@ class PodcastEpisode(models.Model):
         pod = self.podcast
         now = round_now()
         if (pod.private_after_age is not None and
-            self.publish < now - datetime.timedelta(seconds=pod.private_after_age)):
+            self.publish < now - timedelta(seconds=pod.private_after_age)):
             return True
 
         if pod.private_after_nth is not None:

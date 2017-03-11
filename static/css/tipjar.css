@@ -37,7 +37,7 @@ main hgroup {
     color: inherit;
 }
 
-hgroup h1, hgroup h2, hgroup h3 {
+h1, h2, h3 {
     font-weight: 300;
 }
 
@@ -137,9 +137,19 @@ input[type=radio]:focus:checked + span:before {
 }
 .tip-success {
     color: #23BA5A;
-    line-height: 2em;
+    font-size: 16px;
+    line-height: 1.5em;
     padding: 2em 0;
     text-align: center;
+}
+.tip-success a {
+    text-decoration: underline;
+}
+.can-access-private {
+    border: 1px solid;
+    border-radius: 5px;
+    margin-top: 1em;
+    padding: 10px;
 }
 
 .existing-tips {
@@ -150,6 +160,7 @@ input[type=radio]:focus:checked + span:before {
     border: 1px solid #bbb;
     border-radius: 2px;
     margin-bottom: 15px;
+    max-width: 100%;
     padding: 15px;
 }
 .existing-tip strong {
@@ -172,6 +183,11 @@ input[type=radio]:focus:checked + span:before {
     color: #aaa;
     font-size: 12px;
     font-weight: 400;
+}
+
+.existing-tip .private-feed-line span {
+    display: block;
+    flex: 1 1;
 }
 
 .existing-tip .buttons {
@@ -221,6 +237,10 @@ input[type=radio]:focus:checked + span:before {
     }
     .tip-frequency button + button {
         margin-top: 15px;
+    }
+
+    .tip-success {
+        font-size: 13px;
     }
 }
 

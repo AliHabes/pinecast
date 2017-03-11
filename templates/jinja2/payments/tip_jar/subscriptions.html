@@ -2,44 +2,48 @@
 
 {% block content %}
 <main>
-  <div class="card">
-    <hgroup>
-      <h1>{{ _('Podcast Subscriptions') }}</h1>
-    </hgroup>
+  <h1>{{ _('Podcast Subscriptions') }}</h1>
 
-    {% set rts = list(tip_user.recurring_tips.filter(deactivated=False)) %}
-    {% if rts %}
-      <p>{{ _('These are the podcasts that you currently contribute to every month.') }}</p>
+  {% set rts = list(tip_user.recurring_tips.filter(deactivated=False)) %}
+  {% if rts %}
+    <p>{{ _('These are the podcasts that you currently contribute to every month.') }}</p>
 
-      <ul class="existing-tips">
-        {% for rt in rts %}
-          <li class="card existing-tip">
-            <strong>{{ rt.podcast.name }}</strong>
-            <div>
+    <ul class="existing-tips">
+      {% for rt in rts %}
+        <li class="card existing-tip">
+          <strong>{{ rt.podcast.name }}</strong>
+          <div>
+            <span>
+              <b>{{ _('Amount') }}</b>
+              {{ '$%.2f' % (float(rt.amount) / 100) }}
+            </span>
+            <span>
+              <b>{{ _('Start Date') }}</b>
+              <abbr title="{{ rt.created }}">
+                {{ rt.created|pretty_date }}
+              </abbr>
+            </span>
+          </div>
+          {% if rt.eligible_to_access_private() and rt.podcast.has_private_episodes() %}
+            <div class="private-feed-line">
               <span>
-                <b>{{ _('Amount') }}</b>
-                {{ '$%.2f' % (float(rt.amount) / 100) }}
-              </span>
-              <span>
-                <b>{{ _('Start Date') }}</b>
-                <abbr title="{{ rt.created }}">
-                  {{ rt.created|pretty_date }}
-                </abbr>
+                <b>Private RSS Feed</b>
+                <input type="url" readonly value="https://pinecast.com{{ url('feed_private', podcast_slug=rt.podcast.slug, subscriber=str(rt.tipper.uuid)) }}" style="font-size: 12px; padding: 5px" onclick="this.select()">
               </span>
             </div>
-            <div class="buttons">
-              <a class="btn" href="{{ url('tip_jar', podcast_slug=rt.podcast.slug) }}">Update</a>
-              <form action="{{ url('cancel_sub', podcast_slug=rt.podcast.slug) }}" method="post">
-                <button class="btn btn--danger">Cancel</button>
-                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-              </form>
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>{{ _('You currently do not subscribe to any podcasts.') }}</p>
-    {% endif %}
-  </div>
+          {% endif %}
+          <div class="buttons">
+            <a class="btn" href="{{ url('tip_jar', podcast_slug=rt.podcast.slug) }}">Update</a>
+            <form action="{{ url('cancel_sub', podcast_slug=rt.podcast.slug) }}" method="post">
+              <button class="btn btn--danger">Cancel</button>
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>{{ _('You currently do not subscribe to any podcasts.') }}</p>
+  {% endif %}
 </main>
 {% endblock %}

@@ -93,9 +93,16 @@
   {{ _("We've sent you a confirmation email.") }}<br>
   {{ _('Click the link to confirm your subscription.') }}
 </div>
-<div class="tip-success tip-success-subscribe-complete" style="display: none">
+<div class="tip-success tip-success-subscribe-complete" style="display: none; ">
   {{ _("You're all set!") }}<br>
-  {{ _('You are now a subscriber of %s.') % podcast.name }}
+  {{ _("You're subscribed to %s.") % podcast.name }}
+  {% if podcast.has_private_episodes() %}
+    <div class="can-access-private" style="display: none">
+      {% trans subs_url=url('tip_jar_subs') %}
+        You can now access the private RSS feed. <a href="{{ subs_url }}">Get private feed...</a>
+      {% endtrans %}
+    </div>
+  {% endif %}
 </div>
 <div class="tip-error-spec error" style="display: none"></div>
 <div class="tip-error-gen error" style="display: none">
@@ -166,6 +173,12 @@ window.addEventListener('load', function() {
           document.querySelector('.tip-success-' + type + '-' + parsed.status).style.display = 'block';
         } else {
           document.querySelector('.tip-success-' + type).style.display = 'block';
+        }
+        if (
+          type === 'subscribe' &&
+          {{ ('true' if podcast.private_access_min_subscription is none else 'amount >= %s' % podcast.private_access_min_subscription)|safe }}
+        ) {
+          document.querySelector('.can-access-private').style.display = 'block';
         }
       }
     };
