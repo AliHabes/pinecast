@@ -1164,14 +1164,14 @@ menu.toolbar-right li {
     .form-block form:not(.inline-form) label.checkbox input:checked + span:before {
         left: 2px;
     }
-    .form-block form:not(.inline-form) label:not(.checkbox) {
+    .form-block form:not(.inline-form) label:not(.checkbox):not(.radio) {
         flex-direction: column;
     }
-    .form-block form:not(.inline-form) label:not(.checkbox) > span:first-child {
+    .form-block form:not(.inline-form) label:not(.checkbox):not(.radio) > span:first-child {
         text-align: left;
         white-space: nowrap;
     }
-    .form-block form:not(.inline-form) label:not(.checkbox) input {
+    .form-block form:not(.inline-form) label:not(.checkbox):not(.radio) input {
         flex: 1 1 2.5em !important /* important to override inline styles from React */;
     }
 }
