@@ -19,7 +19,7 @@
       <a href="" data-tab=".tab-networks">{{ _('Networks') }}</a>
     </li>
     <li>
-      <a href="" data-tab=".tab-settings">
+      <a href="" data-tab=".tab-settings" aria-label="{{ _('Settings') }}">
         <span class="hide-on-mobile">{{ _('Settings') }}</span>
         <span class="hide-on-desktop">
           <i class="icon icon-sliders"></i>
@@ -28,10 +28,10 @@
     </li>
     {% if is_paid_plan(user_settings.plan) %}
       <li>
-        <a href="" data-tab=".tab-referrals" style="color: #52D1C7">
+        <a href="" data-tab=".tab-referrals" style="color: #52D1C7" aria-label="{{ _('Referrals') }}">
           <span class="hide-on-mobile">{{ _('Referrals') }}</span>
           <span class="hide-on-desktop">
-            <i class="icon icon-credit-card"></i>
+            <i class="icon icon-dollar"></i>
           </span>
         </a>
       </li>

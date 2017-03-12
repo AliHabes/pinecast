@@ -28,8 +28,11 @@
     <a href="{{ url('upgrade') }}" class="upgrade-link">
       {{ _('Upgrade') }}
     </a>
-    <a href="{{ SUPPORT_URL }}" class="support-link">
-      {{ _('Help') }}
+    <a href="{{ SUPPORT_URL }}" class="support-link" aria-label="{{ _('Help') }}">
+      <span class="hide-on-mobile">{{ _('Help') }}</span>
+      <span class="hide-on-desktop">
+        <i class="icon icon-lifebuoy"></i>
+      </span>
     </a>
     <a class="user-card menu-trigger" href="{{ url('dashboard') }}#settings">
       <img src="{{ gravatar(user.email) }}" alt="">
