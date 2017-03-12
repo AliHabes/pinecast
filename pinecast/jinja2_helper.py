@@ -104,6 +104,7 @@ def environment(**options):
     env.filters['json'] = json.dumps
     env.filters['json_parse'] = json.loads
     env.filters['markdown'] = gfm.markdown
+    env.filters['parse_date'] = lambda d: datetime.datetime.strptime(d, '%Y-%m-%d')
     env.filters['pretty_date'] = helpers.pretty_date
     env.filters['replace'] = lambda s: s.replace
     env.filters['safe_json'] = safe_json

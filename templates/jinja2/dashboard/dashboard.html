@@ -19,11 +19,21 @@
       <a href="" data-tab=".tab-networks">{{ _('Networks') }}</a>
     </li>
     <li>
-      <a href="" data-tab=".tab-settings">{{ _('Settings') }}</a>
+      <a href="" data-tab=".tab-settings">
+        <span class="hide-on-mobile">{{ _('Settings') }}</span>
+        <span class="hide-on-desktop">
+          <i class="icon icon-sliders"></i>
+        </span>
+      </a>
     </li>
     {% if is_paid_plan(user_settings.plan) %}
       <li>
-        <a href="" data-tab=".tab-referrals" style="color: #52D1C7">{{ _('Referrals') }}</a>
+        <a href="" data-tab=".tab-referrals" style="color: #52D1C7">
+          <span class="hide-on-mobile">{{ _('Referrals') }}</span>
+          <span class="hide-on-desktop">
+            <i class="icon icon-credit-card"></i>
+          </span>
+        </a>
       </li>
     {% endif %}
   </ul>
@@ -45,6 +55,23 @@
       {% endif %}
     </a>
   </div>
+
+  <div class="card card-block">
+    <button class="btn-plain expander expander-toggle" type="button">
+      <b>
+        <i class="icon icon-newspaper"></i>
+        {{ _("What's New?") }}
+      </b>
+      <span>
+        {{ news[0].title }}
+        <span class="hide-on-mobile" style="opacity: 0.3">({{ news[0].when|parse_date|pretty_date }})</span>
+        <i class="icon icon-angle-right"></i>
+      </span>
+    </button><div style="display: none; border-top: 1px solid #eee; margin: 0.5em 0 0; padding: 0.5em 0 0">
+      {{ news[0].summary }}
+    </div>
+  </div>
+
   <ul class="card-list">
   {% for p in podcasts %}
     <li class="card"

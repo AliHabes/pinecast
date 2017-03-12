@@ -6,6 +6,7 @@ import datetime
 import hashlib
 import hmac
 import json
+import os
 import sys
 import time
 import urllib.request
@@ -38,6 +39,9 @@ from sites.models import Site, SitePage
 
 
 ISO_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
+news = json.load(open(os.path.join(os.path.dirname(__file__), 'news.json')))
+print(news)
 
 
 class EmptyStringDefaultDict(collections.defaultdict):
@@ -75,6 +79,7 @@ def dashboard(req):
     ctx = {
         'success': req.GET.get('success'),
         'error': req.GET.get('error'),
+        'news': news,
     }
 
     us = UserSettings.get_from_user(req.user)
@@ -108,6 +113,7 @@ def dashboard(req):
             .values('podcast')
             .annotate(newest=Max('publish'))}
 
+    print(ctx)
     return _pmrender(req, 'dashboard/dashboard.html', ctx)
 
 

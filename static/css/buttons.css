@@ -1,5 +1,6 @@
 
-button, .btn {
+button:not(.btn-plain),
+.btn:not(.btn-plain) {
     -moz-appearance: none;
     -ms-appearance: none;
     -webkit-appearance: none;
@@ -21,21 +22,31 @@ button, .btn {
     top: 0;
 }
 
-button:hover, .btn:hover,
-button:focus, .btn:focus {
+button:not(.btn-plain):hover, .btn:not(.btn-plain):hover,
+button:not(.btn-plain):focus, .btn:not(.btn-plain):focus {
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
     text-decoration: none;
 }
 
-button:active, .btn:active {
+button:not(.btn-plain):active, .btn:not(.btn-plain):active {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     top: 3px;
 }
 
-button:disabled, .btn:disabled {
+button:not(.btn-plain):disabled, .btn:not(.btn-plain):disabled {
     opacity: 0.4;
 }
 
 .btn-danger {
     background: #FF5252;
+}
+
+.btn-plain {
+    background: transparent;
+    border: 0;
+    display: inline-block;
+    font-size: 1em;
+    margin: 0;
+    padding: 0;
+    text-align: left;
 }
