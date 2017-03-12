@@ -41,7 +41,6 @@ from sites.models import Site, SitePage
 ISO_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
 news = json.load(open(os.path.join(os.path.dirname(__file__), 'news.json')))
-print(news)
 
 
 class EmptyStringDefaultDict(collections.defaultdict):

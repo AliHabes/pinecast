@@ -260,7 +260,7 @@ class PodcastEpisode(models.Model):
     title = models.CharField(max_length=1024)
     subtitle = models.CharField(max_length=1024, default='', blank=True)
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    publish = models.DateTimeField()
+    publish = models.DateTimeField(db_index=True)
     description = models.TextField(default='')
     duration = models.PositiveIntegerField(
         help_text=ugettext_lazy('Audio duration in seconds'))
