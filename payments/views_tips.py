@@ -182,7 +182,8 @@ def confirm_sub(req, podcast_slug):
         result = _finish_sub(req, pod, amount, email, token)
         if result:
             return redirect('tip_jar_subs')
-    except Exception:
+    except Exception as e:
+        print(e)
         return HttpResponse(status=400)
 
 

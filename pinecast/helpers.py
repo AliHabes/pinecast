@@ -51,7 +51,7 @@ def cached_method(func):
 
         targs = tuple(args) + tuple(kwargs.items())
         if targs not in cache:
-            cache[targs] = func(self, *args)
+            cache[targs] = func(self, *args, **kwargs)
         return cache[targs]
     return memoized
 

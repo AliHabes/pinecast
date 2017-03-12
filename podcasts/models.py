@@ -116,7 +116,7 @@ class Podcast(models.Model):
         if not include_private:
             episodes = episodes.filter(is_private=False)
             if self.private_after_age is not None:
-                max_age = rount_now() - timedelta(seconds=self.private_after_age)
+                max_age = round_now() - timedelta(seconds=self.private_after_age)
                 episodes = episodes.filter(publish__gt=max_age)
             if self.private_after_nth is not None:
                 episodes = episodes[:self.private_after_nth]
