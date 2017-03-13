@@ -92,10 +92,9 @@ def _send_one_time_tip(req, podcast, owner_us, amount):
             application_fee=application_fee,
             currency='usd',
             description='Tip for %s' % podcast.name,
-            destination=owner_us.stripe_payout_managed_account,
             source=token,
+            stripe_account=owner_us.stripe_payout_managed_account,
         )
-
     except Exception as e:
         rollbar.report_message('Error when sending tip: %s' % str(e), 'error')
         return {'error': str(e)}

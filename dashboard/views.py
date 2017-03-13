@@ -112,7 +112,6 @@ def dashboard(req):
             .values('podcast')
             .annotate(newest=Max('publish'))}
 
-    print(ctx)
     return _pmrender(req, 'dashboard/dashboard.html', ctx)
 
 

@@ -102,3 +102,6 @@ class TipEvent(models.Model):
         following_payout = date + datetime.timedelta(days=(5 - date.isoweekday()) % 7)
 
         return following_payout + datetime.timedelta(days=7)
+
+    def __str__(self):
+        return '%s to %s - %s' % (self.amount, self.podcast.name, self.occurred_at.strftime('%x %X'))
