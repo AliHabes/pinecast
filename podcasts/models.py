@@ -156,15 +156,6 @@ class Podcast(models.Model):
         return self.podcastepisode_set.filter(
             publish__gt=round_now()).count()
 
-    @cached_method
-    def get_most_recent_episode(self):
-        episodes = list(self.get_episodes())
-        return None if not episodes else episodes[0]
-
-    def get_most_recent_publish_date(self):
-        latest = self.get_most_recent_episode()
-        return latest.publish if latest else None
-
     def get_available_flair_flags(self, flatten=False):
         us = UserSettings.get_from_user(self.owner)
         plan = us.plan

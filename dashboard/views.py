@@ -287,10 +287,9 @@ def podcast_new_ep(req, podcast_slug):
 
     tz_delta = UserSettings.get_from_user(req.user).get_tz_delta()
 
-    latest_episode = pod.get_most_recent_episode()
     ctx = {
         'podcast': pod,
-        'latest_ep': latest_episode,
+        'latest_ep': pod.podcastepisode_set.order_by('-created')[0],
     }
     if not req.POST:
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
