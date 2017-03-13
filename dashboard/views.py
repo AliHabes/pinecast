@@ -288,9 +288,15 @@ def delete_podcast_episode(req, podcast_slug, episode_id):
 def podcast_new_ep(req, podcast_slug):
     pod = get_podcast(req, podcast_slug)
 
+    latest_eps = pod.podcastepisode_set.order_by('-created')
+    try:
+        latest_ep = latest_eps[0]
+    except IndexError:
+        latest_ep = None
+
     ctx = {
         'podcast': pod,
-        'latest_ep': pod.podcastepisode_set.order_by('-created')[0],
+        'latest_ep': latest_ep,
     }
     if not req.POST:
         return _pmrender(req, 'dashboard/episode/page_new.html', ctx)
