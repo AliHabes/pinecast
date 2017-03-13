@@ -285,8 +285,6 @@ def delete_podcast_episode(req, podcast_slug, episode_id):
 def podcast_new_ep(req, podcast_slug):
     pod = get_podcast(req, podcast_slug)
 
-    tz_delta = UserSettings.get_from_user(req.user).get_tz_delta()
-
     ctx = {
         'podcast': pod,
         'latest_ep': pod.podcastepisode_set.order_by('-created')[0],
