@@ -35,11 +35,6 @@ def write_influx_many(db, items):
 
     return influx_client.write_points(items, database=db)
 
-def write_listen(*args, **kwargs):
-    obj = get_listen_obj(*args, **kwargs)
-    if not obj:
-        return
-    commit_listens([obj])
 
 def get_listen_obj(ep, source, req=None, ip=None, ua=None, timestamp=None):
     if is_bot(req=req, ua=ua): return None
