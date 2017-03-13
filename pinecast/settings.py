@@ -194,7 +194,10 @@ USE_TZ = False
 def show_debug_toolbar(req):
     if req.is_ajax():
         return False
-    return req.META.get('REMOTE_ADDR', req.META.get('HTTP_CF_CONNECTING_IP')) in INTERNAL_IPS
+    return (
+        req.META.get('REMOTE_ADDR') in INTERNAL_IPS or
+        req.META.get('HTTP_CF_CONNECTING_IP') in INTERNAL_IPS
+    )
 
 
 DEBUG_TOOLBAR_CONFIG = {
