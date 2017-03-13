@@ -20,6 +20,30 @@ class FormatException(Exception):
     pass
 
 
+
+def _parse_duration(input):
+    """Returns the duration as a positive integer of seconds
+    """
+    try:
+        dur_tup = [
+            int(x.lstrip('0') if len(x) > 1 else (x or '0')) for
+            x in
+            input.replace('::', ':').split(':')
+        ]
+    except ValueError:
+        return 0
+
+    size = len(dur_tup)
+    if size > 3:
+        dur_tup = dur_tup[-3:]
+        size = 3
+
+    return sum(
+        v * 60 ** (size - i - 1) for
+        i, v in
+        enumerate(dur_tup)
+    )
+
 def get_details(req, parsed):
     rss = get_first_tag(parsed, 'rss')
 
@@ -64,16 +88,7 @@ def get_details(req, parsed):
             continue
 
         duration = first_tag_text(node, 'itunes:duration', '0:00')
-        try:
-            dur_tup = list(map(int, duration.split(':').replace('::', ':')))
-        except Exception as e:
-            dur_tup = (0, )
-        if len(dur_tup) == 1:
-            dur_seconds = dur_tup[0]
-        elif len(dur_tup) == 2:
-            dur_seconds = dur_tup[0] * 60 + dur_tup[1]
-        else:
-            dur_seconds = dur_tup[-3] * 3600 + dur_tup[-2] * 60 + dur_tup[-1]
+        dur_seconds = _parse_duration(duration)
         items.append({
             'title': first_tag_text(node, 'title'),
             'description': first_tag_text(node, 'description'),

@@ -1,4 +1,6 @@
-test: test_py3k
+test: test_py3k nose
+
+nose:
 	REUSE_DB=1 python manage.py test
 
 test_py3k:
