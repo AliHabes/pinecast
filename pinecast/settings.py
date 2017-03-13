@@ -30,12 +30,17 @@ SECRET_KEY = os.environ.get('SECRET', 'p)r2w-c!m^znb%2ppj0rxp9uu$+$q928w#*$41y5(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
-DEBUG_TOOLBAR = DEBUG and os.environ.get('DEBUG_TOOLBAR')
+DEBUG_TOOLBAR = os.environ.get('DEBUG_TOOLBAR', 'False') == 'True'
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = ['pinecast.herokuapp.com', 'pinecast.com', 'pinecast.co', '.pinecast.co']
+
+if os.environ.get('ADMIN_IP'):
+    INTERNAL_IPS = [os.environ.get('ADMIN_IP')]
+else:
+    INTERNAL_IPS = []
 
 
 if DEBUG_TOOLBAR:
@@ -186,8 +191,14 @@ USE_THOUSAND_SEPARATOR = True
 USE_TZ = False
 
 
+def show_debug_toolbar(req):
+    if req.is_ajax():
+        return False
+    return req.META.get('REMOTE_ADDR') in INTERNAL_IPS
+
+
 DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': lambda req: True,
+    'SHOW_TOOLBAR_CALLBACK': show_debug_toolbar,
 }
 
 
