@@ -132,10 +132,13 @@ def podcast_dashboard(req, podcast_slug):
             if not ep.is_private:
                 i += 1
 
+    episodes = list(pod.podcastepisode_set.order_by('-publish'))
+    now = round_now()
+
     data = {
         'podcast': pod,
-        'episodes': list(pod.podcastepisode_set.order_by('-publish')),
-        'future_episodes': list(pod.podcastepisode_set.filter(publish__lte=datetime.datetime.now()).order_by('-publish')),
+        'episodes': episodes,
+        'future_episodes': [e for e in episodes if e.publish >= now],
         'analytics': {
             'total_listens': total_listens,
             'total_listens_this_week': total_listens_this_week,

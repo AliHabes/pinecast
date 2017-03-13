@@ -30,6 +30,7 @@ def environment(**options):
         options['extensions'].append('jinja2.ext.i18n')
 
     env = Environment(**options)
+    env.cache = {}
     env.globals.update({
         'bool': bool,
         'dir': dir,
