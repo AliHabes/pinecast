@@ -60,6 +60,8 @@ INSTALLED_APPS = (
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
 
+    'rest_framework',
+
     'accounts',
     'analytics',
     'dashboard',
@@ -175,6 +177,14 @@ except Exception:
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'OPTIONS': {'timeout': 5},
     }
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'PAGE_SIZE': 10,
+}
 
 
 # Internationalization
