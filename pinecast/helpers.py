@@ -7,7 +7,7 @@ import bleach
 import django.core.urlresolvers
 import requests
 from django.conf import settings
-from django.core.urlresolvers import reverse as reverse_django
+from django.core.urlresolvers import reverse as django_reverse
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404 as dj_get_object_or_404, render as dj_render
 from django.utils.translation import ugettext, ungettext
@@ -30,7 +30,7 @@ def json_response(*args, **jr_kwargs):
     return wrapper if jr_kwargs else wrapper(*args)
 
 
-@wraps(reverse_django)
+@wraps(django_reverse)
 def reverse(viewname, kwargs=None, **kw):
     if kwargs is None:
         kwargs = {}
@@ -39,7 +39,7 @@ def reverse(viewname, kwargs=None, **kw):
     if 'urlconf' in kwargs:
         other_kw['urlconf'] = kwargs['urlconf']
         del kwargs['urlconf']
-    return reverse_django(viewname, kwargs=kwargs, **other_kw)
+    return django_reverse(viewname, kwargs=kwargs, **other_kw)
 
 
 def cached_method(func):

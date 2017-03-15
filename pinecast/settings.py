@@ -61,6 +61,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
 
     'accounts',
     'analytics',
@@ -87,6 +88,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 
+    'api.middleware.api_subdomain.APISubdomainMiddleware',
     'sites.middleware.subdomains.SubdomainMiddleware',
     'pinecast.middleware.hnredirect.HostnameRedirect',
     'pinecast.middleware.tsredirect.TrailingSlashRedirect',
@@ -181,7 +183,7 @@ except Exception:
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny' if DEBUG else 'rest_framework.permissions.IsAdminUser',
     ),
     'PAGE_SIZE': 10,
 }
@@ -203,6 +205,8 @@ USE_TZ = False
 
 def show_debug_toolbar(req):
     if req.is_ajax():
+        return False
+    if (req.META.get('HTTP_HOST') or req.META.get('SERVER_NAME')).startswith('api.'):
         return False
     return (
         req.META.get('REMOTE_ADDR') in INTERNAL_IPS or
