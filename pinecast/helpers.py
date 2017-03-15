@@ -63,6 +63,8 @@ def sanitize(data):
             'p', 'div', 'dl', 'dt', 'dd', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'span'],
         {'*': ['src', 'href', 'title']}
     )
+def sanitize_hard(data):
+    return bleach.clean(data, [], {'*': []})
 
 
 def validate_recaptcha(response, ip):

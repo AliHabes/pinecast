@@ -28,7 +28,7 @@
       <meta name="twitter:player:stream:content_type" content="{{ episode.audio_type }}" />
     {% endif %}
     {% if site.custom_css %}
-      <style>{{ site.custom_css }}</style>
+      <style>{{ site.custom_css|sanitize_hard|safe }}</style>
     {% endif %}
     {% set itunes_banner = site.get_banner_id() %}
     {% if itunes_banner %}

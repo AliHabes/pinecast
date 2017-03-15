@@ -110,6 +110,7 @@ def environment(**options):
     env.filters['replace'] = lambda s: s.replace
     env.filters['safe_json'] = safe_json
     env.filters['sanitize'] = helpers.sanitize
+    env.filters['sanitize_hard'] = helpers.sanitize_hard
     env.filters['sparkline'] = sparkline
     env.filters['thumbnail'] = thumbnail
     return env
