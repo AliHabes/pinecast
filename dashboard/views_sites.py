@@ -19,6 +19,7 @@ from sites.models import Site, SiteBlogPost, SiteLink, SitePage
 def get_site(req, podcast_slug):
     pod = get_object_or_404(Podcast, slug=podcast_slug)
     if (pod.owner != req.user and
+        not req.user.is_staff and
         not Network.objects.filter(
             deactivated=False, members__in=[req.user], podcast__in=[pod]).exists()):
         raise Http404()
