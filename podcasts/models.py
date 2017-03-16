@@ -62,11 +62,13 @@ class Podcast(models.Model):
         default=0, help_text=ugettext_lazy(
             'Tips collected over podcast lifetime in cents'))
 
-    private_after_nth = models.PositiveIntegerField(default=None, null=True)
+    private_after_nth = models.PositiveIntegerField(default=None, null=True, blank=True)
     private_after_age = models.PositiveIntegerField(
-        default=None, null=True, help_text=ugettext_lazy('Age in seconds'))
+        default=None, null=True, blank=True,
+        help_text=ugettext_lazy('Age in seconds'))
     private_access_min_subscription = models.PositiveIntegerField(
-        default=None, null=True, help_text=ugettext_lazy('Min sub value in cents'))
+        default=None, null=True, blank=True,
+        help_text=ugettext_lazy('Min sub value in cents'))
 
     @staticmethod
     def is_slug_valid(slug):
