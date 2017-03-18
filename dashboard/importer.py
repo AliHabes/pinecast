@@ -91,14 +91,14 @@ def get_details(req, parsed):
         dur_seconds = _parse_duration(duration)
         items.append({
             'title': first_tag_text(node, 'title'),
-            'description': first_tag_text(node, 'description'),
+            'description': first_tag_text(node, 'description', 'Enjoy!'),
             'subtitle': first_tag_text(node, 'itunes:subtitle', ''),
             'publish': parsedate(first_tag_text(node, 'pubDate')),
             'image_url': first_tag_attr(node, 'itunes:image', 'href', ''),
             'duration': dur_seconds,
             'audio_url': audio_url,
-            'audio_size': first_tag_attr(node, 'enclosure', 'length'),
-            'audio_type': first_tag_attr(node, 'enclosure', 'type'),
+            'audio_size': first_tag_attr(node, 'enclosure', 'length', 0),
+            'audio_type': first_tag_attr(node, 'enclosure', 'type', 'audio/mp3'),
             'copyright': first_tag_text(node, 'dc:copyright', ''),
             'license': first_tag_text(node, 'dc:rights', ''),
         })
