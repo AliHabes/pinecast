@@ -43,6 +43,8 @@ urlpatterns = (
         url(r'^services/log$', views.log),
         url(r'^services/oembed\.json$', views.oembed),
 
+        url(r'^oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+
         url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript_catalog'),
 
         url(r'^favicon\.ico$', lambda *_: redirect('/static/img/256x256.png')),

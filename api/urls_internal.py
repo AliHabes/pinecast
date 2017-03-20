@@ -10,7 +10,9 @@ router.register(r'users', views.UserViewSet)
 router.register(r'podcasts', views.PodcastViewSet)
 router.register(r'episodes', views.PodcastEpisodeViewSet)
 
-print(router.urls)
+# Very helpful for setting up hyperlink stuff
+# print(router.urls)
+
 urlpatterns = [
     url(r'^v1/', include(router.urls)),
     url(r'^v1/api-auth/', include('rest_framework.urls', namespace='rest_framework'))

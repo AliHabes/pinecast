@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext, ugettext_lazy
+from rest_framework.authtoken.models import Token
 
 from . import payment_plans
 from pinecast.email import send_notification_email
@@ -27,6 +28,8 @@ class UserSettings(StripeCustomerMixin, StripeManagedAccountMixin, models.Model)
     stripe_payout_managed_account = models.CharField(max_length=128, blank=True, null=True)
 
     coupon_code = models.CharField(max_length=16, blank=True, null=True)
+
+    api_token = models.ForeignKey(Token, null=True, default=None, related_name='usersettings')
 
     def clean(self):
         if self.tz_offset < -12 or self.tz_offset > 14:

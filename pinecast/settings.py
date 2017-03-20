@@ -62,6 +62,7 @@ INSTALLED_APPS = (
 
     'rest_framework',
     'rest_framework.authtoken',
+    'oauth2_provider',
 
     'accounts',
     'analytics',
@@ -183,7 +184,9 @@ except Exception:
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny' if DEBUG else 'rest_framework.permissions.IsAdminUser',
+        'rest_framework.permissions.IsAdminUser'
+        ,
+    # ) + (('rest_framework.permissions.AllowAny', ) if DEBUG else ()
     ),
     'PAGE_SIZE': 10,
 }
