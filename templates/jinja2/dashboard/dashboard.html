@@ -100,6 +100,9 @@
     </li>
   {% endfor %}
   </ul>
+  <div>
+    <div data-canny></div>
+  </div>
 </div>
 <div class="tab-networks dashboard" style="display: none">
   {% if not networks %}
@@ -165,5 +168,13 @@
 <script src="https://js.stripe.com/v2/"></script>
 <script>
   Stripe.setPublishableKey('{{ STRIPE_PUBLISHABLE_KEY }}');
+</script>
+{% include 'canny.html' %}
+<script>
+  Canny('render', {
+    basePath: '/dashboard',
+    boardToken: '6d4fdda5-2f88-91c7-27e8-e1598851f24a',
+    ssoToken: '{{ CANNY_SSO_TOKEN }}',
+  });
 </script>
 {% endblock %}

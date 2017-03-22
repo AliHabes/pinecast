@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 
 import datetime
-import hashlib
 import json
 from urllib.parse import quote as urlencode
 
@@ -47,7 +46,7 @@ def environment(**options):
         'str': str,
 
         'get_user_settings': UserSettings.get_from_user,
-        'gravatar': gravatar,
+        'gravatar': helpers.gravatar,
         'is_paid_plan': lambda p: p != payment_plans.PLAN_DEMO and p != payment_plans.PLAN_COMMUNITY,
         'minimum_plan': minimum_plan,
         'now': lambda hours=0: datetime.datetime.now() + datetime.timedelta(hours=hours),
@@ -134,11 +133,6 @@ def minimum_plan(user_settings, plan):
     if isinstance(user_settings, User):
         user_settings = UserSettings.get_from_user(user_settings)
     return payment_plans.minimum(user_settings.plan, plan)
-
-
-def gravatar(s, size=40):
-    dig = hashlib.md5(s.encode('utf-8')).hexdigest()
-    return 'https://www.gravatar.com/avatar/%s?s=%d' % (dig, size)
 
 
 def safe_json(data):
