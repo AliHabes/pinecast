@@ -1165,6 +1165,7 @@ menu.toolbar-right li {
         left: 2px;
     }
     .form-block form:not(.inline-form) label:not(.checkbox):not(.radio) {
+        flex: none !important; /* fixes a dumb safari bug where all the elements get a height of 0 */
         flex-direction: column;
     }
     .form-block form:not(.inline-form) label:not(.checkbox):not(.radio) > span:first-child {
@@ -1173,6 +1174,11 @@ menu.toolbar-right li {
     }
     .form-block form:not(.inline-form) label:not(.checkbox):not(.radio) input {
         flex: 1 1 2.5em !important /* important to override inline styles from React */;
+    }
+
+    /* hack for safari :( */
+    .bank-form .ledob-label > div {
+        flex: none !important;
     }
 }
 
