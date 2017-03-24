@@ -1,8 +1,9 @@
-import codecs
+import binascii
 import hashlib
 import json
 
-import pyaes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
 from django.conf import settings
 
 from pinecast.helpers import gravatar
@@ -20,12 +21,12 @@ def get_canny_token(req):
     }
     plaintext = json.dumps(user_data)
 
-
     dig = hashlib.md5(settings.CANNY_SSO_KEY.encode('utf-8')).digest()
-    aes = pyaes.AESModeOfOperationECB(dig)
+    cipher = Cipher(algorithms.AES(dig), modes.ECB(), backend=default_backend())
+    encryptor = cipher.encryptor()
 
-    ciphertext = b''
-    for i in range(0, len(plaintext), 16):
-        ciphertext += aes.encrypt(plaintext[i:16].rjust(16))
+    padding_required = 16 - len(plaintext) % 16
+    encoded = plaintext.encode('utf-8') + padding_required * bytes([padding_required])
 
-    return codecs.encode(ciphertext, 'hex_codec').decode('utf-8')
+    ciphertext = encryptor.update(encoded) + encryptor.finalize()
+    return binascii.hexlify(ciphertext).decode('utf-8')
