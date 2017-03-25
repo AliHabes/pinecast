@@ -13,7 +13,7 @@
     <div style="{{ site.get_cover_style(bgcolor='#2196F3') }}">
       <a href="{{ url('site_home', podcast_slug=podcast.slug) }}">
         {% if site.logo_url %}
-          <img src="{{ site.logo_url|thumbnail(height=60, width=60) }}" alt="" class="logo" height="60" width="60">
+          <img src="{{ site.logo_url|thumbnail(height=60, width=60, format='png') }}" alt="" class="logo" height="60" width="60">
         {% else %}
           {{ podcast.name }}
         {% endif %}
