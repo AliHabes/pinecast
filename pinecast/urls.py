@@ -37,6 +37,8 @@ urlpatterns = (
         url(r'^notifications/', include(notifications.urls)),
         url(r'^payments/', include(payments.urls)),
 
+        url(r'^feedback$', views.canny_feedback, name='canny_feedback'),
+
         url(r'^logout$', logout_view, name='logout'),
         url(r'^services/log$', views.log),
         url(r'^services/oembed\.json$', views.oembed),

@@ -1,5 +1,6 @@
 import collections
 import datetime
+import hashlib
 from functools import wraps
 
 import bleach
@@ -224,3 +225,8 @@ def render(req, template, data=None):
     populate_context(req.user, data)
     data['is_admin'] = req.user.is_staff and bool(req.GET.get('admin'))
     return dj_render(req, template, data)
+
+
+def gravatar(s, size=40):
+    dig = hashlib.md5(s.encode('utf-8')).hexdigest()
+    return 'https://www.gravatar.com/avatar/%s?s=%d' % (dig, size)

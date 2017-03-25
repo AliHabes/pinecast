@@ -34,6 +34,12 @@
         <i class="icon icon-lifebuoy"></i>
       </span>
     </a>
+    <a href="{{ url('canny_feedback') }}" class="feedback-link" aria-label="{{ _('Feedback') }}">
+      <span class="hide-on-mobile">{{ _('Feedback') }}</span>
+      <span class="hide-on-desktop">
+        <i class="icon icon-megaphone"></i>
+      </span>
+    </a>
     <a class="user-card menu-trigger" href="{{ url('dashboard') }}#settings">
       <img src="{{ gravatar(user.email) }}" alt="">
     </a>

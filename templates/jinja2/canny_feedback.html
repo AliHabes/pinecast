@@ -1,0 +1,72 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ _('Feedback | Pinecast') }}{% endblock %}
+
+{% block subheader %}
+<section class="subheader">
+  <div>
+    <hgroup>
+      <h1>{{ _('Feedback') }}</h1>
+    </hgroup>
+  </div>
+</section>
+<nav class="tabs dynamic">
+  <ul>
+    <li class="selected">
+      <a href="" data-tab=".tab-features">{{ _('Features') }}</a>
+    </li>
+    <li>
+      <a href="" data-tab=".tab-contact">{{ _('Contact') }}</a>
+    </li>
+  </ul>
+</nav>
+{% endblock %}
+
+{% block dashboard_body %}
+
+<div class="tab-features">
+  <div data-canny style="padding-top: 50px"></div>
+</div>
+<div class="tab-contact form-block" style="display: none; padding-top: 50px">
+  <strong>{{ _('Need to get in touch?') }}</strong>
+  <p>
+    {% trans %}
+      Sometimes it's just easier to talk to person. If you need to get in touch, don't hesitate to reach out. We'll try to respond within 24 hours of receiving your message.
+    {% endtrans %}
+  </p>
+
+  <table style="margin-bottom: 2em">
+    <thead>
+      <tr>
+        <th>{{ _('Purpose') }}</th>
+        <th>{{ _('Address') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>{{ _('Support') }}</b></td>
+        <td>{{ settings.SUPPORT_EMAIL }}</td>
+      </tr>
+      <tr>
+        <td><b>{{ _('Our Founder') }}</b></td>
+        <td>matt@pinecast.com</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>{{ _('We are happy to address questions, concerns, bugs, and anything else that we can offer you help with.') }}</p>
+
+</div>
+
+{% endblock %}
+
+{% block after_content %}
+{% include 'canny.html' %}
+<script>
+  Canny('render', {
+    basePath: '/feedback',
+    boardToken: '6d4fdda5-2f88-91c7-27e8-e1598851f24a',
+    ssoToken: '{{ CANNY_SSO_TOKEN }}',
+  });
+</script>
+{% endblock %}
