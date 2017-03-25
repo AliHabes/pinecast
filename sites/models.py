@@ -39,6 +39,7 @@ class Site(models.Model):
     logo_url = models.URLField(blank=True, null=True, max_length=500)
 
     itunes_url = models.URLField(blank=True, null=True, max_length=500)
+    google_play_url = models.URLField(blank=True, null=True, max_length=500)
     stitcher_url = models.URLField(blank=True, null=True, max_length=500)
 
     show_itunes_banner = models.BooleanField(default=False)

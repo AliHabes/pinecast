@@ -43,6 +43,7 @@ def new_site(req, podcast_slug):
             logo_url=signer.unsign(req.POST.get('logo-url')) if req.POST.get('logo-url') else None,
             analytics_id=req.POST.get('analytics_id'),
             itunes_url=req.POST.get('itunes_url'),
+            google_play_url=req.POST.get('google_play_url'),
             stitcher_url=req.POST.get('stitcher_url'),
             show_itunes_banner=req.POST.get('show_itunes_banner') == 'true')
         site.save()
@@ -61,6 +62,7 @@ def edit_site(req, podcast_slug):
         site.logo_url = signer.unsign(req.POST.get('logo-url')) if req.POST.get('logo-url') else None
         site.analytics_id = req.POST.get('analytics_id')
         site.itunes_url = req.POST.get('itunes_url')
+        site.google_play_url = req.POST.get('google_play_url')
         site.stitcher_url = req.POST.get('stitcher_url')
         site.show_itunes_banner = req.POST.get('show_itunes_banner') == 'true'
         site.custom_css = req.POST.get('custom_css')

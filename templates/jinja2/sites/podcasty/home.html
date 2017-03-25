@@ -27,9 +27,14 @@
               {{ _('iTunes') }}
             </a>
           {%- endif -%}
+          {%- if site.google_play_url -%}
+            <a class="btn" href="{{ site.google_play_url }}">
+              {{ _('Google Play') }}
+            </a>
+          {%- endif -%}
           {%- if site.stitcher_url -%}
             <a class="btn" href="{{ site.stitcher_url }}">
-              {{ _('Stitcher Radio') }}
+              {{ _('Stitcher') }}
             </a>
           {%- endif -%}
         </div>

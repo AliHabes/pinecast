@@ -24,7 +24,7 @@
 
   <label>
     <span>{{ _('iTunes URL') }}</span>
-    <input type="text"
+    <input type="url"
       name="itunes_url"
       oninput="var x = document.querySelector('[name=show_itunes_banner]');var h = /id\w+/.exec(this.value);x.disabled = !h;x.checked = !!h;"
       placeholder="https://itunes.apple.com/la/podcast/almost-better-than-dragons/id981540916?mt=2"
@@ -41,8 +41,16 @@
   </label>
 
   <label>
+    <span>{{ _('Google Play URL') }}</span>
+    <input type="url"
+      name="google_play_url"
+      placeholder="https://play.google.com/music/listen?u=0#/ps/Iuscgum4gmep6isira64kdeskjm"
+      value="{{ default.get('google_play_url', site.google_play_url or '') }}">
+  </label>
+
+  <label>
     <span>{{ _('Stitcher Radio URL') }}</span>
-    <input type="text"
+    <input type="url"
       name="stitcher_url"
       placeholder="http://www.stitcher.com/podcast/this-american-life"
       value="{{ default.get('stitcher_url', site.stitcher_url or '') }}">

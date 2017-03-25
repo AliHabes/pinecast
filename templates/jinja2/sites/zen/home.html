@@ -24,6 +24,11 @@
         {{ _('Subscribe on iTunes') }}
       </a>
     {%- endif -%}
+    {%- if site.google_play_url -%}
+      <a class="btn" href="{{ site.google_play_url }}">
+        {{ _('Subscribe on Google Play') }}
+      </a>
+    {%- endif -%}
     {%- if site.stitcher_url -%}
       <a class="btn" href="{{ site.stitcher_url }}">
         {{ _('Subscribe on Stitcher') }}
