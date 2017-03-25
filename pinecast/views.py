@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 
 import rollbar
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -119,7 +120,7 @@ def oembed(req):
         'thumbnail_height': 500,
     }
 
-
+@login_required
 def canny_feedback(req):
     ctx = {'CANNY_SSO_TOKEN': get_canny_token(req)}
     return render(req, 'canny_feedback.html', ctx)
