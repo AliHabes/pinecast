@@ -158,14 +158,14 @@ def sparkline(data, spacing=1, height=20):
     sadj = ((i - spark_min) / spark_range for i in data)
     return ' '.join('%d,%d' % (i * spacing, (1 - y) * height) for i, y in enumerate(sadj))
 
-def thumbnail(url, width=100, height=100):
+def thumbnail(url, width=100, height=100, format='jpeg'):
     bucket_host = '%s.s3.amazonaws.com/' % settings.S3_BUCKET
     if bucket_host not in url:
         return url
     key = url.split(bucket_host)[1]
     encoded_key = urlencode(key)
-    return 'https://thumb.service.pinecast.com:444/resize?h=%d&w=%d&key=%s' % (
-        height, width, encoded_key)
+    return 'https://thumb.service.pinecast.com:444/resize?h=%d&w=%d&key=%s&format=%s' % (
+        height, width, encoded_key, format)
 
 def pop_until_lt(arr, field, comp, max=-1):
         count = 0
