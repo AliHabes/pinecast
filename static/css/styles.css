@@ -729,6 +729,7 @@ section.row > :last-child {
         flex-direction: column-reverse;
     }
     .row > * {
+        flex: none !important; /* gross hack for certain versions of safari */
         margin-left: 0;
         margin-right: 0;
     }
@@ -1747,6 +1748,11 @@ table th {
 .episode-empty-state {
     padding: 70px 100px;
     text-align: center;
+}
+@media (max-width: 700px) {
+    .episode-empty-state {
+        padding: 45px 15px;
+    }
 }
 
 p {
