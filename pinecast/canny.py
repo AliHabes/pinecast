@@ -6,7 +6,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
 from django.conf import settings
 
-from pinecast.helpers import gravatar
+from .helpers import gravatar
 
 
 def get_canny_token(req):
@@ -26,7 +26,8 @@ def get_canny_token(req):
     encryptor = cipher.encryptor()
 
     padding_required = 16 - len(plaintext) % 16
-    encoded = plaintext.encode('utf-8') + padding_required * bytes([padding_required])
+    if padding_required != 16:
+        encoded = plaintext.encode('utf-8') + padding_required * bytes([padding_required])
 
     ciphertext = encryptor.update(encoded) + encryptor.finalize()
     return binascii.hexlify(ciphertext).decode('utf-8')

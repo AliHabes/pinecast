@@ -9,8 +9,9 @@ from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 import analytics.log as analytics_log
+from .canny import get_canny_token
+from .helpers import get_object_or_404, json_response, render, reverse
 from .jinja2_helper import thumbnail
-from .helpers import get_object_or_404, json_response, reverse
 from accounts.models import UserSettings
 from accounts.payment_plans import PLAN_DEMO
 from podcasts.models import PodcastEpisode
@@ -89,7 +90,6 @@ def oembed(req):
             raise Http404()
 
         ep = get_object_or_404(PodcastEpisode.objects.select_related('podcast'), id=ep_id)
-        print(ep)
 
     else:
         raise Http404()
@@ -118,3 +118,8 @@ def oembed(req):
         'thumbnail_width': 500,
         'thumbnail_height': 500,
     }
+
+
+def canny_feedback(req):
+    ctx = {'CANNY_SSO_TOKEN': get_canny_token(req)}
+    return render(req, 'canny_feedback.html', ctx)

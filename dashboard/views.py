@@ -25,7 +25,6 @@ from django.views.decorators.http import require_GET, require_POST
 import accounts.payment_plans as payment_plans
 import analytics.query as analytics_query
 import pinecast.constants as constants
-from .canny import get_canny_token
 from .models import AssetImportRequest, Collaborator
 from accounts.decorators import restrict_minimum_plan
 from accounts.models import Network, UserSettings
@@ -80,8 +79,6 @@ def dashboard(req):
         'success': req.GET.get('success'),
         'error': req.GET.get('error'),
         'news': news,
-
-        'CANNY_SSO_TOKEN': get_canny_token(req),
     }
 
     us = UserSettings.get_from_user(req.user)
