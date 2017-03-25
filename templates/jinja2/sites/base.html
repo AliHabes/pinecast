@@ -3,47 +3,47 @@
   <head>
     <title>{% block title %}{% endblock %}</title>
     {% block head %}{% endblock %}
+    {%- if site.custom_css -%}
+      <link type="text/css" rel="stylesheet" href="{{ site.custom_css|data_uri('text/css') }}">
+    {%- endif -%}
     <link rel="alternate" type="application/rss+xml" title="{{ _('Podcast Feed') }}" href="https://pinecast.com{{ url_global('feed', podcast_slug=podcast.slug) }}">
-    {% if posts %}
+    {%- if posts -%}
       <link rel="alternate" type="application/rss+xml" title="{{ _('Blog RSS Feed') }}" href="{{ url('blog_rss', podcast_slug=podcast.slug) }}">
-    {% endif %}
-    {% if site.favicon_url %}
+    {%- endif -%}
+    {%- if site.favicon_url -%}
       <link type="image/png" rel="icon" href="{{ site.favicon_url }}">
-    {% else %}
+    {%- else -%}
       <link type="image/png" rel="icon" href="https://pinecast.com/static/img/favicon.png">
-    {% endif %}
-    {% if episode %}
+    {%- endif -%}
+    {%- if episode -%}
       <link rel="alternate" type="application/json+oembed"
         href="https://pinecast.com/services/oembed.json?url=https://pinecast.com{{ url_global('listen', episode_id=str(episode.id)) }}"
-        title="Pinecast oEmbed Profile" />
-      <meta name="twitter:card" content="player" />
-      <meta name="twitter:site" content="@getpinecast" />
-      <meta name="twitter:title" content="{{ episode.title }}" />
-      <meta name="twitter:description" content="{{ episode.subtitle or episode.description[:140].replace('\n', ' ') }}" />
-      <meta name="twitter:image" content="{{ episode.image_url or podcast.cover_image }}" />
-      <meta name="twitter:player" content="https://pinecast.com{{ url_global('player', episode_id=str(episode.id)) }}" />
-      <meta name="twitter:player:width" content="480" />
-      <meta name="twitter:player:height" content="60" />
-      <meta name="twitter:player:stream" content="https://pinecast.com{{ url_global('listen', episode_id=str(episode.id)) }}" />
-      <meta name="twitter:player:stream:content_type" content="{{ episode.audio_type }}" />
-    {% endif %}
-    {% if site.custom_css %}
-      <style>{{ site.custom_css|sanitize_hard|safe }}</style>
-    {% endif %}
-    {% set itunes_banner = site.get_banner_id() %}
-    {% if itunes_banner %}
+        title="Pinecast oEmbed Profile">
+      <meta name="twitter:card" content="player">
+      <meta name="twitter:site" content="@getpinecast">
+      <meta name="twitter:title" content="{{ episode.title }}">
+      <meta name="twitter:description" content="{{ episode.subtitle or episode.description[:140].replace('\n', ' ') }}">
+      <meta name="twitter:image" content="{{ episode.image_url or podcast.cover_image }}">
+      <meta name="twitter:player" content="https://pinecast.com{{ url_global('player', episode_id=str(episode.id)) }}">
+      <meta name="twitter:player:width" content="480">
+      <meta name="twitter:player:height" content="60">
+      <meta name="twitter:player:stream" content="https://pinecast.com{{ url_global('listen', episode_id=str(episode.id)) }}">
+      <meta name="twitter:player:stream:content_type" content="{{ episode.audio_type }}">
+    {%- endif -%}
+    {%- set itunes_banner = site.get_banner_id() -%}
+    {%- if itunes_banner -%}
       <meta name="apple-itunes-app" content="app-id={{ itunes_banner }}">
-    {% endif %}
+    {%- endif -%}
   </head>
   <body>
-    {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) %}
+    {%- if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_COMMENT_BOX) -%}
       <aside class="leave-feedback">
         <a href="{% block feedbackurl %}https://pinecast.com{{ url_global('podcast_comment_box', podcast_slug=podcast.slug) }}{% endblock %}">
           <span>{{ _('Leave a note in the comment box') }}</span>
         </a>
       </aside>
       <style>
-      {% if site.theme != 'unstyled' %}
+      {%- if site.theme != 'unstyled' -%}
       .leave-feedback {
         bottom: 0;
         padding: 0 15px 15px 0;
@@ -77,9 +77,9 @@
           position: static;
         }
       }
-      {% endif %}
+      {%- endif -%}
       </style>
-    {% endif %}
+    {%- endif -%}
     {% block body %}{% endblock %}
     {% block afterbody %}{% endblock %}
     {% if site.disqus_url %}

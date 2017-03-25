@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-from __future__ import division
-
+import base64
 import datetime
 import json
 from urllib.parse import quote as urlencode
@@ -98,6 +96,7 @@ def environment(**options):
             14.0,
         ],
     })
+    env.filters['data_uri'] = lambda t, type: 'data:%s;base64,%s' % (type, base64.b64encode(t.encode('utf-8')).decode('utf-8'))
     env.filters['format_tz'] = format_tz
     env.filters['https'] = lambda s: ('https:%s' % s[5:]) if s.startswith('http:') else s
     env.filters['intcomma'] = lambda v: (lambda f: f if f != str(v) else intcomma(v, False))(intcomma(v))

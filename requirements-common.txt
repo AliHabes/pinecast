@@ -1,4 +1,4 @@
-bleach==1.4.3
+bleach==2.0.0
 boto3==1.4.1
 brotlipy==0.6.0
 cryptography==1.8.1
@@ -6,7 +6,7 @@ defusedxml==0.4.1
 Django==1.10.2
 django-debug-toolbar==1.6
 gfm==0.0.3
-html5lib==1.0b7
+html5lib==1.0b10
 influxdb==3.0.0
 iso8601==0.1.11
 itsdangerous==0.24
@@ -14,7 +14,7 @@ Jinja2==2.8
 MarkupSafe==0.23
 PyYAML==3.12
 requests==2.11.1
-rollbar==0.13.10
+rollbar==0.13.11
 stripe==1.41.1
 ua-parser==0.5.1
 user-agents==1.0.1
