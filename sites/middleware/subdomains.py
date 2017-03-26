@@ -12,7 +12,7 @@ from accounts.payment_plans import FEATURE_MIN_CNAME, FEATURE_MIN_SITES, minimum
 from podcasts.models import Podcast
 
 
-RAW_SUBDOMAIN_HOSTS = [] #'pinecast.co', 'pinecast.dev']
+RAW_SUBDOMAIN_HOSTS = ['pinecast.co', 'pinecast.dev']
 SUBDOMAIN_HOSTS = ['.pinecast.co', '.pinecast.dev']
 
 
@@ -27,11 +27,6 @@ class SubdomainMiddleware(object):
 
         if settings.DEBUG and ':' in domain:
             domain = domain[:domain.index(':')]
-
-        if domain in RAW_SUBDOMAIN_HOSTS:
-            path = req.get_full_path()
-            func, args, kwargs = resolve(path, urls_pinecast_co)
-            return func(req, *args, **kwargs)
 
         pc_forward = req.META.get('HTTP_X_PINECAST_FORWARD')
         if pc_forward and pc_forward.endswith('.pinecast.co'):
@@ -48,6 +43,11 @@ class SubdomainMiddleware(object):
                 return self._resolve(req, site.podcast.slug)
             except (Site.DoesNotExist, NotCNAMEReadyException):
                 pass
+
+        if domain in RAW_SUBDOMAIN_HOSTS:
+            path = req.get_full_path()
+            func, args, kwargs = resolve(path, urls_pinecast_co)
+            return func(req, *args, **kwargs)
 
         pieces = domain.split('.')
         if len(pieces) != 3:
