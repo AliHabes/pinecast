@@ -10,7 +10,7 @@ from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 import analytics.log as analytics_log
-from .canny import get_canny_token
+from .canny import get_anonymous_name, get_canny_token
 from .helpers import get_object_or_404, json_response, render, reverse
 from .jinja2_helper import thumbnail
 from accounts.models import UserSettings
@@ -122,5 +122,5 @@ def oembed(req):
 
 @login_required
 def canny_feedback(req):
-    ctx = {'CANNY_SSO_TOKEN': get_canny_token(req)}
+    ctx = {'CANNY_SSO_TOKEN': get_canny_token(req), 'un': get_anonymous_name(req.user.email)}
     return render(req, 'canny_feedback.html', ctx)
