@@ -12,7 +12,7 @@ from accounts.payment_plans import FEATURE_MIN_CNAME, FEATURE_MIN_SITES, minimum
 from podcasts.models import Podcast
 
 
-RAW_SUBDOMAIN_HOSTS = ['pinecast.co', 'pinecast.dev']
+RAW_SUBDOMAIN_HOSTS = [] #'pinecast.co', 'pinecast.dev']
 SUBDOMAIN_HOSTS = ['.pinecast.co', '.pinecast.dev']
 
 
