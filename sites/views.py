@@ -177,11 +177,11 @@ def favicon(req, podcast_slug):
     pod = get_object_or_404(Podcast, slug=podcast_slug)
     us = UserSettings.get_from_user(pod.owner)
     if not minimum(us.plan, FEATURE_MIN_SITE_FAVICON):
-        return redirect('https://pinecast.com/static/img/favicon.png')
+        return redirect('https://pinecast.com/static/img/256x256.png')
 
     site = get_object_or_404(models.Site, podcast=pod)
 
     if not site.favicon_url:
-        return redirect('https://pinecast.com/static/img/favicon.png')
+        return redirect('https://pinecast.com/static/img/256x256.png')
 
     return redirect(site.favicon_url)

@@ -45,7 +45,7 @@ urlpatterns = (
 
         url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript_catalog'),
 
-        url(r'^favicon\.ico$', lambda *_: redirect('/static/img/favicon.png')),
+        url(r'^favicon\.ico$', lambda *_: redirect('/static/img/256x256.png')),
 
     ]
 )
