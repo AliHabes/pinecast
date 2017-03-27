@@ -165,7 +165,11 @@ def player(req, episode_id):
     ep = get_object_or_404(PodcastEpisode.objects.select_related('podcast'), id=episode_id)
     if (not req.user or req.user != ep.podcast.owner) and ep.check_is_private():
         raise Http404()
-    resp = render(req, 'player.html', {'episode': ep})
+
+    ctx = {'episode': ep}
+    if req.GET.get('card'):
+        ctx['card'] = True
+    resp = render(req, 'player.html', ctx)
 
     # If the user is not a demo user, allow the player to be used outside the app.
     if UserSettings.user_meets_plan(ep.podcast.owner, plans.FEATURE_MIN_PLAYER):

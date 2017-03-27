@@ -24,7 +24,7 @@
       <meta name="twitter:title" content="{{ episode.title }}">
       <meta name="twitter:description" content="{{ episode.subtitle or episode.description[:140].replace('\n', ' ') }}">
       <meta name="twitter:image" content="{{ episode.image_url or podcast.cover_image }}">
-      <meta name="twitter:player" content="https://pinecast.com{{ url_global('player', episode_id=str(episode.id)) }}">
+      <meta name="twitter:player" content="https://pinecast.com{{ url_global('player', episode_id=str(episode.id)) }}?card=true">
       <meta name="twitter:player:width" content="480">
       <meta name="twitter:player:height" content="60">
       <meta name="twitter:player:stream" content="https://pinecast.com{{ url_global('listen', episode_id=str(episode.id)) }}">

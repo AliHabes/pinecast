@@ -4,7 +4,7 @@
   <title>{{ episode.title }}</title>
   <style type="text/css">
   html, body {
-    background: transparent;
+    background: {{ 'transparent' if not card else 'white'}};
     font-family: Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -33,8 +33,10 @@
   }
   .main-body {
     background: #fff;
+    {% if not card %}
     border: 1px solid #eee;
     border-radius: 3px;
+    {% endif %}
     padding: 10px 45px 10px 60px;
     position: relative;
   }
@@ -86,6 +88,19 @@
   .feedback-button:active {
     top: 7px;
   }
+  {% if card %}
+  html, body {
+    height: 100%;
+  }
+  body {
+    display: flex;
+    width: 100%;
+  }
+  .main-body {
+    align-self: center;
+    flex: 1 1 100%;
+  }
+  {% endif %}
   </style>
   <link type="image/png" rel="icon" href="/static/img/256x256.png">
 </head>
