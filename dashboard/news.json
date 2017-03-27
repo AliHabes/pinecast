@@ -1,5 +1,10 @@
 [
     {
+        "title": "Twitter Player",
+        "summary": "If you post a link to your pinecast.co site on Twitter, your tweet will have a little player! Available for all paid plans.",
+        "when": "2017-03-27"
+    },
+    {
         "title": "Vote for features",
         "summary": "Let us know what we could do better. Click the feedback link in the header to vote on new features.",
         "when": "2017-03-24"
