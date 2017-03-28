@@ -71,6 +71,8 @@ def get_canny_token(req):
     padding_required = 16 - len(plaintext) % 16
     if padding_required != 16:
         encoded = plaintext.encode('utf-8') + padding_required * bytes([padding_required])
+    else:
+        encoded = plaintext.encode('utf-8')
 
     ciphertext = encryptor.update(encoded) + encryptor.finalize()
     return binascii.hexlify(ciphertext).decode('utf-8')
