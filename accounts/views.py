@@ -193,9 +193,24 @@ support@pinecast.zendesk.com.
 @login_required
 @request_must_be_confirmed
 def user_settings_page_changeemail_finalize(req):
+    email = req.GET.get('email')
+
     user = get_object_or_404(User, id=req.GET.get('user'))
-    user.email = req.GET.get('email')
+    user.email = email
     user.save()
+
+    us = UserSettings.get_from_user(user)
+
+    customer = us.get_stripe_customer()
+    if customer:
+        customer.email = email
+        customer.save()
+
+    owner = us.get_stripe_managed_account()
+    if owner:
+        owner.email = email
+        owner.save()
+
     return redirect(reverse('dashboard') + '?success=emf#settings')
 
 
