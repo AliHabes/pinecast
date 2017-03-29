@@ -1,24 +1,24 @@
-{% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_BLOG) %}
-  <div class="tabs-inline tabs dynamic" data-hash-pos="1">
-    <ul>
-      <li class="selected">
-        <a href="" data-tab=".tab-options">{{ _('Options') }}</a>
-      </li>
-      <li>
-        <a href="" data-tab=".tab-new-page">{{ _('New Page') }}</a>
-      </li>
-      <li>
-        <a href="" data-tab=".tab-links">{{ _('Links') }}</a>
-      </li>
+<div class="tabs-inline tabs dynamic" data-hash-pos="1">
+  <ul>
+    <li class="selected">
+      <a href="" data-tab=".tab-options">{{ _('Options') }}</a>
+    </li>
+    <li>
+      <a href="" data-tab=".tab-new-page">{{ _('New Page') }}</a>
+    </li>
+    <li>
+      <a href="" data-tab=".tab-links">{{ _('Links') }}</a>
+    </li>
+    {% if minimum_plan(podcast.owner, PLANS.FEATURE_MIN_BLOG) %}
       <li>
         <a href="" data-tab=".tab-blog">
           {{ _('Blog') }}
           <i class="pro-tag"></i>
         </a>
       </li>
-    </ul>
-  </div>
-{% endif %}
+    {% endif %}
+  </ul>
+</div>
 
 <div class="tab-options">
   {% include "dashboard/podcast/tab_site_options.html" %}
